@@ -65,6 +65,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
       avatarBorderWidth: 4,
       avatarBorderColor: '#ffffff',
       nameOffsetY: 0,
+      titleOffsetY: 0,
       bioOffsetY: 0,
       emailOffsetY: 0,
       websiteOffsetY: 0,
@@ -83,7 +84,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
       qrOffsetY: 0,
       qrBorderWidth: 4,
       qrBorderColor: '#f9fafb',
-      qrBorderRadius: 24,
+      qrBorderRadius: 0, // Default changed to 0 (Square)
       showQrCodeByDefault: true,
       showBioByDefault: true,
       showNameByDefault: true,
@@ -520,6 +521,9 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in border-l-2 border-blue-500 pl-4">
                             <ColorPicker label={t('لون المسمى الوظيفي', 'Title Color')} value={template.config.titleColor} onChange={(v: string) => updateConfig('titleColor', v)} />
                             <ToggleSwitch label={t('تفعيل ظهور الشركة', 'Show Company')} value={template.config.showCompanyByDefault !== false} onChange={(v: boolean) => updateConfig('showCompanyByDefault', v)} icon={Box} />
+                            <div className="md:col-span-2">
+                               <RangeControl label={t('إزاحة المسمى الوظيفي', 'Title Y Offset')} min={-400} max={400} value={template.config.titleOffsetY || 0} onChange={(v: number) => updateConfig('titleOffsetY', v)} icon={Move} />
+                            </div>
                          </div>
                        )}
                     </div>

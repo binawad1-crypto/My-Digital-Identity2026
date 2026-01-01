@@ -68,7 +68,7 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
          qrPadding: 0,
          qrBorderWidth: selectedTmpl.config.qrBorderWidth || 0,
          qrBorderColor: selectedTmpl.config.qrBorderColor || '#ffffff',
-         qrBorderRadius: selectedTmpl.config.qrBorderRadius || 24,
+         qrBorderRadius: selectedTmpl.config.qrBorderRadius ?? 0, // Default to 0 for precision
          qrSize: selectedTmpl.config.qrSize || 90,
          showName: selectedTmpl.config.showNameByDefault ?? true,
          showTitle: selectedTmpl.config.showTitleByDefault ?? true,
@@ -117,7 +117,7 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
           qrPadding: newTmpl.config.qrPadding ?? prev.qrPadding,
           qrBorderWidth: newTmpl.config.qrBorderWidth || prev.qrBorderWidth,
           qrBorderColor: newTmpl.config.qrBorderColor || prev.qrBorderColor,
-          qrBorderRadius: newTmpl.config.qrBorderRadius || prev.qrBorderRadius,
+          qrBorderRadius: newTmpl.config.qrBorderRadius ?? 0,
           qrSize: newTmpl.config.qrSize || prev.qrSize,
           themeType: newTmpl.config.defaultThemeType || prev.themeType,
           themeColor: newTmpl.config.defaultThemeColor || prev.themeColor,
@@ -647,7 +647,7 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
             )}
 
             <div className="mt-16 pt-10 border-t border-gray-50 dark:border-gray-800/50 flex flex-col sm:flex-row gap-4 relative z-10">
-               <button onClick={() => onSave(formData, originalIdRef.current || undefined)} className="flex-1 py-6 bg-blue-600 text-white rounded-[2rem] font-black text-lg shadow-2xl shadow-blue-500/30 flex items-center justify-center gap-4 hover:scale-[1.02] active:scale-95 transition-all group order-1 sm:order-1">
+               <button onClick={() => onSave(formData, originalIdRef.current || undefined)} className="flex-[2] py-6 bg-blue-600 text-white rounded-[2rem] font-black text-lg shadow-2xl shadow-blue-500/30 flex items-center justify-center gap-4 hover:scale-[1.02] active:scale-95 transition-all group order-1 sm:order-1 min-h-[80px]">
                   <div className="p-2 bg-white/20 rounded-xl group-hover:rotate-12 transition-transform"><Save size={24} /></div>
                   {t('حفظ جميع التغييرات', 'Save All Changes')}
                </button>

@@ -78,9 +78,11 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
 
   const qrBorderWidth = data.qrBorderWidth ?? config.qrBorderWidth ?? 0;
   const qrBorderColor = data.qrBorderColor || config.qrBorderColor || 'transparent';
-  const qrBorderRadius = data.qrBorderRadius ?? config.qrBorderRadius ?? 24;
+  const qrBorderRadius = data.qrBorderRadius ?? config.qrBorderRadius ?? 0; // Default to 0
   const qrBgColor = data.qrBgColor || config.qrBgColor || (isDark ? '#111115' : '#ffffff');
-  const qrPadding = 0; 
+  
+  // If user sets a radius but no padding, we add a small automatic padding to prevent distortion
+  const qrPadding = data.qrPadding ?? config.qrPadding ?? (qrBorderRadius > 10 ? 8 : 0); 
   
   const qrSize = data.qrSize || config.qrSize || 90;
   const qrOffsetY = data.qrOffsetY || config.qrOffsetY || 0;
@@ -219,7 +221,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
   const displayOccasionDesc = data.occasionDesc || config.occasionDesc || '';
 
   return (
-    <div className={`w-full h-full flex flex-col transition-all duration-500 relative overflow-hidden ${isDark ? 'bg-[#0f0f12] text-white' : 'bg-white text-gray-900'}`} style={{ textAlign: config.contentAlign }}>
+    <div className={`w-full h-full flex flex-col transition-all duration-500 relative overflow-hidden rounded-t-[3rem] ${isDark ? 'bg-[#0f0f12] text-white' : 'bg-white text-gray-900'}`} style={{ textAlign: config.contentAlign }}>
       <div className="shrink-0 overflow-hidden" style={getHeaderStyles()} />
 
       <div className="flex flex-col items-center flex-1 px-4 sm:px-6" style={bodyStyles}>
@@ -241,7 +243,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
            )}
 
            {(data.showTitle !== false || data.showCompany !== false) && (
-             <p className="font-bold opacity-80" style={{ color: titleColor }}>
+             <p className="font-bold opacity-80" style={{ color: titleColor, transform: `translateY(${config.titleOffsetY || 0}px)` }}>
                {data.showTitle !== false && data.title}
                {(data.showTitle !== false && data.showCompany !== false) && data.company && ' • '}
                {data.showCompany !== false && data.company}
@@ -309,19 +311,19 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
            )}
 
            {shouldShowButtonsContainer && (
-              <div className="flex flex-wrap gap-2 justify-center w-full mt-6" style={{ transform: `translateY(${config.contactButtonsOffsetY || 0}px)` }}>
+              <div className="flex flex-row items-center justify-center gap-2 w-full mt-6 px-1" style={{ transform: `translateY(${config.contactButtonsOffsetY || 0}px)` }}>
                 {data.showPhone !== false && data.phone && (
-                  <a href={`tel:${data.phone}`} className={`flex items-center gap-2 px-6 py-3 rounded-full bg-blue-600 text-white font-black text-xs shadow-lg`}>
+                  <a href={`tel:${data.phone}`} className={`flex-1 flex items-center justify-center gap-2 px-3 py-4 rounded-full bg-blue-600 text-white font-black text-[10px] shadow-lg whitespace-nowrap`}>
                     <Phone size={14} /> {t('call')}
                   </a>
                 )}
                 {data.showWhatsapp !== false && data.whatsapp && (
-                  <a href={`https://wa.me/${data.whatsapp}`} target="_blank" className={`flex items-center gap-2 px-6 py-3 rounded-full bg-emerald-500 text-white font-black text-xs shadow-lg`}>
+                  <a href={`https://wa.me/${data.whatsapp}`} target="_blank" className={`flex-1 flex items-center justify-center gap-2 px-3 py-4 rounded-full bg-emerald-500 text-white font-black text-[10px] shadow-lg whitespace-nowrap`}>
                     <MessageCircle size={14} /> {t('whatsappBtn')}
                   </a>
                 )}
                 {!hideSaveButton && data.showButtons !== false && (
-                  <button onClick={() => downloadVCard(data)} className="flex items-center gap-2 px-6 py-3 rounded-full bg-gray-900 text-white font-black text-xs shadow-lg">
+                  <button onClick={() => downloadVCard(data)} className="flex-1 flex items-center justify-center gap-2 px-3 py-4 rounded-full bg-gray-900 text-white font-black text-[10px] shadow-lg whitespace-nowrap">
                     <UserPlus size={14} /> {t('saveContact')}
                   </button>
                 )}
@@ -331,7 +333,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
            {data.showQrCode !== false && (
              <div className="pt-10 flex flex-col items-center gap-3" style={{ transform: `translateY(${qrOffsetY}px)` }}>
                <div 
-                 className="transition-all duration-500 overflow-hidden"
+                 className="transition-all duration-500 overflow-hidden flex items-center justify-center"
                  style={{ 
                    border: qrBorderWidth > 0 ? `${qrBorderWidth}px solid ${qrBorderColor}` : 'none',
                    borderRadius: `${qrBorderRadius}px`,
@@ -343,10 +345,12 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
                   <img 
                     src={qrImageUrl} 
                     alt="QR" 
+                    className="block"
                     style={{ 
                       width: `${qrSize}px`, 
                       height: `${qrSize}px`,
-                      borderRadius: qrPadding > 0 ? `${Math.max(0, qrBorderRadius - qrPadding)}px` : `${qrBorderRadius}px`
+                      // The QR itself must remain square (radius 0) to avoid pixel distortion
+                      borderRadius: '0px'
                     }} 
                   />
                </div>

@@ -23,6 +23,7 @@ export interface TemplateConfig {
   avatarBorderWidth?: number;
   avatarBorderColor?: string;
   nameOffsetY: number;
+  titleOffsetY?: number; // Added for title/company positioning
   bioOffsetY: number;
   emailOffsetY: number;
   websiteOffsetY: number;
