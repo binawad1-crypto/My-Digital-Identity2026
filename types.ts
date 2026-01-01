@@ -106,7 +106,6 @@ export interface CardData {
   title: string;
   company: string;
   bio: string;
-  showBio?: boolean; 
   email: string;
   phone: string;
   whatsapp: string;
@@ -122,10 +121,21 @@ export interface CardData {
   isActive?: boolean;
   viewCount?: number;
   socialLinks: SocialLink[];
-  showQrCode?: boolean;
-  qrColor?: string; 
   ownerId?: string;
   updatedAt?: string;
+
+  // التحكم في الرؤية (Visibility) - Card Level
+  showName?: boolean;
+  showTitle?: boolean;
+  showCompany?: boolean;
+  showBio?: boolean;
+  showEmail?: boolean;
+  showPhone?: boolean;
+  showWebsite?: boolean;
+  showWhatsapp?: boolean;
+  showSocialLinks?: boolean;
+  showButtons?: boolean;
+  showQrCode?: boolean;
 
   // Occasion Data
   showOccasion?: boolean;
@@ -144,6 +154,7 @@ export interface CardData {
   bioTextColor?: string;
   bioBgColor?: string;
   linksColor?: string;
+  qrColor?: string; 
 }
 
 export interface TranslationStrings {

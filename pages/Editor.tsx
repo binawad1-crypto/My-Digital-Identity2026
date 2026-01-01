@@ -13,7 +13,7 @@ import {
   Mail, Phone, Globe, MessageCircle, Link as LinkIcon, 
   CheckCircle2, AlertCircle, UploadCloud, ImageIcon, 
   Palette, Layout, User as UserIcon, Camera, Share2, 
-  Pipette, Type as TypographyIcon, Smartphone, Tablet, Monitor, Eye, ArrowLeft, QrCode, RefreshCcw, FileText, Calendar, MapPin, PartyPopper, Move, Wind
+  Pipette, Type as TypographyIcon, Smartphone, Tablet, Monitor, Eye, ArrowLeft, QrCode, RefreshCcw, FileText, Calendar, MapPin, PartyPopper, Move, Wind, ChevronRight, Info, Settings, LayoutGrid, ToggleLeft, ToggleRight, EyeOff
 } from 'lucide-react';
 
 interface EditorProps {
@@ -26,26 +26,29 @@ interface EditorProps {
   forcedTemplateId?: string; 
 }
 
+type EditorTab = 'identity' | 'social' | 'design' | 'occasion';
+
 const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, isAdminEdit, templates, forcedTemplateId }) => {
   const isRtl = lang === 'ar';
   const t = (key: string, fallback?: string) => {
     if (fallback && !TRANSLATIONS[key]) return isRtl ? key : fallback;
     return TRANSLATIONS[key] ? (TRANSLATIONS[key][lang] || TRANSLATIONS[key]['en']) : key;
   };
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bgFileInputRef = useRef<HTMLInputElement>(null);
-  const colorInputRef = useRef<HTMLInputElement>(null);
   const originalIdRef = useRef<string | null>(initialData?.id || null);
 
+  const [activeTab, setActiveTab] = useState<EditorTab>('identity');
   const [previewDevice, setPreviewDevice] = useState<'mobile' | 'tablet' | 'desktop'>('mobile');
   const [showMobilePreview, setShowMobilePreview] = useState(false);
-
+  
   const [formData, setFormData] = useState<CardData>(() => {
     const targetTemplateId = initialData?.templateId || forcedTemplateId || templates[0]?.id || 'classic';
     const selectedTmpl = templates.find(t => t.id === targetTemplateId);
-    const baseData = initialData || { ...(SAMPLE_DATA[lang] || SAMPLE_DATA['en']), id: generateSerialId(), templateId: targetTemplateId, showQrCode: true, showBio: true } as CardData;
+    const baseData = initialData || { ...(SAMPLE_DATA[lang] || SAMPLE_DATA['en']), id: generateSerialId(), templateId: targetTemplateId, showQrCode: true, showBio: true, showName: true, showTitle: true, showCompany: true, showEmail: true, showPhone: true, showWebsite: true, showWhatsapp: true, showSocialLinks: true, showButtons: true } as CardData;
 
-    if (selectedTmpl) {
+    if (selectedTmpl && !initialData) {
        return {
          ...baseData,
          templateId: targetTemplateId,
@@ -56,40 +59,21 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
          isDark: selectedTmpl.config.defaultIsDark ?? baseData.isDark,
          nameColor: selectedTmpl.config.nameColor || baseData.nameColor,
          titleColor: selectedTmpl.config.titleColor || baseData.titleColor,
-         bioTextColor: selectedTmpl.config.bioTextColor || baseData.bioTextColor,
-         bioBgColor: selectedTmpl.config.bioBgColor || baseData.bioBgColor,
          linksColor: selectedTmpl.config.linksColor || baseData.linksColor,
-         qrColor: selectedTmpl.config.qrColor || baseData.qrColor,
-         showBio: selectedTmpl.config.showBioByDefault ?? baseData.showBio,
-         showQrCode: selectedTmpl.config.showQrCodeByDefault ?? baseData.showQrCode,
-         // Occasion defaults
-         showOccasion: baseData.showOccasion ?? (selectedTmpl.config.showOccasionByDefault ?? false),
-         occasionTitleAr: baseData.occasionTitleAr || (selectedTmpl.config.occasionTitleAr || 'مناسبة خاصة'),
-         occasionTitleEn: baseData.occasionTitleEn || (selectedTmpl.config.occasionTitleEn || 'Special Occasion'),
-         occasionDate: baseData.occasionDate || (selectedTmpl.config.occasionDate || ''),
-         occasionMapUrl: baseData.occasionMapUrl || (selectedTmpl.config.occasionMapUrl || ''),
-         occasionOffsetY: baseData.occasionOffsetY ?? (selectedTmpl.config.occasionOffsetY || 0),
-         occasionFloating: baseData.occasionFloating ?? (selectedTmpl.config.occasionFloating ?? true),
-         occasionPrimaryColor: baseData.occasionPrimaryColor || (selectedTmpl.config.occasionPrimaryColor || '#7c3aed'),
-         occasionBgColor: baseData.occasionBgColor || (selectedTmpl.config.occasionBgColor || ''),
-         occasionTitleColor: baseData.occasionTitleColor || (selectedTmpl.config.occasionTitleColor || '')
        } as CardData;
     }
     return baseData;
   });
 
-  const [activeImgTab, setActiveImgTab] = useState<'upload' | 'link'>('upload');
-  const [activeBgImgTab, setActiveBgImgTab] = useState<'presets' | 'upload' | 'link'>('presets');
   const [isGeneratingBio, setIsGeneratingBio] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isUploadingBg, setIsUploadingBg] = useState(false);
   const [socialInput, setSocialInput] = useState({ platformId: SOCIAL_PLATFORMS[0].id, url: '' });
-  const [slugStatus, setSlugStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
 
   const currentTemplate = templates.find(t => t.id === formData.templateId);
 
   const handleChange = (field: keyof CardData, value: any) => {
-    if (field === 'id') { value = (value || '').toLowerCase().replace(/[^a-z0-9-]/g, ''); setSlugStatus('idle'); }
+    if (field === 'id') { value = (value || '').toLowerCase().replace(/[^a-z0-9-]/g, ''); }
     if (field === 'templateId') {
       const newTmpl = templates.find(t => t.id === value);
       if (newTmpl) {
@@ -98,23 +82,13 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
           templateId: value,
           nameColor: newTmpl.config.nameColor || prev.nameColor,
           titleColor: newTmpl.config.titleColor || prev.titleColor,
-          bioTextColor: newTmpl.config.bioTextColor || prev.bioTextColor,
-          bioBgColor: newTmpl.config.bioBgColor || prev.bioBgColor,
           linksColor: newTmpl.config.linksColor || prev.linksColor,
           qrColor: newTmpl.config.qrColor || prev.qrColor,
           themeType: newTmpl.config.defaultThemeType || prev.themeType,
           themeColor: newTmpl.config.defaultThemeColor || prev.themeColor,
           themeGradient: newTmpl.config.defaultThemeGradient || prev.themeGradient,
           backgroundImage: newTmpl.config.defaultBackgroundImage || prev.backgroundImage,
-          isDark: newTmpl.config.defaultIsDark ?? prev.isDark,
-          showBio: newTmpl.config.showBioByDefault ?? prev.showBio,
-          showQrCode: newTmpl.config.showQrCodeByDefault ?? prev.showQrCode,
-          showOccasion: newTmpl.config.showOccasionByDefault ?? prev.showOccasion,
-          occasionOffsetY: newTmpl.config.occasionOffsetY ?? prev.occasionOffsetY,
-          occasionFloating: newTmpl.config.occasionFloating ?? prev.occasionFloating,
-          occasionPrimaryColor: newTmpl.config.occasionPrimaryColor || prev.occasionPrimaryColor,
-          occasionBgColor: newTmpl.config.occasionBgColor || prev.occasionBgColor,
-          occasionTitleColor: newTmpl.config.occasionTitleColor || prev.occasionTitleColor
+          isDark: newTmpl.config.defaultIsDark ?? prev.isDark
         }));
         return;
       }
@@ -122,9 +96,29 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const resetToTemplateColors = () => {
-    if (!currentTemplate) return;
-    handleChange('templateId', currentTemplate.id);
+  const VisibilityToggle = ({ field, label }: { field: keyof CardData, label: string }) => {
+    const isVisible = formData[field] !== false;
+    return (
+      <button 
+        onClick={() => handleChange(field, !isVisible)}
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl transition-all ${isVisible ? 'text-blue-600 bg-blue-50 dark:bg-blue-900/20 shadow-sm' : 'text-gray-400 bg-gray-100 dark:bg-gray-800'}`}
+        title={isVisible ? t('ظاهر', 'Visible') : t('مخفي', 'Hidden')}
+      >
+        {isVisible ? <Eye size={14} /> : <EyeOff size={14} />}
+        <span className="text-[10px] font-black uppercase tracking-tighter">{isVisible ? t('إظهار', 'Show') : t('إخفاء', 'Hide')}</span>
+      </button>
+    );
+  };
+
+  const handleGenerateBio = async () => {
+    if (!formData.name || !formData.title) return;
+    setIsGeneratingBio(true);
+    try {
+      const bio = await generateProfessionalBio(formData.name, formData.title, formData.company, "", lang);
+      if (bio) handleChange('bio', bio);
+    } finally {
+      setIsGeneratingBio(false);
+    }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,223 +127,551 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
     try { const b = await uploadImageToCloud(file); if (b) handleChange('profileImage', b); } finally { setIsUploading(false); }
   };
 
-  const checkAvailability = async () => {
-    if (!formData.id || formData.id.length < 3) return;
-    setSlugStatus('checking');
-    const available = await isSlugAvailable(formData.id, formData.ownerId || auth.currentUser?.uid);
-    setSlugStatus(available ? 'available' : 'taken');
+  const handleBgUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]; if (!file) return;
+    setIsUploadingBg(true);
+    try { const b = await uploadImageToCloud(file); if (b) handleChange('backgroundImage', b); } finally { setIsUploadingBg(false); }
   };
 
   const addSocialLink = () => {
     if (!socialInput.url) return;
     const platform = SOCIAL_PLATFORMS.find(p => p.id === socialInput.platformId);
     if (!platform) return;
-    setFormData(prev => ({ ...prev, socialLinks: [...prev.socialLinks, { platform: platform.name, url: socialInput.url, platformId: platform.id }] }));
+    setFormData(prev => ({ 
+      ...prev, 
+      socialLinks: [...(prev.socialLinks || []), { platform: platform.name, url: socialInput.url, platformId: platform.id }] 
+    }));
     setSocialInput({ ...socialInput, url: '' });
   };
 
-  const ColorPickerField = ({ label, field, value, compact = false }: { label: string, field: keyof CardData, value?: string | null, compact?: boolean }) => (
-    <div className={`flex items-center justify-between gap-3 bg-white dark:bg-gray-800 ${compact ? 'p-2' : 'p-3'} rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm transition-all hover:border-violet-200`}>
-      <span className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider shrink-0">{label}</span>
-      <div className="flex items-center gap-2">
-         <div className="relative w-7 h-7 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm"><input type="color" value={value || (formData.isDark ? '#333333' : '#ffffff')} onChange={(e) => handleChange(field, e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer scale-150" /><div className="w-full h-full" style={{ backgroundColor: value || (formData.isDark ? '#333333' : '#ffffff') }} /></div>
-         <button onClick={() => handleChange(field, null)} className="p-1 text-gray-300 hover:text-red-500 transition-colors"><X size={12}/></button>
-      </div>
-    </div>
+  const removeSocialLink = (index: number) => {
+    const updated = [...formData.socialLinks];
+    updated.splice(index, 1);
+    setFormData(prev => ({ ...prev, socialLinks: updated }));
+  };
+
+  const TabButton = ({ id, label, icon: Icon }: { id: EditorTab, label: string, icon: any }) => (
+    <button 
+      onClick={() => setActiveTab(id)}
+      className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-3 px-2 sm:px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-black text-[9px] sm:text-[10px] uppercase tracking-tighter sm:tracking-widest transition-all ${activeTab === id ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20 scale-[1.02]' : 'bg-white dark:bg-gray-900 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 border border-gray-100 dark:border-gray-800'}`}
+    >
+      <Icon size={16} className="shrink-0" /> <span className="truncate">{label}</span>
+    </button>
   );
 
-  const PreviewContent = ({ isMobileView = false }) => (
-    <div className="flex flex-col items-center w-full">
-      {!isMobileView && (
-        <div className="mb-6 w-full flex items-center justify-between px-6">
-          <div className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div><span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{isRtl ? 'معاينة حية' : 'Live Preview'}</span></div>
-          <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
-             <button onClick={() => setPreviewDevice('mobile')} className={`p-2 rounded-lg transition-all ${previewDevice === 'mobile' ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm' : 'text-gray-400'}`}><Smartphone size={16}/></button>
-             <button onClick={() => setPreviewDevice('tablet')} className={`p-2 rounded-lg transition-all ${previewDevice === 'tablet' ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm' : 'text-gray-400'}`}><Tablet size={16}/></button>
-             <button onClick={() => setPreviewDevice('desktop')} className={`p-2 rounded-lg transition-all ${previewDevice === 'desktop' ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm' : 'text-gray-400'}`}><Monitor size={16}/></button>
-          </div>
-        </div>
-      )}
-      <div className={`transition-all duration-500 ease-in-out origin-top border-[8px] border-gray-900 dark:border-gray-800 rounded-[3rem] shadow-2xl overflow-hidden bg-white dark:bg-gray-950 ${isMobileView ? 'w-[280px]' : previewDevice === 'mobile' ? 'w-[320px]' : previewDevice === 'tablet' ? 'w-[480px]' : 'w-[360px]'}`}>
-        <div className={`no-scrollbar overflow-x-hidden ${isMobileView ? 'h-[500px]' : 'h-[640px]'} overflow-y-auto`}>
-          <CardPreview data={formData} lang={lang} customConfig={currentTemplate?.config} hideSaveButton={true} />
-        </div>
-      </div>
-    </div>
-  );
-
-  const labelClasses = "block text-[9px] font-black text-gray-400 dark:text-gray-500 mb-1 px-1 uppercase tracking-widest";
-  const inputClasses = "w-full px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1a1a1f] text-gray-900 dark:text-white focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 outline-none transition-all shadow-sm placeholder:text-gray-300 font-medium text-[13px]";
+  const inputClasses = "w-full px-5 py-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950 text-gray-900 dark:text-white outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/10 transition-all font-bold text-sm shadow-inner";
+  const labelClasses = "block text-[10px] font-black text-gray-400 dark:text-gray-500 mb-2 uppercase tracking-widest px-1";
 
   return (
     <div className="max-w-[1440px] mx-auto px-4 md:px-6">
-      <div className="flex flex-col lg:flex-row gap-8 pb-32 items-start justify-center">
-        <div className="w-full lg:max-w-[960px] flex-1 space-y-6">
-          <div className="bg-white dark:bg-[#121215] p-5 md:p-8 rounded-[2.5rem] shadow-xl border border-gray-100 dark:border-gray-800 space-y-6">
+      <div className="flex flex-col lg:flex-row gap-10 items-start">
+        {/* Editor Left Column */}
+        <div className="flex-1 w-full space-y-8 pb-32">
+          {/* Enhanced Mobile Tabs Container */}
+          <div className="flex w-full bg-white/80 dark:bg-black/40 p-1.5 rounded-[1.8rem] sm:rounded-[2rem] border border-gray-200/50 dark:border-gray-800/50 sticky top-[75px] z-50 backdrop-blur-md shadow-lg shadow-black/5 gap-1.5 sm:gap-2">
+            <TabButton id="identity" label={t('الهوية', 'Identity')} icon={UserIcon} />
+            <TabButton id="social" label={t('التواصل', 'Contact')} icon={MessageCircle} />
+            <TabButton id="design" label={t('التصميم', 'Design')} icon={Palette} />
+            <TabButton id="occasion" label={t('المناسبة', 'Event')} icon={PartyPopper} />
+          </div>
+
+          <div className="bg-white dark:bg-[#121215] p-6 md:p-10 rounded-[3.5rem] shadow-2xl border border-gray-100 dark:border-gray-800 animate-fade-in min-h-[600px] relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[100px] pointer-events-none rounded-full" />
             
-            <div className="bg-blue-50 dark:bg-blue-900/10 p-4 rounded-2xl border border-blue-100 dark:border-blue-900/20 flex flex-col sm:flex-row items-center gap-3">
-              <div className="relative flex-1 w-full"><input type="text" value={formData.id} onChange={e => handleChange('id', e.target.value)} className={`${inputClasses} ${isRtl ? 'pr-10' : 'pl-10'} !py-3 !rounded-xl text-blue-600 font-black text-base`} placeholder="username" /><Hash className={`absolute ${isRtl ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 text-blue-400`} size={18} /><div className={`absolute ${isRtl ? 'left-3' : 'right-3'} top-1/2 -translate-y-1/2`}>{slugStatus === 'available' && <CheckCircle2 className="text-emerald-500" size={20} />}{slugStatus === 'taken' && <AlertCircle className="text-red-500" size={20} />}</div></div>
-              <button onClick={checkAvailability} disabled={slugStatus === 'checking'} className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-xl font-black text-[10px] uppercase shadow-md flex items-center justify-center gap-2">{slugStatus === 'checking' ? <Loader2 size={14} className="animate-spin" /> : <LinkIcon size={14} />}{isRtl ? 'تحقق من الرابط' : 'Check URL'}</button>
-            </div>
-
-            <div className="bg-gray-50/50 dark:bg-gray-900/20 p-5 md:p-6 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 grid grid-cols-1 xl:grid-cols-12 gap-8">
-              <div className="xl:col-span-3 flex flex-col items-center gap-4">
-                  <div className="relative group"><div className="w-28 h-28 rounded-[2.2rem] overflow-hidden border-4 border-white dark:border-gray-800 shadow-lg bg-gray-100 dark:bg-gray-900 flex items-center justify-center">{formData.profileImage ? <img src={formData.profileImage} className="w-full h-full object-cover" /> : <UserIcon size={36} className="text-gray-300" />}{isUploading && <div className="absolute inset-0 bg-indigo-600/60 backdrop-blur-sm flex items-center justify-center"><Loader2 className="animate-spin text-white" size={24} /></div>}</div><button onClick={() => fileInputRef.current?.click()} className="absolute -bottom-1 -right-1 p-2.5 bg-indigo-600 text-white rounded-xl shadow-lg hover:scale-105 transition-all"><Camera size={16} /></button></div>
-                  <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept="image/*" className="hidden" />
-              </div>
-              <div className="xl:col-span-9 space-y-5">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label className={labelClasses}>{t('fullName')}</label><input type="text" value={formData.name} onChange={e => handleChange('name', e.target.value)} className={inputClasses} /></div>
-                    <div className="grid grid-cols-2 gap-3">
-                        <div><label className={labelClasses}>{t('jobTitle')}</label><input type="text" value={formData.title} onChange={e => handleChange('title', e.target.value)} className={inputClasses} /></div>
-                        <div><label className={labelClasses}>{t('company')}</label><input type="text" value={formData.company} onChange={e => handleChange('company', e.target.value)} className={inputClasses} /></div>
-                    </div>
-                  </div>
-              </div>
-            </div>
-
-            {/* Occasion Section For User - Improved Labels & Controls */}
-            <div className="bg-violet-50 dark:bg-violet-900/10 p-6 md:p-8 rounded-[3rem] border border-violet-100 dark:border-violet-900/30 space-y-6 shadow-sm">
-                <div className="flex items-center justify-between">
-                   <div className="flex items-center gap-3">
-                      <div className="p-3 bg-violet-600 text-white rounded-2xl shadow-lg shadow-violet-500/20"><PartyPopper size={22} /></div>
-                      <div>
-                        <h4 className="text-sm font-black uppercase text-violet-700 dark:text-violet-300 tracking-widest leading-none mb-1">{isRtl ? 'تفعيل قسم المناسبة الخاصة' : 'Enable Special Occasion'}</h4>
-                        <p className="text-[9px] font-bold text-violet-400 dark:text-violet-500 uppercase tracking-widest">{isRtl ? 'زفاف، تخرج، افتتاح، إلخ' : 'Wedding, Graduation, Launch, etc'}</p>
+            {activeTab === 'identity' && (
+              <div className="space-y-10 animate-fade-in relative z-10">
+                <div className="flex flex-col md:flex-row gap-8 items-center md:items-start border-b border-gray-50 dark:border-gray-800/50 pb-10">
+                   <div className="relative shrink-0 group">
+                      <div className="w-32 h-32 rounded-[2.5rem] overflow-hidden border-4 border-white dark:border-gray-800 shadow-2xl bg-gray-50 dark:bg-gray-900 flex items-center justify-center relative">
+                        {formData.profileImage ? <img src={formData.profileImage} className="w-full h-full object-cover" /> : <UserIcon size={40} className="text-gray-200" />}
+                        {isUploading && <div className="absolute inset-0 bg-blue-600/60 backdrop-blur-sm flex items-center justify-center"><Loader2 className="animate-spin text-white" /></div>}
                       </div>
+                      <button onClick={() => fileInputRef.current?.click()} className="absolute -bottom-2 -right-2 p-3 bg-blue-600 text-white rounded-2xl shadow-xl hover:scale-110 transition-all active:scale-90"><Camera size={18} /></button>
+                      <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept="image/*" className="hidden" />
                    </div>
-                   <button 
-                     onClick={() => handleChange('showOccasion', !formData.showOccasion)} 
-                     className={`w-14 h-7 rounded-full relative transition-all ${formData.showOccasion ? 'bg-violet-600 shadow-inner' : 'bg-gray-200 dark:bg-gray-700'}`}
-                   >
-                     <div className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow-md transition-all ${isRtl ? (formData.showOccasion ? 'right-8' : 'right-1') : (formData.showOccasion ? 'left-8' : 'left-1')}`} />
-                   </button>
-                </div>
-
-                {formData.showOccasion && (
-                   <div className="space-y-8 animate-fade-in pt-6 border-t border-violet-100/50">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-4">
-                           <div>
-                              <label className={labelClasses}>{isRtl ? 'عنوان المناسبة (عربي)' : 'Occasion Title (Arabic)'}</label>
-                              <input 
-                                type="text" 
-                                value={formData.occasionTitleAr} 
-                                onChange={e => handleChange('occasionTitleAr', e.target.value)} 
-                                className={`${inputClasses} !bg-white/80 dark:!bg-black/20`}
-                                placeholder="مناسبة خاصة" 
-                              />
-                           </div>
-                           <div>
-                              <label className={labelClasses}>{isRtl ? 'Occasion Title (English)' : 'Occasion Title (English)'}</label>
-                              <input 
-                                type="text" 
-                                value={formData.occasionTitleEn} 
-                                onChange={e => handleChange('occasionTitleEn', e.target.value)} 
-                                className={`${inputClasses} !bg-white/80 dark:!bg-black/20`}
-                                placeholder="Special Occasion" 
-                              />
-                           </div>
-                        </div>
-                        <div className="space-y-4">
-                           <div>
-                              <label className={labelClasses}>{isRtl ? 'تاريخ ووقت المناسبة' : 'Event Date & Time'}</label>
-                              <input 
-                                type="datetime-local" 
-                                value={formData.occasionDate} 
-                                onChange={e => handleChange('occasionDate', e.target.value)} 
-                                className={`${inputClasses} block !bg-white/80 dark:!bg-black/20 !py-3 !px-4 min-h-[52px] [direction:ltr] text-right font-bold`} 
-                              />
-                           </div>
-                           <div>
-                              <label className={labelClasses}>{isRtl ? 'رابط خرائط قوقل' : 'Google Maps Link'}</label>
-                              <div className="relative">
-                                 <MapPin className={`absolute ${isRtl ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 text-violet-400`} size={16} />
-                                 <input 
-                                   type="url" 
-                                   value={formData.occasionMapUrl} 
-                                   onChange={e => handleChange('occasionMapUrl', e.target.value)} 
-                                   className={`${inputClasses} ${isRtl ? 'pr-10' : 'pl-10'} !bg-white/80 dark:!bg-black/20`} 
-                                   placeholder="https://maps.google.com/..." 
-                                 />
-                              </div>
-                           </div>
-                        </div>
-                      </div>
-
-                      {/* إعدادات التموضع والألوان للمناسبة */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-white/40 dark:bg-black/20 rounded-[2rem] border border-violet-100/50">
-                         <div className="space-y-4">
-                            <div className="flex justify-between items-center mb-1">
-                               <label className={labelClasses}>{isRtl ? 'إزاحة القسم (فوق / تحت)' : 'Section Offset (Y Axis)'}</label>
-                               <span className="text-[10px] font-black text-violet-600 bg-violet-50 px-2 py-0.5 rounded-lg">{formData.occasionOffsetY || 0}px</span>
+                   <div className="flex-1 w-full space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                         <div className="space-y-2">
+                            <div className="flex justify-between items-center px-1">
+                              <label className={labelClasses}>{t('الاسم الكامل', 'Full Name')}</label>
+                              <VisibilityToggle field="showName" label="Name" />
                             </div>
-                            <div className="flex items-center gap-4">
-                               <Move size={18} className="text-violet-400 shrink-0" />
-                               <input 
-                                 type="range" 
-                                 min="-250" 
-                                 max="150" 
-                                 value={formData.occasionOffsetY || 0} 
-                                 onChange={e => handleChange('occasionOffsetY', parseInt(e.target.value))} 
-                                 className="flex-1 h-1.5 bg-violet-100 dark:bg-violet-900/30 rounded-full appearance-none accent-violet-600 cursor-pointer"
-                               />
-                            </div>
-                            <div className="flex items-center justify-between pt-2">
-                               <div className="flex items-center gap-3">
-                                  <Wind size={18} className="text-violet-500" />
-                                  <span className={labelClasses + " !mb-0"}>{isRtl ? 'تفعيل تحريك الطفو' : 'Enable Float Animation'}</span>
-                               </div>
-                               <button 
-                                 onClick={() => handleChange('occasionFloating', !formData.occasionFloating)} 
-                                 className={`w-12 h-6 rounded-full relative transition-all ${formData.occasionFloating !== false ? 'bg-violet-600' : 'bg-gray-200 dark:bg-gray-700'}`}
-                               >
-                                 <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-all ${isRtl ? (formData.occasionFloating !== false ? 'right-7' : 'right-1') : (formData.occasionFloating !== false ? 'left-7' : 'left-1')}`} />
-                               </button>
-                            </div>
+                            <input type="text" value={formData.name} onChange={e => handleChange('name', e.target.value)} className={inputClasses} placeholder="John Doe" />
                          </div>
-                         
-                         <div className="space-y-3">
-                            <label className={labelClasses}>{isRtl ? 'تخصيص ألوان المناسبة' : 'Customize Occasion Colors'}</label>
-                            <div className="grid grid-cols-1 gap-2">
-                               <ColorPickerField label={isRtl ? "اللون الأساسي" : "Primary"} field="occasionPrimaryColor" value={formData.occasionPrimaryColor} compact />
-                               <ColorPickerField label={isRtl ? "خلفية البطاقة" : "Background"} field="occasionBgColor" value={formData.occasionBgColor} compact />
-                               <ColorPickerField label={isRtl ? "لون العنوان" : "Title Color"} field="occasionTitleColor" value={formData.occasionTitleColor} compact />
+                         <div className="space-y-2">
+                            <div className="flex justify-between items-center px-1">
+                              <label className={labelClasses}>{t('المسمى الوظيفي', 'Job Title')}</label>
+                              <VisibilityToggle field="showTitle" label="Title" />
                             </div>
+                            <input type="text" value={formData.title} onChange={e => handleChange('title', e.target.value)} className={inputClasses} placeholder="Product Designer" />
                          </div>
                       </div>
+                      <div className="space-y-2">
+                         <div className="flex justify-between items-center px-1">
+                            <label className={labelClasses}>{t('الشركة / المنظمة', 'Company')}</label>
+                            <VisibilityToggle field="showCompany" label="Company" />
+                         </div>
+                         <input type="text" value={formData.company} onChange={e => handleChange('company', e.target.value)} className={inputClasses} placeholder="Google Inc." />
+                      </div>
                    </div>
-                )}
-            </div>
+                </div>
 
-            <div className="bg-white dark:bg-[#121215] p-6 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 space-y-10">
-              <div className="space-y-6">
-                <div className="flex items-center gap-3 mb-4"><Layout className="text-blue-600" size={20} /><h4 className="text-[12px] font-black uppercase text-gray-700 dark:text-gray-300 tracking-widest">{isRtl ? 'اختر قالب التصميم' : 'Select Layout Template'}</h4></div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                    {templates.map(tmpl => (
-                      <button key={tmpl.id} onClick={() => handleChange('templateId', tmpl.id)} className={`p-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 group ${formData.templateId === tmpl.id ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-gray-400'}`}><Layout size={18} className={formData.templateId === tmpl.id ? 'text-white' : 'group-hover:text-blue-500'} /><span className="text-[9px] font-black uppercase text-center truncate w-full">{isRtl ? tmpl.nameAr : tmpl.nameEn}</span></button>
-                    ))}
+                <div className="space-y-4">
+                   <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-4">
+                        <label className={labelClasses}>{t('النبذة التعريفية (Bio)', 'Professional Bio')}</label>
+                        <VisibilityToggle field="showBio" label="Bio" />
+                      </div>
+                      <button 
+                        onClick={handleGenerateBio} 
+                        disabled={isGeneratingBio || !formData.name}
+                        className="text-[9px] font-black text-blue-600 uppercase flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 rounded-xl hover:bg-blue-100 transition-all border border-blue-100 dark:border-blue-900/30"
+                      >
+                        {isGeneratingBio ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                        {t('توليد بالذكاء الاصطناعي', 'AI Generate')}
+                      </button>
+                   </div>
+                   <textarea 
+                     value={formData.bio} 
+                     onChange={e => handleChange('bio', e.target.value)} 
+                     className={`${inputClasses} min-h-[120px] resize-none leading-relaxed`} 
+                     placeholder={t('اكتب نبذة مهنية قصيرة تعبر عنك...', 'Write a brief professional summary about yourself...')}
+                   />
                 </div>
               </div>
+            )}
 
-              <div className="pt-8 border-t border-gray-50 dark:border-gray-800 space-y-8">
-                 <div className="flex items-center justify-between"><div className="flex items-center gap-3"><Palette className="text-blue-600" size={20} /><h4 className="text-[12px] font-black uppercase text-gray-700 dark:text-gray-300 tracking-widest">{isRtl ? 'المظهر والألوان' : 'Appearance & Colors'}</h4></div><button onClick={resetToTemplateColors} className="text-[9px] font-black text-blue-600 uppercase flex items-center gap-2 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 transition-colors"><RefreshCcw size={12} /> {isRtl ? 'استعادة ألوان القالب' : 'Reset Colors'}</button></div>
-                 <div className="flex flex-col items-center gap-6">
-                    <div className="flex bg-gray-50 dark:bg-gray-900 p-1 rounded-2xl border border-gray-100 dark:border-gray-800 shrink-0 w-full sm:w-auto"><button onClick={() => handleChange('themeType', 'color')} className={`flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all ${formData.themeType === 'color' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}> <Palette size={16} /> </button><button onClick={() => handleChange('themeType', 'gradient')} className={`flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all ${formData.themeType === 'gradient' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}> <Sparkles size={16} /> </button><button onClick={() => handleChange('themeType', 'image')} className={`flex-1 sm:flex-none px-6 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all ${formData.themeType === 'image' ? 'bg-blue-600 text-white' : 'text-gray-400'}`}> <ImageIcon size={16} /> </button></div>
-                    <div className="w-full grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <ColorPickerField label={t('الاسم', 'Name')} field="nameColor" value={formData.nameColor} />
-                        <ColorPickerField label={t('المسمى', 'Title')} field="titleColor" value={formData.titleColor} />
-                        <ColorPickerField label={t('الباركود', 'QR')} field="qrColor" value={formData.qrColor} />
+            {activeTab === 'social' && (
+              <div className="space-y-8 animate-fade-in relative z-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-10 border-b border-gray-50 dark:border-gray-800/50">
+                   <div className="space-y-2">
+                      <div className="flex justify-between items-center px-1">
+                        <label className={labelClasses}>{t('البريد الإلكتروني', 'Email')}</label>
+                        <VisibilityToggle field="showEmail" label="Email" />
+                      </div>
+                      <div className="relative">
+                        <Mail className={`absolute ${isRtl ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-blue-500`} size={18} />
+                        <input type="email" value={formData.email} onChange={e => handleChange('email', e.target.value)} className={`${inputClasses} ${isRtl ? 'pr-12' : 'pl-12'}`} />
+                      </div>
+                   </div>
+                   <div className="space-y-2">
+                      <div className="flex justify-between items-center px-1">
+                        <label className={labelClasses}>{t('رقم الهاتف', 'Phone')}</label>
+                        <VisibilityToggle field="showPhone" label="Phone" />
+                      </div>
+                      <div className="relative">
+                        <Phone className={`absolute ${isRtl ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-blue-500`} size={18} />
+                        <input type="tel" value={formData.phone} onChange={e => handleChange('phone', e.target.value)} className={`${inputClasses} ${isRtl ? 'pr-12' : 'pl-12'}`} />
+                      </div>
+                   </div>
+                   <div className="space-y-2">
+                      <div className="flex justify-between items-center px-1">
+                        <label className={labelClasses}>{t('رابط الموقع', 'Website')}</label>
+                        <VisibilityToggle field="showWebsite" label="Website" />
+                      </div>
+                      <div className="relative">
+                        <Globe className={`absolute ${isRtl ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-blue-500`} size={18} />
+                        <input type="text" value={formData.website} onChange={e => handleChange('website', e.target.value)} className={`${inputClasses} ${isRtl ? 'pr-12' : 'pl-12'}`} />
+                      </div>
+                   </div>
+                   <div className="space-y-2">
+                      <div className="flex justify-between items-center px-1">
+                        <label className={labelClasses}>{t('رقم الواتساب', 'WhatsApp')}</label>
+                        <VisibilityToggle field="showWhatsapp" label="WhatsApp" />
+                      </div>
+                      <div className="relative">
+                        <MessageCircle className={`absolute ${isRtl ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-emerald-500`} size={18} />
+                        <input type="text" value={formData.whatsapp} onChange={e => handleChange('whatsapp', e.target.value)} className={`${inputClasses} ${isRtl ? 'pr-12' : 'pl-12'}`} />
+                      </div>
+                   </div>
+                </div>
+
+                <div className="space-y-6">
+                   <div className="flex justify-between items-center px-1">
+                      <h4 className={labelClasses}>{t('إضافة روابط التواصل الاجتماعي', 'Add Social Media Links')}</h4>
+                      <div className="flex items-center gap-4">
+                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{t('رؤية الروابط', 'Socials Visibility')}</span>
+                        <VisibilityToggle field="showSocialLinks" label="Socials" />
+                      </div>
+                   </div>
+                   <div className="flex flex-col sm:flex-row gap-3">
+                      <select 
+                        value={socialInput.platformId} 
+                        onChange={e => setSocialInput({...socialInput, platformId: e.target.value})}
+                        className="bg-gray-50 dark:bg-gray-800 border-none rounded-2xl px-5 py-3 text-sm font-black dark:text-white outline-none focus:ring-4 focus:ring-blue-100"
+                      >
+                        {SOCIAL_PLATFORMS.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                      </select>
+                      <div className="flex-1 relative">
+                        <LinkIcon className={`absolute ${isRtl ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-gray-300`} size={16} />
+                        <input 
+                          type="url" 
+                          value={socialInput.url} 
+                          onChange={e => setSocialInput({...socialInput, url: e.target.value})} 
+                          className={`${inputClasses} ${isRtl ? 'pr-12' : 'pl-12'} !py-3`} 
+                          placeholder="https://..."
+                        />
+                      </div>
+                      <button onClick={addSocialLink} className="px-6 py-3 bg-blue-600 text-white rounded-2xl font-black text-xs uppercase flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 active:scale-95 transition-all">
+                        <Plus size={18} /> {t('إضافة', 'Add')}
+                      </button>
+                   </div>
+
+                   <div className="flex flex-wrap gap-3 mt-4">
+                      {formData.socialLinks?.map((link, i) => (
+                        <div key={i} className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800 px-4 py-2 rounded-xl border dark:border-gray-700 group hover:border-blue-200 transition-all shadow-sm">
+                           <SocialIcon platformId={link.platformId} size={16} />
+                           <span className="text-[10px] font-bold truncate max-w-[100px]">{link.platform}</span>
+                           <button onClick={() => removeSocialLink(i)} className="text-gray-300 hover:text-red-500 transition-colors"><X size={14} /></button>
+                        </div>
+                      ))}
+                   </div>
+
+                   <div className="pt-8 border-t border-gray-50 dark:border-gray-800/50 flex items-center justify-between px-1">
+                      <div className="flex flex-col">
+                        <span className="text-xs font-black dark:text-white uppercase leading-none mb-1">{t('أزرار الاتصال السريع', 'Quick Contact Buttons')}</span>
+                        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{t('اتصال، واتساب، حفظ جهة الاتصال', 'Call, WhatsApp, Save Contact')}</span>
+                      </div>
+                      <VisibilityToggle field="showButtons" label="Contact Buttons" />
+                   </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'design' && (
+              <div className="space-y-12 animate-fade-in relative z-10">
+                <div className="space-y-6">
+                   <div className="flex items-center gap-3 px-1">
+                      <Layout className="text-blue-600" size={20} />
+                      <label className={labelClasses.replace('mb-2', 'mb-0')}>{t('اختر نمط القالب الهيكلي', 'Choose Template Layout')}</label>
+                   </div>
+                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                      {templates.map(tmpl => (
+                        <button 
+                          key={tmpl.id} 
+                          onClick={() => handleChange('templateId', tmpl.id)}
+                          className={`relative p-4 rounded-3xl border-2 transition-all flex flex-col items-center gap-3 group ${formData.templateId === tmpl.id ? 'bg-blue-600 border-blue-600 text-white shadow-xl scale-[1.03]' : 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-gray-400 hover:border-blue-100'}`}
+                        >
+                           <div className={`p-3 rounded-2xl ${formData.templateId === tmpl.id ? 'bg-white/20' : 'bg-gray-50 dark:bg-gray-700'} transition-colors`}>
+                              <LayoutGrid size={24} className={formData.templateId === tmpl.id ? 'text-white' : 'text-gray-300 group-hover:text-blue-500'} />
+                           </div>
+                           <span className="text-[9px] font-black uppercase text-center leading-tight">{isRtl ? tmpl.nameAr : tmpl.nameEn}</span>
+                           {formData.templateId === tmpl.id && <div className="absolute top-2 right-2 p-1 bg-white rounded-lg"><CheckCircle2 size={12} className="text-blue-600" /></div>}
+                        </button>
+                      ))}
+                   </div>
+                </div>
+
+                <div className="pt-10 border-t border-gray-50 dark:border-gray-800/50 space-y-8">
+                   <div className="flex items-center gap-3 px-1">
+                      <ImageIcon className="text-blue-600" size={20} />
+                      <h4 className={labelClasses.replace('mb-2', 'mb-0')}>{t('نمط السمة والخلفية', 'Theme Style & Background')}</h4>
+                   </div>
+
+                   <div className="grid grid-cols-3 gap-3 bg-gray-100/50 dark:bg-black/20 p-2 rounded-[2rem]">
+                      {['color', 'gradient', 'image'].map(type => (
+                        <button 
+                          key={type} 
+                          onClick={() => handleChange('themeType', type)}
+                          className={`py-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 flex-1 ${formData.themeType === type ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-white dark:bg-gray-800 text-gray-400 border-transparent shadow-sm'}`}
+                        >
+                          {type === 'color' ? <Palette size={20}/> : type === 'gradient' ? <Sparkles size={20}/> : <ImageIcon size={20}/>}
+                          <span className="text-[10px] font-black uppercase tracking-widest">{t(type === 'color' ? 'لون ثابت' : type === 'gradient' ? 'تدرج' : 'صورة', type.toUpperCase())}</span>
+                        </button>
+                      ))}
+                   </div>
+
+                   {formData.themeType === 'color' && (
+                     <div className="p-8 bg-gray-50 dark:bg-gray-800 rounded-[2.5rem] space-y-6 animate-fade-in border border-gray-100 dark:border-gray-700 shadow-inner">
+                        <label className={labelClasses}>{t('اختر لون السمة', 'Select Theme Color')}</label>
+                        <div className="grid grid-cols-5 sm:grid-cols-10 gap-3">
+                           {THEME_COLORS.map((clr, i) => (
+                             <button key={i} onClick={() => handleChange('themeColor', clr)} className={`h-8 w-8 rounded-full border-2 transition-all hover:scale-125 ${formData.themeColor === clr ? 'border-blue-600 scale-125 shadow-lg' : 'border-white dark:border-gray-600'}`} style={{ backgroundColor: clr }} />
+                           ))}
+                           <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-dashed border-gray-300 group">
+                             <input type="color" value={formData.themeColor} onChange={e => handleChange('themeColor', e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer scale-150" />
+                             <div className="w-full h-full flex items-center justify-center bg-white"><Pipette size={14} className="text-gray-400 group-hover:text-blue-500 transition-colors" /></div>
+                           </div>
+                        </div>
+                     </div>
+                   )}
+
+                   {formData.themeType === 'gradient' && (
+                     <div className="p-8 bg-gray-50 dark:bg-gray-800 rounded-[2.5rem] space-y-6 animate-fade-in border border-gray-100 dark:border-gray-700 shadow-inner">
+                        <label className={labelClasses}>{t('اختر التدرج اللوني المفضل', 'Select Gradient Preset')}</label>
+                        <div className="grid grid-cols-4 sm:grid-cols-6 gap-3 max-h-[220px] overflow-y-auto no-scrollbar p-1">
+                           {THEME_GRADIENTS.map((grad, i) => (
+                             <button key={i} onClick={() => handleChange('themeGradient', grad)} className={`h-14 rounded-2xl border-2 transition-all ${formData.themeGradient === grad ? 'border-blue-600 scale-105 shadow-xl' : 'border-transparent opacity-60 hover:opacity-100'}`} style={{ background: grad }} />
+                           ))}
+                        </div>
+                     </div>
+                   )}
+
+                   {formData.themeType === 'image' && (
+                     <div className="p-8 bg-gray-50 dark:bg-gray-800 rounded-[2.5rem] space-y-6 animate-fade-in border border-gray-100 dark:border-gray-700 shadow-inner">
+                        <label className={labelClasses}>{t('اختر خلفية فنية أو ارفع صورتك', 'Artistic Backgrounds')}</label>
+                        <div className="grid grid-cols-4 gap-3 mb-4">
+                           {BACKGROUND_PRESETS.map((url, i) => (
+                             <button key={i} onClick={() => handleChange('backgroundImage', url)} className={`h-20 rounded-2xl border-2 overflow-hidden transition-all ${formData.backgroundImage === url ? 'border-blue-600 scale-105 shadow-lg' : 'border-transparent opacity-50 hover:opacity-100'}`}><img src={url} className="w-full h-full object-cover" /></button>
+                           ))}
+                        </div>
+                        <button onClick={() => bgFileInputRef.current?.click()} className="w-full py-5 bg-white dark:bg-gray-900 border border-dashed border-gray-200 dark:border-gray-700 text-blue-600 rounded-[1.5rem] font-black text-xs uppercase flex items-center justify-center gap-3 hover:bg-blue-50 transition-all shadow-sm">
+                           {isUploadingBg ? <Loader2 className="animate-spin" /> : <UploadCloud size={18} />} {t('رفع صورة خلفية خاصة', 'Upload Custom Background')}
+                        </button>
+                        <input type="file" ref={bgFileInputRef} onChange={handleBgUpload} className="hidden" accept="image/*" />
+                     </div>
+                   )}
+                </div>
+
+                <div className="pt-10 border-t border-gray-50 dark:border-gray-800/50 space-y-8">
+                   <div className="flex items-center justify-between px-1">
+                      <div className="flex items-center gap-3">
+                        <TypographyIcon className="text-blue-600" size={20} />
+                        <h4 className="text-[11px] font-black uppercase dark:text-white tracking-widest">{t('تخصيص ألوان الخطوط والعناصر', 'Typography & UI Colors')}</h4>
+                      </div>
+                      <button onClick={() => handleChange('templateId', formData.templateId)} className="text-[9px] font-black text-blue-600 uppercase flex items-center gap-2 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/10 rounded-xl hover:bg-blue-100 transition-all shadow-sm"><RefreshCcw size={12}/> {t('استعادة ألوان القالب', 'Reset Colors')}</button>
+                   </div>
+
+                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-[2rem] space-y-4 shadow-sm border border-gray-100 dark:border-gray-700">
+                         <label className={labelClasses}>{t('لون الاسم', 'Name Color')}</label>
+                         <div className="flex items-center gap-3">
+                            <div className="relative w-10 h-10 rounded-xl overflow-hidden border shadow-sm">
+                              <input type="color" value={formData.nameColor} onChange={e => handleChange('nameColor', e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer scale-150" />
+                              <div className="w-full h-full" style={{ backgroundColor: formData.nameColor }} />
+                            </div>
+                            <span className="text-[11px] font-mono font-black uppercase dark:text-gray-400">{formData.nameColor}</span>
+                         </div>
+                      </div>
+                      <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-[2rem] space-y-4 shadow-sm border border-gray-100 dark:border-gray-700">
+                         <label className={labelClasses}>{t('لون المسمى', 'Title Color')}</label>
+                         <div className="flex items-center gap-3">
+                            <div className="relative w-10 h-10 rounded-xl overflow-hidden border shadow-sm">
+                              <input type="color" value={formData.titleColor} onChange={e => handleChange('titleColor', e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer scale-150" />
+                              <div className="w-full h-full" style={{ backgroundColor: formData.titleColor }} />
+                            </div>
+                            <span className="text-[11px] font-mono font-black uppercase dark:text-gray-400">{formData.titleColor}</span>
+                         </div>
+                      </div>
+                      <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-[2rem] space-y-4 shadow-sm border border-gray-100 dark:border-gray-700">
+                         <label className={labelClasses}>{t('لون الروابط', 'Links Color')}</label>
+                         <div className="flex items-center gap-3">
+                            <div className="relative w-10 h-10 rounded-xl overflow-hidden border shadow-sm">
+                              <input type="color" value={formData.linksColor} onChange={e => handleChange('linksColor', e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer scale-150" />
+                              <div className="w-full h-full" style={{ backgroundColor: formData.linksColor }} />
+                            </div>
+                            <span className="text-[11px] font-mono font-black uppercase dark:text-gray-400">{formData.linksColor}</span>
+                         </div>
+                      </div>
+                   </div>
+
+                   <div className="flex flex-col sm:flex-row gap-6 p-8 bg-blue-50/30 dark:bg-blue-900/5 rounded-[3rem] border border-blue-100/50 dark:border-blue-900/10">
+                      <div className="flex-1 flex items-center justify-between gap-4">
+                        <div className="flex flex-col">
+                           <span className="text-xs font-black dark:text-white uppercase leading-none mb-1">{t('الوضع الليلي', 'Dark Mode')}</span>
+                           <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{t('تفعيل المظهر الداكن للبطاقة', 'Toggle dark aesthetics')}</span>
+                        </div>
+                        <button onClick={() => handleChange('isDark', !formData.isDark)} className={`w-14 h-7 rounded-full relative transition-all ${formData.isDark ? 'bg-blue-600 shadow-lg shadow-blue-500/20' : 'bg-gray-300 dark:bg-gray-700'}`}>
+                           <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all shadow-md ${isRtl ? (formData.isDark ? 'right-8' : 'right-1') : (formData.isDark ? 'left-8' : 'left-1')}`} />
+                        </button>
+                      </div>
+                      <div className="flex-1 flex items-center justify-between gap-4 border-t sm:border-t-0 sm:border-l border-gray-100 dark:border-gray-800 pt-4 sm:pt-0 sm:pl-8">
+                        <div className="flex flex-col">
+                           <span className="text-xs font-black dark:text-white uppercase leading-none mb-1">{t('رمز الـ QR', 'QR Code')}</span>
+                           <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{t('إظهار رمز المشاركة السريعة', 'Show quick share code')}</span>
+                        </div>
+                        <button onClick={() => handleChange('showQrCode', !formData.showQrCode)} className={`w-14 h-7 rounded-full relative transition-all ${formData.showQrCode !== false ? 'bg-blue-600 shadow-lg shadow-blue-500/20' : 'bg-gray-300 dark:bg-gray-700'}`}>
+                           <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all shadow-md ${isRtl ? (formData.showQrCode !== false ? 'right-8' : 'right-1') : (formData.showQrCode !== false ? 'left-8' : 'left-1')}`} />
+                        </button>
+                      </div>
+                   </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'occasion' && (
+              <div className="space-y-10 animate-fade-in relative z-10">
+                 <div className="flex items-center justify-between p-8 bg-violet-50 dark:bg-violet-900/10 rounded-[3rem] border border-violet-100 dark:border-violet-900/20 shadow-sm relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-full bg-violet-600/5 rotate-12 translate-x-10 pointer-events-none" />
+                    <div className="flex items-center gap-5 relative">
+                       <div className="p-4 bg-violet-600 text-white rounded-2xl shadow-xl"><PartyPopper size={28} /></div>
+                       <div>
+                          <h4 className="text-base font-black dark:text-white uppercase leading-none mb-2">{t('قسم المناسبة الخاصة', 'Special Occasion Section')}</h4>
+                          <p className="text-[10px] font-bold text-violet-400 uppercase tracking-[0.2em]">{t('زفاف، تخرج، افتتاح، إلخ', 'Wedding, graduation, etc')}</p>
+                       </div>
                     </div>
+                    <button onClick={() => handleChange('showOccasion', !formData.showOccasion)} className={`w-16 h-8 rounded-full relative transition-all shadow-inner ${formData.showOccasion ? 'bg-violet-600 shadow-violet-500/20' : 'bg-gray-300 dark:bg-gray-700'}`}>
+                       <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-all shadow-md ${isRtl ? (formData.showOccasion ? 'right-9' : 'right-1') : (formData.showOccasion ? 'left-9' : 'left-1')}`} />
+                    </button>
                  </div>
-              </div>
-            </div>
 
-            <button onClick={() => onSave(formData, originalIdRef.current || undefined)} className="hidden lg:flex w-full py-6 bg-blue-600 text-white rounded-[2.5rem] font-black text-xl shadow-2xl items-center justify-center gap-4 hover:scale-[1.01] transition-all"><Save size={24} /> {t('saveChanges')}</button>
+                 {formData.showOccasion && (
+                    <div className="space-y-8 pt-6 animate-fade-in">
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                             <label className={labelClasses}>{t('عنوان المناسبة (عربي)', 'Occasion (AR)')}</label>
+                             <input type="text" value={formData.occasionTitleAr} onChange={e => handleChange('occasionTitleAr', e.target.value)} className={inputClasses} placeholder="زفافنا الكبير" />
+                          </div>
+                          <div className="space-y-2">
+                             <label className={labelClasses}>{t('Occasion (EN)', 'Occasion (EN)')}</label>
+                             <input type="text" value={formData.occasionTitleEn} onChange={e => handleChange('occasionTitleEn', e.target.value)} className={inputClasses} placeholder="Our Big Wedding" />
+                          </div>
+                       </div>
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                             <label className={labelClasses}>{t('تاريخ ووقت المناسبة', 'Date & Time')}</label>
+                             <input type="datetime-local" value={formData.occasionDate} onChange={e => handleChange('occasionDate', e.target.value)} className={`${inputClasses} [direction:ltr] text-right font-mono`} />
+                          </div>
+                          <div className="space-y-2">
+                             <label className={labelClasses}>{t('رابط خرائط قوقل', 'Google Maps Link')}</label>
+                             <div className="relative">
+                               <MapPin className={`absolute ${isRtl ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-violet-500`} size={18} />
+                               <input type="url" value={formData.occasionMapUrl} onChange={e => handleChange('occasionMapUrl', e.target.value)} className={`${inputClasses} ${isRtl ? 'pr-12' : 'pl-12'}`} placeholder="https://maps.google.com/..." />
+                             </div>
+                          </div>
+                       </div>
+                       
+                       <div className="p-10 bg-gray-50 dark:bg-gray-800 rounded-[3.5rem] space-y-8 border border-gray-100 dark:border-gray-700 shadow-inner">
+                          <div className="flex items-center gap-3">
+                             <Settings className="text-violet-500" size={18} />
+                             <label className={labelClasses.replace('mb-2', 'mb-0')}>{t('تخصيص أبعاد وألوان المناسبة', 'Layout & Colors Tuning')}</label>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                             <div className="space-y-5">
+                                <div className="flex justify-between items-center px-1"><span className="text-[10px] font-black uppercase text-gray-400">{t('الإزاحة الرأسية', 'Vertical Y Offset')}</span><span className="text-[10px] font-black text-violet-600 bg-violet-50 dark:bg-violet-900/30 px-3 py-1 rounded-full">{formData.occasionOffsetY || 0}px</span></div>
+                                <input type="range" min="-250" max="150" value={formData.occasionOffsetY || 0} onChange={e => handleChange('occasionOffsetY', parseInt(e.target.value))} className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none accent-violet-600 cursor-pointer shadow-sm" />
+                             </div>
+                             <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-50 dark:border-gray-700">
+                                <div className="flex items-center gap-3"><Wind size={20} className="text-violet-500"/><span className="text-[10px] font-black uppercase dark:text-white tracking-widest">{t('تحريك الطفو', 'Float Animation')}</span></div>
+                                <button onClick={() => handleChange('occasionFloating', !formData.occasionFloating)} className={`w-12 h-6 rounded-full relative transition-all ${formData.occasionFloating !== false ? 'bg-violet-600' : 'bg-gray-200 dark:bg-gray-700'}`}><div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all shadow-sm ${isRtl ? (formData.occasionFloating !== false ? 'right-7' : 'right-1') : (formData.occasionFloating !== false ? 'left-7' : 'left-1')}`} /></button>
+                             </div>
+                          </div>
+                       </div>
+                    </div>
+                 )}
+              </div>
+            )}
+
+            <div className="mt-16 pt-10 border-t border-gray-50 dark:border-gray-800/50 flex flex-col sm:flex-row gap-4 relative z-10">
+               <button onClick={() => onSave(formData, originalIdRef.current || undefined)} className="flex-1 py-6 bg-blue-600 text-white rounded-[2rem] font-black text-lg shadow-2xl shadow-blue-500/30 flex items-center justify-center gap-4 hover:scale-[1.02] active:scale-95 transition-all group order-1 sm:order-1">
+                  <div className="p-2 bg-white/20 rounded-xl group-hover:rotate-12 transition-transform"><Save size={24} /></div>
+                  {t('حفظ جميع التغييرات', 'Save All Changes')}
+               </button>
+               
+               <button 
+                 onClick={() => {
+                   setShowMobilePreview(true);
+                   document.body.style.overflow = 'hidden'; 
+                 }}
+                 className="lg:hidden flex-1 py-6 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 rounded-[2rem] font-black text-lg border border-blue-100 dark:border-blue-900/30 shadow-xl flex items-center justify-center gap-4 hover:bg-blue-50 transition-all order-2 sm:order-2"
+               >
+                  <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-xl"><Eye size={24} /></div>
+                  {t('معاينة البطاقة', 'Preview Card')}
+               </button>
+
+               <button onClick={onCancel} className="px-10 py-6 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-[2rem] font-black text-sm uppercase transition-all hover:bg-red-50 hover:text-red-500 border border-transparent hover:border-red-100 order-3 sm:order-3">
+                  {t('إلغاء', 'Cancel')}
+               </button>
+            </div>
           </div>
         </div>
-        <div className="hidden lg:block w-[480px] sticky top-12 self-start"><div className="p-4 bg-white dark:bg-gray-900 rounded-[4rem] border border-gray-100 dark:border-gray-800 shadow-2xl overflow-hidden"><PreviewContent /></div></div>
+
+        {/* Desktop Fixed Preview */}
+        <div className="hidden lg:block w-[450px] sticky top-[80px] self-start py-8">
+           <div className="p-5 bg-white dark:bg-gray-950 rounded-[4.5rem] border border-gray-100 dark:border-gray-800 shadow-2xl overflow-hidden relative group">
+              <div className="mb-8 flex items-center justify-between px-6">
+                <div className="flex items-center gap-3">
+                   <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                   <span className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">{isRtl ? 'معاينة حية' : 'Live Preview'}</span>
+                </div>
+                <div className="flex bg-gray-100 dark:bg-gray-800 p-1.5 rounded-2xl">
+                   <button onClick={() => setPreviewDevice('mobile')} className={`p-2.5 rounded-xl transition-all ${previewDevice === 'mobile' ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-md' : 'text-gray-400'}`}><Smartphone size={18}/></button>
+                   <button onClick={() => setPreviewDevice('tablet')} className={`p-2.5 rounded-xl transition-all ${previewDevice === 'tablet' ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-md' : 'text-gray-400'}`}><Tablet size={18}/></button>
+                   <button onClick={() => setPreviewDevice('desktop')} className={`p-2.5 rounded-xl transition-all ${previewDevice === 'desktop' ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-md' : 'text-gray-400'}`}><Monitor size={18}/></button>
+                </div>
+              </div>
+
+              <div className={`transition-all duration-500 border-[12px] border-gray-900 dark:border-gray-800 rounded-[4rem] shadow-2xl overflow-hidden mx-auto bg-white dark:bg-black ${previewDevice === 'mobile' ? 'w-[320px]' : previewDevice === 'tablet' ? 'w-[400px]' : 'w-[340px]'}`}>
+                <div className="h-[640px] overflow-y-auto no-scrollbar scroll-smooth">
+                  <CardPreview data={formData} lang={lang} customConfig={currentTemplate?.config} hideSaveButton={true} />
+                </div>
+              </div>
+           </div>
+        </div>
       </div>
+      
+      {/* Premium Centered Mobile Preview Modal - EXACT MATCH TO DESKTOP */}
+      {showMobilePreview && (
+        <div className="lg:hidden fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-2xl animate-fade-in">
+           
+           <div className="relative flex flex-col items-center max-h-full">
+              {/* Header Floating Label */}
+              <div className="mb-6 flex items-center gap-3 bg-white/10 px-6 py-2.5 rounded-full border border-white/20 backdrop-blur-md">
+                 <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.8)]"></div>
+                 <span className="text-[10px] font-black text-white uppercase tracking-[0.3em]">{t('معاينة حية', 'Live Preview')}</span>
+              </div>
+
+              {/* The "Phone" Frame - EXACTLY like desktop version */}
+              <div className="relative w-[320px] max-h-[80vh] aspect-[1/2] border-[12px] border-gray-900 dark:border-[#1a1a1f] rounded-[4rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.8)] overflow-hidden bg-white dark:bg-black flex flex-col animate-zoom-in">
+                 
+                 {/* Floating Close Button - Inside the top area but subtle */}
+                 <button 
+                   onClick={() => { setShowMobilePreview(false); document.body.style.overflow = 'auto'; }}
+                   className="absolute top-4 right-4 z-[1200] p-2 bg-black/40 backdrop-blur-xl text-white rounded-full active:scale-90 transition-all border border-white/10"
+                 >
+                   <X size={18} />
+                 </button>
+
+                 <div className="flex-1 overflow-y-auto no-scrollbar scroll-smooth">
+                    <CardPreview data={formData} lang={lang} customConfig={currentTemplate?.config} hideSaveButton={true} />
+                 </div>
+
+                 {/* Bottom Indicator */}
+                 <div className="h-6 flex items-center justify-center shrink-0 bg-white dark:bg-black/50 border-t border-gray-100/10">
+                    <div className="w-20 h-1 bg-gray-300 dark:bg-gray-800 rounded-full opacity-40"></div>
+                 </div>
+              </div>
+
+              {/* Large CTA Button to close and save */}
+              <button 
+                 onClick={() => { setShowMobilePreview(false); document.body.style.overflow = 'auto'; }}
+                 className="mt-8 px-12 py-4 bg-white text-blue-600 rounded-[1.5rem] font-black text-xs uppercase shadow-[0_20px_40px_-10px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
+              >
+                 <ArrowLeft size={16} className={isRtl ? 'rotate-180' : ''} />
+                 {t('العودة للتعديل', 'Back to Editor')}
+              </button>
+           </div>
+           
+           {/* Dismiss Backdrop Area */}
+           <div 
+             className="absolute inset-0 -z-10" 
+             onClick={() => { setShowMobilePreview(false); document.body.style.overflow = 'auto'; }}
+           />
+        </div>
+      )}
+
+      {/* Global CSS for scrollbars */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes zoom-in {
+          from { transform: scale(0.9) translateY(40px); opacity: 0; }
+          to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .animate-zoom-in { animation: zoom-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* تصفير أشرطة التمرير في كافة العناصر بشكل قطعي */
+        .no-scrollbar::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none !important;
+          scrollbar-width: none !important;
+          overflow: -moz-scrollbars-none;
+        }
+      `}} />
     </div>
   );
 };

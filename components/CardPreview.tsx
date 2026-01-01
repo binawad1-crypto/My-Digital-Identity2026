@@ -196,17 +196,13 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
   };
 
   const isOverlay = headerType === 'overlay';
-  
-  // نحدد "الإزاحة التلقائية" لكل نمط ليكون السلايدر هو إضافة (Nudge) فوقها
   const baseAvatarOffset = isOverlay ? -(config.avatarSize * 0.6 + 10) : 0;
   const totalAvatarOffsetY = baseAvatarOffset + (config.avatarOffsetY || 0);
 
-  // حساب خلفية الجسم مع دعم الشفافية والنمط الزجاجي
   const bodyOpacity = (config.bodyOpacity ?? 100) / 100;
   const bodyBgBase = isDark ? `rgba(18, 18, 21, ${bodyOpacity})` : `rgba(255, 255, 255, ${bodyOpacity})`;
   const bodyRadius = config.bodyBorderRadius !== undefined ? `${config.bodyBorderRadius}px` : '3rem';
 
-  // حساب الهامش العلوي الأساسي بناءً على النمط
   const getBaseMargin = () => {
     if (isOverlay) return (headerHeight * 0.4);
     if (headerType === 'top-bar' || headerType === 'minimal') return 20;
@@ -214,12 +210,11 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
     return -60; 
   };
 
-  // الأرضية تظهر دائماً إذا كان هناك إزاحة (bodyOffsetY) أو إذا كان النمط متداخل أو زجاجي
   const shouldShowFloor = isOverlay || config.bodyGlassy || config.bodyOffsetY !== 0 || (config.bodyOpacity ?? 100) < 100;
 
   const bodyStyles: React.CSSProperties = {
     marginTop: `${getBaseMargin()}px`,
-    transform: `translateY(${config.bodyOffsetY || 0}px)`, // نستخدم transform للتحريك لضمان استجابة الزر فورياً
+    transform: `translateY(${config.bodyOffsetY || 0}px)`, 
     backgroundColor: shouldShowFloor ? bodyBgBase : 'transparent',
     borderRadius: (shouldShowFloor || config.bodyBorderRadius) ? `${bodyRadius} ${bodyRadius} 0 0` : '0',
     paddingTop: shouldShowFloor ? '20px' : '0',
@@ -236,12 +231,9 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
 
   return (
     <div className={`w-full h-full flex flex-col transition-all duration-500 relative overflow-hidden ${isDark ? 'bg-[#0f0f12] text-white' : 'bg-white text-gray-900'}`} style={{ textAlign: config.contentAlign }}>
-      {/* Header */}
       <div className="shrink-0 overflow-hidden" style={getHeaderStyles()} />
 
-      {/* Body Content (الأرضية الملونة/البيضاء) */}
       <div className="flex flex-col items-center flex-1 px-4 sm:px-6" style={bodyStyles}>
-        
         {(config.avatarStyle !== 'none' || !config.avatarStyle) && (
           <ProfileImage 
             size={config.avatarSize} 
@@ -253,21 +245,24 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
         )}
 
         <div className="w-full space-y-4" style={{ marginTop: isOverlay ? `-${config.avatarSize * 0.4}px` : '20px' }}>
-           {config.showNameByDefault !== false && (
+           {/* Name Visibility Logic */}
+           {data.showName !== false && config.showNameByDefault !== false && (
              <h2 className="text-2xl font-black leading-tight" style={{ color: nameColor, transform: `translateY(${config.nameOffsetY}px)`, fontSize: `${config.nameSize}px` }}>
                {data.name || '---'}
              </h2>
            )}
 
-           {(config.showTitleByDefault !== false || config.showCompanyByDefault !== false) && (
+           {/* Title & Company Visibility Logic */}
+           {( (data.showTitle !== false && config.showTitleByDefault !== false) || (data.showCompany !== false && config.showCompanyByDefault !== false) ) && (
              <p className="font-bold opacity-80" style={{ color: titleColor }}>
-               {config.showTitleByDefault !== false && data.title}
-               {config.showTitleByDefault !== false && config.showCompanyByDefault !== false && data.company && ' • '}
-               {config.showCompanyByDefault !== false && data.company}
+               {data.showTitle !== false && config.showTitleByDefault !== false && data.title}
+               {(data.showTitle !== false && config.showTitleByDefault !== false) && (data.showCompany !== false && config.showCompanyByDefault !== false) && data.company && ' • '}
+               {data.showCompany !== false && config.showCompanyByDefault !== false && data.company}
              </p>
            )}
 
-           {config.showBioByDefault !== false && data.bio && (
+           {/* Bio Visibility Logic */}
+           {data.showBio !== false && config.showBioByDefault !== false && data.bio && (
              <div className="p-4 rounded-2xl mx-auto max-w-[300px]" style={{ backgroundColor: bioBgColor, transform: `translateY(${config.bioOffsetY}px)` }}>
                <p className="font-medium leading-relaxed" style={{ color: bioTextColor, fontSize: `${config.bioSize}px` }}>
                  "{data.bio}"
@@ -275,7 +270,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
              </div>
            )}
 
-           {config.showOccasionByDefault && data.showOccasion && data.occasionDate && (
+           {data.showOccasion !== false && config.showOccasionByDefault && data.showOccasion && data.occasionDate && (
              <div className={`p-6 rounded-[2.5rem] shadow-xl border relative overflow-hidden mt-6 ${data.occasionFloating !== false ? 'animate-float' : ''}`}
                   style={{ 
                     backgroundColor: data.occasionBgColor || (isDark ? 'rgba(255,255,255,0.05)' : '#ffffff'),
@@ -298,19 +293,19 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
            )}
 
            <div className="space-y-3 pt-6">
-              {config.showEmailByDefault !== false && data.email && (
+              {data.showEmail !== false && config.showEmailByDefault !== false && data.email && (
                 <a href={`mailto:${data.email}`} className="flex items-center gap-3 justify-center text-sm font-bold opacity-80 hover:opacity-100 transition-opacity" style={{ color: linksColor }}>
                   <Mail size={16} /> {data.email}
                 </a>
               )}
-              {config.showWebsiteByDefault !== false && data.website && (
+              {data.showWebsite !== false && config.showWebsiteByDefault !== false && data.website && (
                 <a href={`https://${data.website}`} target="_blank" className="flex items-center gap-3 justify-center text-sm font-bold opacity-80 hover:opacity-100 transition-opacity" style={{ color: linksColor }}>
                   <Globe size={16} /> {data.website}
                 </a>
               )}
            </div>
 
-           {config.showSocialLinksByDefault !== false && data.socialLinks?.length > 0 && (
+           {data.showSocialLinks !== false && config.showSocialLinksByDefault !== false && data.socialLinks?.length > 0 && (
              <div className="flex flex-wrap justify-center gap-3 py-6">
                {data.socialLinks.map((link, idx) => (
                  <a key={idx} href={link.url} target="_blank" className="p-3 bg-gray-50 dark:bg-gray-800 rounded-2xl hover:scale-110 transition-all shadow-sm">
@@ -320,14 +315,14 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
              </div>
            )}
 
-           {config.showButtonsByDefault !== false && (
+           {data.showButtons !== false && config.showButtonsByDefault !== false && (
               <div className="flex flex-wrap gap-2 justify-center w-full mt-6" style={{ transform: `translateY(${config.contactButtonsOffsetY}px)` }}>
-                {data.phone && (
+                {data.showPhone !== false && data.phone && (
                   <a href={`tel:${data.phone}`} className={`flex items-center gap-2 px-6 py-3 rounded-full bg-blue-600 text-white font-black text-xs shadow-lg`}>
                     <Phone size={14} /> {t('call')}
                   </a>
                 )}
-                {data.whatsapp && (
+                {data.showWhatsapp !== false && data.whatsapp && (
                   <a href={`https://wa.me/${data.whatsapp}`} target="_blank" className={`flex items-center gap-2 px-6 py-3 rounded-full bg-emerald-500 text-white font-black text-xs shadow-lg`}>
                     <MessageCircle size={14} /> {t('whatsappBtn')}
                   </a>
@@ -340,7 +335,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
               </div>
            )}
 
-           {config.showQrCodeByDefault !== false && (
+           {data.showQrCode !== false && config.showQrCodeByDefault !== false && (
              <div className="pt-10 flex flex-col items-center gap-3" style={{ transform: `translateY(${config.qrOffsetY}px)` }}>
                <div className="p-3 bg-white rounded-3xl shadow-2xl border-4 border-gray-50 dark:border-gray-800">
                   <img src={qrImageUrl} alt="QR" style={{ width: `${config.qrSize}px`, height: `${config.qrSize}px` }} />
