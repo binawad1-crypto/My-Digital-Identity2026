@@ -12,7 +12,7 @@ import {
   AlignRight, LayoutTemplate, Info, Maximize2, UserCircle, Mail, 
   Phone, Globe, MessageCircle, Camera, Download, Tablet, Monitor, 
   Eye, QrCode, Wind, GlassWater, ChevronRight, ChevronLeft, 
-  Waves, Square, Columns, Minus, ToggleLeft, ToggleRight, Calendar, MapPin, Timer, PartyPopper
+  Waves, Square, Columns, Minus, ToggleLeft, ToggleRight, Calendar, MapPin, Timer, PartyPopper, Link as LinkIcon
 } from 'lucide-react';
 
 interface TemplateBuilderProps {
@@ -241,26 +241,26 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
 
             {activeTab === 'layout' && (
               <div className="space-y-8 animate-fade-in">
-                {/* إعدادات بطاقة المحتوى (الأرضية) */}
                 <div className="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="p-3 bg-blue-600 text-white rounded-2xl shadow-lg"><Move size={20} /></div>
                     <div>
-                      <h4 className="text-sm font-black dark:text-white uppercase tracking-widest leading-none mb-1">{isRtl ? 'إعدادات بطاقة المحتوى (الأرضية)' : 'Content Card Settings'}</h4>
-                      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{isRtl ? 'تخصيص وتحريك البطاقة التي تبرز فوق الترويسة' : 'Customize and move the card overlapping header'}</p>
+                      <h4 className="text-sm font-black dark:text-white uppercase tracking-widest leading-none mb-1">{isRtl ? 'تحريك وتموضع عناصر البطاقة' : 'Element Positioning'}</h4>
+                      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{isRtl ? 'تحكم في إزاحة كل قسم داخل البطاقة' : 'Control the vertical offset of each section'}</p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <RangeControl 
-                      label={t('تحريك الأرضية (فوق/تحت)', 'Card Vertical Offset')} 
-                      min={-200} 
-                      max={500} 
-                      value={template.config.bodyOffsetY || 0} 
-                      onChange={(v: number) => updateConfig('bodyOffsetY', v)} 
-                      icon={Move} 
-                    />
-                    <RangeControl label={t('زوايا البطاقة', 'Card Corners')} min={0} max={100} value={template.config.bodyBorderRadius !== undefined ? template.config.bodyBorderRadius : 48} onChange={(v: number) => updateConfig('bodyBorderRadius', v)} icon={Box} />
+                    <RangeControl label={t('تحريك الأرضية العامة', 'Main Body Offset')} min={-200} max={500} value={template.config.bodyOffsetY || 0} onChange={(v: number) => updateConfig('bodyOffsetY', v)} icon={Layers} />
+                    <RangeControl label={t('زوايا البطاقة', 'Body Radius')} min={0} max={100} value={template.config.bodyBorderRadius !== undefined ? template.config.bodyBorderRadius : 48} onChange={(v: number) => updateConfig('bodyBorderRadius', v)} icon={Box} />
+                  </div>
+
+                  {/* قمة التحكم المفقودة - تحريك الروابط والازرار */}
+                  <div className="pt-6 border-t border-gray-100 dark:border-gray-800 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <RangeControl label={t('إزاحة قسم البريد', 'Email Offset')} min={-100} max={100} value={template.config.emailOffsetY || 0} onChange={(v: number) => updateConfig('emailOffsetY', v)} icon={Mail} />
+                    <RangeControl label={t('إزاحة قسم الموقع', 'Website Offset')} min={-100} max={100} value={template.config.websiteOffsetY || 0} onChange={(v: number) => updateConfig('websiteOffsetY', v)} icon={Globe} />
+                    <RangeControl label={t('إزاحة أيقونات التواصل', 'Social Icons Offset')} min={-100} max={100} value={template.config.socialLinksOffsetY || 0} onChange={(v: number) => updateConfig('socialLinksOffsetY', v)} icon={LinkIcon} />
+                    <RangeControl label={t('إزاحة أزرار الاتصال', 'Contact Buttons Offset')} min={-100} max={100} value={template.config.contactButtonsOffsetY || 0} onChange={(v: number) => updateConfig('contactButtonsOffsetY', v)} icon={Phone} />
                   </div>
 
                   <div className="pt-6 border-t border-gray-100 dark:border-gray-800 space-y-6">
@@ -377,7 +377,6 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
               </div>
             )}
 
-            {/* Visuals tab and others remain essentially same but I'll update to be sure */}
             {activeTab === 'visuals' && (
               <div className="space-y-8 animate-fade-in">
                 <div className="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
@@ -477,6 +476,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
                                <ColorPicker label={t('خلفية النبذة', 'Bio Bg Color')} value={template.config.bioBgColor} onChange={(v: string) => updateConfig('bioBgColor', v)} />
                             </div>
                             <RangeControl label={t('حجم النبذة', 'Bio Font Size')} min={10} max={24} value={template.config.bioSize} onChange={(v: number) => updateConfig('bioSize', v)} icon={TypographyIcon} />
+                            <RangeControl label={t('إزاحة النبذة', 'Bio Offset')} min={-100} max={100} value={template.config.bioOffsetY} onChange={(v: number) => updateConfig('bioOffsetY', v)} icon={Move} />
                          </div>
                        )}
                     </div>
@@ -517,14 +517,12 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
                             </div>
                          </div>
 
-                         {/* ألوان المناسبة للقالب */}
                          <div className="pt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <ColorPicker label={t('اللون الأساسي', 'Primary Color')} value={template.config.occasionPrimaryColor} onChange={(v: string) => updateConfig('occasionPrimaryColor', v)} compact />
                             <ColorPicker label={t('خلفية البطاقة', 'Card BG')} value={template.config.occasionBgColor} onChange={(v: string) => updateConfig('occasionBgColor', v)} compact />
                             <ColorPicker label={t('لون العنوان', 'Title Color')} value={template.config.occasionTitleColor} onChange={(v: string) => updateConfig('occasionTitleColor', v)} compact />
                          </div>
 
-                         {/* تحكم الإزاحة والتحريك الافتراضي للقالب */}
                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <RangeControl label={t('إزاحة القسم افتراضياً', 'Default Y Offset')} min={-250} max={150} value={template.config.occasionOffsetY || 0} onChange={(v: number) => updateConfig('occasionOffsetY', v)} icon={Move} />
                             <ToggleSwitch label={t('تفعيل تحريك الطفو افتراضياً', 'Default Float')} value={template.config.occasionFloating !== false} onChange={(v: boolean) => updateConfig('occasionFloating', v)} icon={Wind} />

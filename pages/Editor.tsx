@@ -46,9 +46,14 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
   const [formData, setFormData] = useState<CardData>(() => {
     const targetTemplateId = initialData?.templateId || forcedTemplateId || templates[0]?.id || 'classic';
     const selectedTmpl = templates.find(t => t.id === targetTemplateId);
-    const baseData = initialData || { ...(SAMPLE_DATA[lang] || SAMPLE_DATA['en']), id: generateSerialId(), templateId: targetTemplateId, showQrCode: true, showBio: true, showName: true, showTitle: true, showCompany: true, showEmail: true, showPhone: true, showWebsite: true, showWhatsapp: true, showSocialLinks: true, showButtons: true } as CardData;
+    
+    // إذا كان تعديلاً لبطاقة موجودة، نستخدم بياناتها كما هي
+    if (initialData) return initialData;
 
-    if (selectedTmpl && !initialData) {
+    // إذا كانت بطاقة جديدة، نقوم بدمج بيانات العينة مع إعدادات القالب المختار
+    const baseData = { ...(SAMPLE_DATA[lang] || SAMPLE_DATA['en']), id: generateSerialId(), templateId: targetTemplateId } as CardData;
+
+    if (selectedTmpl) {
        return {
          ...baseData,
          templateId: targetTemplateId,
@@ -60,6 +65,17 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
          nameColor: selectedTmpl.config.nameColor || baseData.nameColor,
          titleColor: selectedTmpl.config.titleColor || baseData.titleColor,
          linksColor: selectedTmpl.config.linksColor || baseData.linksColor,
+         // مزامنة خيارات الرؤية الافتراضية للقالب مع البطاقة الجديدة
+         showName: selectedTmpl.config.showNameByDefault ?? true,
+         showTitle: selectedTmpl.config.showTitleByDefault ?? true,
+         showCompany: selectedTmpl.config.showCompanyByDefault ?? true,
+         showBio: selectedTmpl.config.showBioByDefault ?? true,
+         showEmail: selectedTmpl.config.showEmailByDefault ?? true,
+         showWebsite: selectedTmpl.config.showWebsiteByDefault ?? true,
+         showSocialLinks: selectedTmpl.config.showSocialLinksByDefault ?? true,
+         showButtons: selectedTmpl.config.showButtonsByDefault ?? true,
+         showQrCode: selectedTmpl.config.showQrCodeByDefault ?? true,
+         showOccasion: selectedTmpl.config.showOccasionByDefault ?? false,
        } as CardData;
     }
     return baseData;
@@ -88,7 +104,18 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
           themeColor: newTmpl.config.defaultThemeColor || prev.themeColor,
           themeGradient: newTmpl.config.defaultThemeGradient || prev.themeGradient,
           backgroundImage: newTmpl.config.defaultBackgroundImage || prev.backgroundImage,
-          isDark: newTmpl.config.defaultIsDark ?? prev.isDark
+          isDark: newTmpl.config.defaultIsDark ?? prev.isDark,
+          // تحديث الرؤية بناءً على القالب المختار الجديد إذا كان المستخدم في مرحلة الإنشاء الأولي
+          showName: newTmpl.config.showNameByDefault ?? prev.showName,
+          showTitle: newTmpl.config.showTitleByDefault ?? prev.showTitle,
+          showCompany: newTmpl.config.showCompanyByDefault ?? prev.showCompany,
+          showBio: newTmpl.config.showBioByDefault ?? prev.showBio,
+          showEmail: newTmpl.config.showEmailByDefault ?? prev.showEmail,
+          showWebsite: newTmpl.config.showWebsiteByDefault ?? prev.showWebsite,
+          showSocialLinks: newTmpl.config.showSocialLinksByDefault ?? prev.showSocialLinks,
+          showButtons: newTmpl.config.showButtonsByDefault ?? prev.showButtons,
+          showQrCode: newTmpl.config.showQrCodeByDefault ?? prev.showQrCode,
+          showOccasion: newTmpl.config.showOccasionByDefault ?? prev.showOccasion,
         }));
         return;
       }

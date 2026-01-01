@@ -245,24 +245,21 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
         )}
 
         <div className="w-full space-y-4" style={{ marginTop: isOverlay ? `-${config.avatarSize * 0.4}px` : '20px' }}>
-           {/* Name Visibility Logic */}
-           {data.showName !== false && config.showNameByDefault !== false && (
+           {data.showName !== false && (
              <h2 className="text-2xl font-black leading-tight" style={{ color: nameColor, transform: `translateY(${config.nameOffsetY}px)`, fontSize: `${config.nameSize}px` }}>
                {data.name || '---'}
              </h2>
            )}
 
-           {/* Title & Company Visibility Logic */}
-           {( (data.showTitle !== false && config.showTitleByDefault !== false) || (data.showCompany !== false && config.showCompanyByDefault !== false) ) && (
+           {(data.showTitle !== false || data.showCompany !== false) && (
              <p className="font-bold opacity-80" style={{ color: titleColor }}>
-               {data.showTitle !== false && config.showTitleByDefault !== false && data.title}
-               {(data.showTitle !== false && config.showTitleByDefault !== false) && (data.showCompany !== false && config.showCompanyByDefault !== false) && data.company && ' • '}
-               {data.showCompany !== false && config.showCompanyByDefault !== false && data.company}
+               {data.showTitle !== false && data.title}
+               {(data.showTitle !== false && data.showCompany !== false) && data.company && ' • '}
+               {data.showCompany !== false && data.company}
              </p>
            )}
 
-           {/* Bio Visibility Logic */}
-           {data.showBio !== false && config.showBioByDefault !== false && data.bio && (
+           {data.showBio !== false && data.bio && (
              <div className="p-4 rounded-2xl mx-auto max-w-[300px]" style={{ backgroundColor: bioBgColor, transform: `translateY(${config.bioOffsetY}px)` }}>
                <p className="font-medium leading-relaxed" style={{ color: bioTextColor, fontSize: `${config.bioSize}px` }}>
                  "{data.bio}"
@@ -270,7 +267,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
              </div>
            )}
 
-           {data.showOccasion !== false && config.showOccasionByDefault && data.showOccasion && data.occasionDate && (
+           {data.showOccasion !== false && data.occasionDate && (
              <div className={`p-6 rounded-[2.5rem] shadow-xl border relative overflow-hidden mt-6 ${data.occasionFloating !== false ? 'animate-float' : ''}`}
                   style={{ 
                     backgroundColor: data.occasionBgColor || (isDark ? 'rgba(255,255,255,0.05)' : '#ffffff'),
@@ -293,20 +290,20 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
            )}
 
            <div className="space-y-3 pt-6">
-              {data.showEmail !== false && config.showEmailByDefault !== false && data.email && (
-                <a href={`mailto:${data.email}`} className="flex items-center gap-3 justify-center text-sm font-bold opacity-80 hover:opacity-100 transition-opacity" style={{ color: linksColor }}>
+              {data.showEmail !== false && data.email && (
+                <a href={`mailto:${data.email}`} className="flex items-center gap-3 justify-center text-sm font-bold opacity-80 hover:opacity-100 transition-opacity" style={{ color: linksColor, transform: `translateY(${config.emailOffsetY || 0}px)` }}>
                   <Mail size={16} /> {data.email}
                 </a>
               )}
-              {data.showWebsite !== false && config.showWebsiteByDefault !== false && data.website && (
-                <a href={`https://${data.website}`} target="_blank" className="flex items-center gap-3 justify-center text-sm font-bold opacity-80 hover:opacity-100 transition-opacity" style={{ color: linksColor }}>
+              {data.showWebsite !== false && data.website && (
+                <a href={`https://${data.website}`} target="_blank" className="flex items-center gap-3 justify-center text-sm font-bold opacity-80 hover:opacity-100 transition-opacity" style={{ color: linksColor, transform: `translateY(${config.websiteOffsetY || 0}px)` }}>
                   <Globe size={16} /> {data.website}
                 </a>
               )}
            </div>
 
-           {data.showSocialLinks !== false && config.showSocialLinksByDefault !== false && data.socialLinks?.length > 0 && (
-             <div className="flex flex-wrap justify-center gap-3 py-6">
+           {data.showSocialLinks !== false && data.socialLinks?.length > 0 && (
+             <div className="flex flex-wrap justify-center gap-3 py-6" style={{ transform: `translateY(${config.socialLinksOffsetY || 0}px)` }}>
                {data.socialLinks.map((link, idx) => (
                  <a key={idx} href={link.url} target="_blank" className="p-3 bg-gray-50 dark:bg-gray-800 rounded-2xl hover:scale-110 transition-all shadow-sm">
                    <SocialIcon platformId={link.platformId} size={20} color={linksColor} />
@@ -315,8 +312,8 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
              </div>
            )}
 
-           {data.showButtons !== false && config.showButtonsByDefault !== false && (
-              <div className="flex flex-wrap gap-2 justify-center w-full mt-6" style={{ transform: `translateY(${config.contactButtonsOffsetY}px)` }}>
+           {data.showButtons !== false && (
+              <div className="flex flex-wrap gap-2 justify-center w-full mt-6" style={{ transform: `translateY(${config.contactButtonsOffsetY || 0}px)` }}>
                 {data.showPhone !== false && data.phone && (
                   <a href={`tel:${data.phone}`} className={`flex items-center gap-2 px-6 py-3 rounded-full bg-blue-600 text-white font-black text-xs shadow-lg`}>
                     <Phone size={14} /> {t('call')}
@@ -335,8 +332,8 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
               </div>
            )}
 
-           {data.showQrCode !== false && config.showQrCodeByDefault !== false && (
-             <div className="pt-10 flex flex-col items-center gap-3" style={{ transform: `translateY(${config.qrOffsetY}px)` }}>
+           {data.showQrCode !== false && (
+             <div className="pt-10 flex flex-col items-center gap-3" style={{ transform: `translateY(${config.qrOffsetY || 0}px)` }}>
                <div className="p-3 bg-white rounded-3xl shadow-2xl border-4 border-gray-50 dark:border-gray-800">
                   <img src={qrImageUrl} alt="QR" style={{ width: `${config.qrSize}px`, height: `${config.qrSize}px` }} />
                </div>
