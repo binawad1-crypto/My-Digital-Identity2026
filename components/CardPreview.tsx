@@ -76,8 +76,17 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
   const linksColor = data.linksColor || config.linksColor || '#3b82f6';
   const qrColorVal = (data.qrColor || config.qrColor || themeColor || '#000000').replace('#', '');
 
+  const qrBorderWidth = data.qrBorderWidth ?? config.qrBorderWidth ?? 0;
+  const qrBorderColor = data.qrBorderColor || config.qrBorderColor || 'transparent';
+  const qrBorderRadius = data.qrBorderRadius ?? config.qrBorderRadius ?? 24;
+  const qrBgColor = data.qrBgColor || config.qrBgColor || (isDark ? '#111115' : '#ffffff');
+  const qrPadding = 0; 
+  
+  const qrSize = data.qrSize || config.qrSize || 90;
+  const qrOffsetY = data.qrOffsetY || config.qrOffsetY || 0;
+
   const cardUrl = generateShareUrl(data);
-  const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(cardUrl)}&bgcolor=${isDark ? '111115' : 'ffffff'}&color=${qrColorVal}&margin=2`;
+  const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(cardUrl)}&bgcolor=${qrBgColor === 'transparent' ? (isDark ? '0f0f12' : 'ffffff') : qrBgColor.replace('#', '')}&color=${qrColorVal}&margin=0`;
 
   const getHeaderBackground = () => {
     if (themeType === 'image' && backgroundImage) {
@@ -115,21 +124,11 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
     }
 
     switch(headerType) {
-      case 'curved':
-        baseStyle.clipPath = 'ellipse(100% 100% at 50% 0%)';
-        break;
-      case 'diagonal':
-        baseStyle.clipPath = 'polygon(0 0, 100% 0, 100% 85%, 0 100%)';
-        break;
-      case 'split-left':
-        baseStyle.clipPath = 'polygon(0 0, 100% 0, 100% 60%, 0 100%)';
-        break;
-      case 'split-right':
-        baseStyle.clipPath = 'polygon(0 0, 100% 0, 100% 100%, 0 60%)';
-        break;
-      case 'wave':
-        baseStyle.clipPath = 'polygon(0% 0%, 100% 0%, 100% 85%, 90% 88%, 80% 90%, 70% 89%, 60% 86%, 50% 84%, 40% 83%, 30% 85%, 20% 88%, 10% 90%, 0% 88%)';
-        break;
+      case 'curved': baseStyle.clipPath = 'ellipse(100% 100% at 50% 0%)'; break;
+      case 'diagonal': baseStyle.clipPath = 'polygon(0 0, 100% 0, 100% 85%, 0 100%)'; break;
+      case 'split-left': baseStyle.clipPath = 'polygon(0 0, 100% 0, 100% 60%, 0 100%)'; break;
+      case 'split-right': baseStyle.clipPath = 'polygon(0 0, 100% 0, 100% 100%, 0 60%)'; break;
+      case 'wave': baseStyle.clipPath = 'polygon(0% 0%, 100% 0%, 100% 85%, 90% 88%, 80% 90%, 70% 89%, 60% 86%, 50% 84%, 40% 83%, 30% 85%, 20% 88%, 10% 90%, 0% 88%)'; break;
       case 'floating':
         baseStyle.width = 'calc(100% - 32px)';
         baseStyle.margin = '16px auto';
@@ -143,32 +142,16 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
         baseStyle.backdropFilter = 'blur(20px)';
         baseStyle.border = '1px solid rgba(255,255,255,0.1)';
         break;
-      case 'modern-split':
-        baseStyle.clipPath = 'polygon(0 0, 100% 0, 75% 100%, 0 100%)';
-        break;
+      case 'modern-split': baseStyle.clipPath = 'polygon(0 0, 100% 0, 75% 100%, 0 100%)'; break;
       case 'side-left':
-        baseStyle.width = '15%';
-        baseStyle.height = '100%';
-        baseStyle.position = 'absolute';
-        baseStyle.left = '0';
-        baseStyle.top = '0';
+        baseStyle.width = '15%'; baseStyle.height = '100%'; baseStyle.position = 'absolute'; baseStyle.left = '0'; baseStyle.top = '0';
         break;
       case 'side-right':
-        baseStyle.width = '15%';
-        baseStyle.height = '100%';
-        baseStyle.position = 'absolute';
-        baseStyle.right = '0';
-        baseStyle.top = '0';
+        baseStyle.width = '15%'; baseStyle.height = '100%'; baseStyle.position = 'absolute'; baseStyle.right = '0'; baseStyle.top = '0';
         break;
-      case 'top-bar':
-        baseStyle.height = '12px';
-        break;
-      case 'minimal':
-        baseStyle.height = '4px';
-        break;
-      case 'hero':
-        baseStyle.height = '350px';
-        break;
+      case 'top-bar': baseStyle.height = '12px'; break;
+      case 'minimal': baseStyle.height = '4px'; break;
+      case 'hero': baseStyle.height = '350px'; break;
     }
 
     return baseStyle;
@@ -229,6 +212,12 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
     transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
   };
 
+  const hasContactButtons = (data.showPhone !== false && data.phone) || (data.showWhatsapp !== false && data.whatsapp) || (!hideSaveButton);
+  const shouldShowButtonsContainer = data.showButtons !== false || hasContactButtons;
+
+  const displayOccasionTitle = data.occasionTitle || (isRtl ? data.occasionTitleAr : data.occasionTitleEn) || data.occasionTitleAr || data.occasionTitleEn || '';
+  const displayOccasionDesc = data.occasionDesc || config.occasionDesc || '';
+
   return (
     <div className={`w-full h-full flex flex-col transition-all duration-500 relative overflow-hidden ${isDark ? 'bg-[#0f0f12] text-white' : 'bg-white text-gray-900'}`} style={{ textAlign: config.contentAlign }}>
       <div className="shrink-0 overflow-hidden" style={getHeaderStyles()} />
@@ -275,9 +264,16 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
                     transform: `translateY(${data.occasionOffsetY || 0}px)`
                   }}>
                 <PartyPopper className="absolute -top-2 -right-2 opacity-10 rotate-12" size={80} />
-                <h3 className="text-sm font-black uppercase mb-4 text-center" style={{ color: data.occasionTitleColor || data.occasionPrimaryColor }}>
-                  {isRtl ? data.occasionTitleAr : data.occasionTitleEn}
-                </h3>
+                <div className="relative z-10 space-y-2">
+                   <h3 className="text-sm font-black uppercase text-center" style={{ color: data.occasionTitleColor || data.occasionPrimaryColor }}>
+                     {displayOccasionTitle}
+                   </h3>
+                   {displayOccasionDesc && (
+                     <p className="text-[10px] font-bold text-center opacity-70 leading-relaxed px-4" style={{ color: data.occasionTitleColor || data.occasionPrimaryColor }}>
+                       {displayOccasionDesc}
+                     </p>
+                   )}
+                </div>
                 {config.showCountdown && <CountdownTimer targetDate={data.occasionDate} isDark={isDark} primaryColor={data.occasionPrimaryColor || '#7c3aed'} />}
                 {data.occasionMapUrl && (
                   <a href={data.occasionMapUrl} target="_blank" className="flex items-center justify-center gap-2 mt-6 py-3 px-6 rounded-2xl text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition-transform hover:scale-105" 
@@ -312,7 +308,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
              </div>
            )}
 
-           {data.showButtons !== false && (
+           {shouldShowButtonsContainer && (
               <div className="flex flex-wrap gap-2 justify-center w-full mt-6" style={{ transform: `translateY(${config.contactButtonsOffsetY || 0}px)` }}>
                 {data.showPhone !== false && data.phone && (
                   <a href={`tel:${data.phone}`} className={`flex items-center gap-2 px-6 py-3 rounded-full bg-blue-600 text-white font-black text-xs shadow-lg`}>
@@ -324,7 +320,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
                     <MessageCircle size={14} /> {t('whatsappBtn')}
                   </a>
                 )}
-                {!hideSaveButton && (
+                {!hideSaveButton && data.showButtons !== false && (
                   <button onClick={() => downloadVCard(data)} className="flex items-center gap-2 px-6 py-3 rounded-full bg-gray-900 text-white font-black text-xs shadow-lg">
                     <UserPlus size={14} /> {t('saveContact')}
                   </button>
@@ -333,9 +329,26 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
            )}
 
            {data.showQrCode !== false && (
-             <div className="pt-10 flex flex-col items-center gap-3" style={{ transform: `translateY(${config.qrOffsetY || 0}px)` }}>
-               <div className="p-3 bg-white rounded-3xl shadow-2xl border-4 border-gray-50 dark:border-gray-800">
-                  <img src={qrImageUrl} alt="QR" style={{ width: `${config.qrSize}px`, height: `${config.qrSize}px` }} />
+             <div className="pt-10 flex flex-col items-center gap-3" style={{ transform: `translateY(${qrOffsetY}px)` }}>
+               <div 
+                 className="transition-all duration-500 overflow-hidden"
+                 style={{ 
+                   border: qrBorderWidth > 0 ? `${qrBorderWidth}px solid ${qrBorderColor}` : 'none',
+                   borderRadius: `${qrBorderRadius}px`,
+                   padding: `${qrPadding}px`,
+                   backgroundColor: qrBgColor === 'transparent' ? 'transparent' : qrBgColor,
+                   boxShadow: (qrBgColor !== 'transparent' && !isDark) ? '0 25px 50px -12px rgba(0,0,0,0.15)' : 'none'
+                 }}
+               >
+                  <img 
+                    src={qrImageUrl} 
+                    alt="QR" 
+                    style={{ 
+                      width: `${qrSize}px`, 
+                      height: `${qrSize}px`,
+                      borderRadius: qrPadding > 0 ? `${Math.max(0, qrBorderRadius - qrPadding)}px` : `${qrBorderRadius}px`
+                    }} 
+                  />
                </div>
                <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">{t('showQrCode')}</span>
              </div>

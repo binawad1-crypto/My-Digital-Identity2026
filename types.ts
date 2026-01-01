@@ -44,7 +44,12 @@ export interface TemplateConfig {
 
   qrSize?: number;
   qrColor?: string; 
+  qrBgColor?: string;
+  qrPadding?: number;
   qrOffsetY?: number;
+  qrBorderWidth?: number;
+  qrBorderColor?: string;
+  qrBorderRadius?: number;
   showQrCodeByDefault?: boolean;
   showBioByDefault?: boolean; 
   showNameByDefault?: boolean;
@@ -52,13 +57,17 @@ export interface TemplateConfig {
   showCompanyByDefault?: boolean;
   showEmailByDefault?: boolean;
   showWebsiteByDefault?: boolean;
+  showPhoneByDefault?: boolean;
+  showWhatsappByDefault?: boolean;
   showSocialLinksByDefault?: boolean;
   showButtonsByDefault?: boolean;
 
   // Occasion Settings
   showOccasionByDefault?: boolean;
-  occasionTitleAr?: string;
-  occasionTitleEn?: string;
+  occasionTitle?: string;
+  occasionDesc?: string;
+  occasionTitleAr?: string; // For backward compatibility
+  occasionTitleEn?: string; // For backward compatibility
   occasionDate?: string;
   occasionMapUrl?: string;
   occasionOffsetY?: number;
@@ -124,7 +133,7 @@ export interface CardData {
   ownerId?: string;
   updatedAt?: string;
 
-  // التحكم في الرؤية (Visibility) - Card Level
+  // Visibility Controls
   showName?: boolean;
   showTitle?: boolean;
   showCompany?: boolean;
@@ -139,6 +148,8 @@ export interface CardData {
 
   // Occasion Data
   showOccasion?: boolean;
+  occasionTitle?: string;
+  occasionDesc?: string;
   occasionTitleAr?: string;
   occasionTitleEn?: string;
   occasionDate?: string;
@@ -154,7 +165,14 @@ export interface CardData {
   bioTextColor?: string;
   bioBgColor?: string;
   linksColor?: string;
+  qrSize?: number;
   qrColor?: string; 
+  qrBgColor?: string;
+  qrPadding?: number;
+  qrOffsetY?: number;
+  qrBorderWidth?: number;
+  qrBorderColor?: string;
+  qrBorderRadius?: number;
 }
 
 export interface TranslationStrings {

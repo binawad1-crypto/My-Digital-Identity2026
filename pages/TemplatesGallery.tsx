@@ -91,11 +91,32 @@ const TemplatesGallery: React.FC<TemplatesGalleryProps> = ({ lang, onSelect }) =
                           titleColor: tmpl.config.titleColor,
                           bioTextColor: tmpl.config.bioTextColor,
                           bioBgColor: tmpl.config.bioBgColor,
-                          linksColor: tmpl.config.linksColor
+                          linksColor: tmpl.config.linksColor,
+                          // مزامنة حالة الرؤية مع القالب لضمان عدم ظهور العناصر المخفية في المعرض
+                          showName: tmpl.config.showNameByDefault ?? true,
+                          showTitle: tmpl.config.showTitleByDefault ?? true,
+                          showCompany: tmpl.config.showCompanyByDefault ?? true,
+                          showBio: tmpl.config.showBioByDefault ?? true,
+                          showEmail: tmpl.config.showEmailByDefault ?? true,
+                          showWebsite: tmpl.config.showWebsiteByDefault ?? true,
+                          showSocialLinks: tmpl.config.showSocialLinksByDefault ?? true,
+                          showButtons: tmpl.config.showButtonsByDefault ?? true,
+                          showQrCode: tmpl.config.showQrCodeByDefault ?? true,
+                          // مزامنة بيانات المناسبة الافتراضية
+                          showOccasion: tmpl.config.showOccasionByDefault ?? false,
+                          occasionTitleAr: tmpl.config.occasionTitleAr,
+                          occasionTitleEn: tmpl.config.occasionTitleEn,
+                          occasionDate: tmpl.config.occasionDate,
+                          occasionMapUrl: tmpl.config.occasionMapUrl,
+                          occasionPrimaryColor: tmpl.config.occasionPrimaryColor,
+                          occasionBgColor: tmpl.config.occasionBgColor,
+                          occasionTitleColor: tmpl.config.occasionTitleColor,
+                          occasionOffsetY: tmpl.config.occasionOffsetY,
+                          occasionFloating: tmpl.config.occasionFloating
                         }} 
                         lang={lang} 
                         customConfig={tmpl.config}
-                        hideSaveButton={true} // إخفاء الزر في المعرض
+                        hideSaveButton={true} 
                       />
                    </div>
                 </div>

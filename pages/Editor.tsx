@@ -13,7 +13,7 @@ import {
   Mail, Phone, Globe, MessageCircle, Link as LinkIcon, 
   CheckCircle2, AlertCircle, UploadCloud, ImageIcon, 
   Palette, Layout, User as UserIcon, Camera, Share2, 
-  Pipette, Type as TypographyIcon, Smartphone, Tablet, Monitor, Eye, ArrowLeft, QrCode, RefreshCcw, FileText, Calendar, MapPin, PartyPopper, Move, Wind, ChevronRight, Info, Settings, LayoutGrid, ToggleLeft, ToggleRight, EyeOff
+  Pipette, Type as TypographyIcon, Smartphone, Tablet, Monitor, Eye, ArrowLeft, QrCode, RefreshCcw, FileText, Calendar, MapPin, PartyPopper, Move, Wind, ChevronRight, Info, Settings, LayoutGrid, ToggleLeft, ToggleRight, EyeOff, Ruler, Box, Maximize2
 } from 'lucide-react';
 
 interface EditorProps {
@@ -47,10 +47,8 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
     const targetTemplateId = initialData?.templateId || forcedTemplateId || templates[0]?.id || 'classic';
     const selectedTmpl = templates.find(t => t.id === targetTemplateId);
     
-    // إذا كان تعديلاً لبطاقة موجودة، نستخدم بياناتها كما هي
     if (initialData) return initialData;
 
-    // إذا كانت بطاقة جديدة، نقوم بدمج بيانات العينة مع إعدادات القالب المختار
     const baseData = { ...(SAMPLE_DATA[lang] || SAMPLE_DATA['en']), id: generateSerialId(), templateId: targetTemplateId } as CardData;
 
     if (selectedTmpl) {
@@ -65,7 +63,13 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
          nameColor: selectedTmpl.config.nameColor || baseData.nameColor,
          titleColor: selectedTmpl.config.titleColor || baseData.titleColor,
          linksColor: selectedTmpl.config.linksColor || baseData.linksColor,
-         // مزامنة خيارات الرؤية الافتراضية للقالب مع البطاقة الجديدة
+         qrColor: selectedTmpl.config.qrColor || baseData.qrColor,
+         qrBgColor: selectedTmpl.config.qrBgColor || 'transparent',
+         qrPadding: 0,
+         qrBorderWidth: selectedTmpl.config.qrBorderWidth || 0,
+         qrBorderColor: selectedTmpl.config.qrBorderColor || '#ffffff',
+         qrBorderRadius: selectedTmpl.config.qrBorderRadius || 24,
+         qrSize: selectedTmpl.config.qrSize || 90,
          showName: selectedTmpl.config.showNameByDefault ?? true,
          showTitle: selectedTmpl.config.showTitleByDefault ?? true,
          showCompany: selectedTmpl.config.showCompanyByDefault ?? true,
@@ -76,6 +80,15 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
          showButtons: selectedTmpl.config.showButtonsByDefault ?? true,
          showQrCode: selectedTmpl.config.showQrCodeByDefault ?? true,
          showOccasion: selectedTmpl.config.showOccasionByDefault ?? false,
+         occasionTitle: selectedTmpl.config.occasionTitle || '',
+         occasionDesc: selectedTmpl.config.occasionDesc || '',
+         occasionDate: selectedTmpl.config.occasionDate || '',
+         occasionMapUrl: selectedTmpl.config.occasionMapUrl || '',
+         occasionPrimaryColor: selectedTmpl.config.occasionPrimaryColor || '#7c3aed',
+         occasionBgColor: selectedTmpl.config.occasionBgColor || '',
+         occasionTitleColor: selectedTmpl.config.occasionTitleColor || '',
+         occasionOffsetY: selectedTmpl.config.occasionOffsetY || 0,
+         occasionFloating: selectedTmpl.config.occasionFloating ?? true
        } as CardData;
     }
     return baseData;
@@ -100,12 +113,17 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
           titleColor: newTmpl.config.titleColor || prev.titleColor,
           linksColor: newTmpl.config.linksColor || prev.linksColor,
           qrColor: newTmpl.config.qrColor || prev.qrColor,
+          qrBgColor: newTmpl.config.qrBgColor || prev.qrBgColor,
+          qrPadding: newTmpl.config.qrPadding ?? prev.qrPadding,
+          qrBorderWidth: newTmpl.config.qrBorderWidth || prev.qrBorderWidth,
+          qrBorderColor: newTmpl.config.qrBorderColor || prev.qrBorderColor,
+          qrBorderRadius: newTmpl.config.qrBorderRadius || prev.qrBorderRadius,
+          qrSize: newTmpl.config.qrSize || prev.qrSize,
           themeType: newTmpl.config.defaultThemeType || prev.themeType,
           themeColor: newTmpl.config.defaultThemeColor || prev.themeColor,
           themeGradient: newTmpl.config.defaultThemeGradient || prev.themeGradient,
           backgroundImage: newTmpl.config.defaultBackgroundImage || prev.backgroundImage,
           isDark: newTmpl.config.defaultIsDark ?? prev.isDark,
-          // تحديث الرؤية بناءً على القالب المختار الجديد إذا كان المستخدم في مرحلة الإنشاء الأولي
           showName: newTmpl.config.showNameByDefault ?? prev.showName,
           showTitle: newTmpl.config.showTitleByDefault ?? prev.showTitle,
           showCompany: newTmpl.config.showCompanyByDefault ?? prev.showCompany,
@@ -116,6 +134,15 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
           showButtons: newTmpl.config.showButtonsByDefault ?? prev.showButtons,
           showQrCode: newTmpl.config.showQrCodeByDefault ?? prev.showQrCode,
           showOccasion: newTmpl.config.showOccasionByDefault ?? prev.showOccasion,
+          occasionTitle: newTmpl.config.occasionTitle || prev.occasionTitle,
+          occasionDesc: newTmpl.config.occasionDesc || prev.occasionDesc,
+          occasionDate: newTmpl.config.occasionDate || prev.occasionDate,
+          occasionMapUrl: newTmpl.config.occasionMapUrl || prev.occasionMapUrl,
+          occasionPrimaryColor: newTmpl.config.occasionPrimaryColor || prev.occasionPrimaryColor,
+          occasionBgColor: newTmpl.config.occasionBgColor || prev.occasionBgColor,
+          occasionTitleColor: newTmpl.config.occasionTitleColor || prev.occasionTitleColor,
+          occasionOffsetY: newTmpl.config.occasionOffsetY || prev.occasionOffsetY,
+          occasionFloating: newTmpl.config.occasionFloating ?? prev.occasionFloating
         }));
         return;
       }
@@ -192,9 +219,7 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
   return (
     <div className="max-w-[1440px] mx-auto px-4 md:px-6">
       <div className="flex flex-col lg:flex-row gap-10 items-start">
-        {/* Editor Left Column */}
         <div className="flex-1 w-full space-y-8 pb-32">
-          {/* Enhanced Mobile Tabs Container */}
           <div className="flex w-full bg-white/80 dark:bg-black/40 p-1.5 rounded-[1.8rem] sm:rounded-[2rem] border border-gray-200/50 dark:border-gray-800/50 sticky top-[75px] z-50 backdrop-blur-md shadow-lg shadow-black/5 gap-1.5 sm:gap-2">
             <TabButton id="identity" label={t('الهوية', 'Identity')} icon={UserIcon} />
             <TabButton id="social" label={t('التواصل', 'Contact')} icon={MessageCircle} />
@@ -308,7 +333,7 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
                       </div>
                       <div className="relative">
                         <MessageCircle className={`absolute ${isRtl ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-emerald-500`} size={18} />
-                        <input type="text" value={formData.whatsapp} onChange={e => handleChange('whatsapp', e.target.value)} className={`${inputClasses} ${isRtl ? 'pr-12' : 'pl-12'}`} />
+                        <input type="text" value={formData.whatsapp} onChange={e => handleChange('whatsapp', e.target.value)} className={`${inputClasses} ${isRtl ? 'pr-12' : 'pl-12'} text-right`} />
                       </div>
                    </div>
                 </div>
@@ -455,11 +480,11 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
                       <div className="flex items-center gap-3">
                         <TypographyIcon className="text-blue-600" size={20} />
                         <h4 className="text-[11px] font-black uppercase dark:text-white tracking-widest">{t('تخصيص ألوان الخطوط والعناصر', 'Typography & UI Colors')}</h4>
-                      </div>
+                   </div>
                       <button onClick={() => handleChange('templateId', formData.templateId)} className="text-[9px] font-black text-blue-600 uppercase flex items-center gap-2 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/10 rounded-xl hover:bg-blue-100 transition-all shadow-sm"><RefreshCcw size={12}/> {t('استعادة ألوان القالب', 'Reset Colors')}</button>
                    </div>
 
-                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                       <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-[2rem] space-y-4 shadow-sm border border-gray-100 dark:border-gray-700">
                          <label className={labelClasses}>{t('لون الاسم', 'Name Color')}</label>
                          <div className="flex items-center gap-3">
@@ -488,6 +513,65 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
                               <div className="w-full h-full" style={{ backgroundColor: formData.linksColor }} />
                             </div>
                             <span className="text-[11px] font-mono font-black uppercase dark:text-gray-400">{formData.linksColor}</span>
+                         </div>
+                      </div>
+                      <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-[2rem] space-y-4 shadow-sm border border-gray-100 dark:border-gray-700">
+                         <label className={labelClasses}>{t('لون الباركود', 'QR Code Color')}</label>
+                         <div className="flex items-center gap-3">
+                            <div className="relative w-10 h-10 rounded-xl overflow-hidden border shadow-sm">
+                              <input type="color" value={formData.qrColor || '#000000'} onChange={e => handleChange('qrColor', e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer scale-150" />
+                              <div className="w-full h-full" style={{ backgroundColor: formData.qrColor || '#000000' }} />
+                            </div>
+                            <span className="text-[11px] font-mono font-black uppercase dark:text-gray-400">{formData.qrColor || '#000000'}</span>
+                         </div>
+                      </div>
+                   </div>
+
+                   <div className="p-10 bg-gray-50 dark:bg-gray-800 rounded-[3rem] space-y-8 border border-gray-100 dark:border-gray-700 shadow-inner">
+                      <div className="flex items-center gap-3">
+                        <QrCode className="text-blue-600" size={20} />
+                        <h4 className="text-[11px] font-black uppercase dark:text-white tracking-widest">{t('تخصيص إطار الباركود', 'QR Border Customization')}</h4>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                         <div className="space-y-4">
+                            <label className={labelClasses}>{t('لون خلفية الصندوق', 'QR Background')}</label>
+                            <div className="flex items-center gap-3">
+                               <div className="relative w-10 h-10 rounded-xl overflow-hidden border shadow-sm">
+                                 <input type="color" value={formData.qrBgColor || 'transparent'} onChange={e => handleChange('qrBgColor', e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer scale-150" />
+                                 <div className="w-full h-full" style={{ backgroundColor: formData.qrBgColor || 'transparent' }} />
+                               </div>
+                               <span className="text-[11px] font-mono font-black uppercase dark:text-gray-400">{formData.qrBgColor || 'transparent'}</span>
+                            </div>
+                         </div>
+                         <div className="space-y-4">
+                            <div className="flex justify-between items-center px-1">
+                               <label className={labelClasses}>{t('حجم الباركود', 'QR Size')}</label>
+                               <span className="text-[10px] font-black text-blue-600">{formData.qrSize || 90}px</span>
+                            </div>
+                            <input type="range" min="30" max="200" value={formData.qrSize || 90} onChange={e => handleChange('qrSize', parseInt(e.target.value))} className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none accent-blue-600 cursor-pointer" />
+                         </div>
+                         <div className="space-y-4">
+                            <div className="flex justify-between items-center px-1">
+                               <label className={labelClasses}>{t('سُمك الإطار', 'Border Width')}</label>
+                               <span className="text-[10px] font-black text-blue-600">{formData.qrBorderWidth || 0}px</span>
+                            </div>
+                            <input type="range" min="0" max="20" value={formData.qrBorderWidth || 0} onChange={e => handleChange('qrBorderWidth', parseInt(e.target.value))} className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none accent-blue-600 cursor-pointer" />
+                         </div>
+                      </div>
+                      <div className="pt-4 flex flex-col sm:flex-row gap-8 items-start sm:items-center border-t border-gray-100 dark:border-gray-700">
+                         <div className="flex-1 w-full space-y-4">
+                            <div className="flex justify-between items-center px-1">
+                               <label className={labelClasses}>{t('انحناء الحواف', 'Border Radius')}</label>
+                               <span className="text-[10px] font-black text-blue-600">{formData.qrBorderRadius || 0}px</span>
+                            </div>
+                            <input type="range" min="0" max="80" value={formData.qrBorderRadius || 0} onChange={e => handleChange('qrBorderRadius', parseInt(e.target.value))} className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none accent-blue-600 cursor-pointer" />
+                         </div>
+                         <div className="flex items-center gap-4 bg-white dark:bg-gray-900 p-4 rounded-2xl border shadow-sm">
+                            <label className={labelClasses + " !mb-0"}>{t('لون الإطار الخارجي', 'Outer Border Color')}</label>
+                            <div className="relative w-8 h-8 rounded-lg overflow-hidden border shadow-sm">
+                               <input type="color" value={formData.qrBorderColor || '#ffffff'} onChange={e => handleChange('qrBorderColor', e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer scale-150" />
+                               <div className="w-full h-full" style={{ backgroundColor: formData.qrBorderColor || '#ffffff' }} />
+                            </div>
                          </div>
                       </div>
                    </div>
@@ -534,14 +618,14 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
 
                  {formData.showOccasion && (
                     <div className="space-y-8 pt-6 animate-fade-in">
-                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                       <div className="space-y-4">
                           <div className="space-y-2">
-                             <label className={labelClasses}>{t('عنوان المناسبة (عربي)', 'Occasion (AR)')}</label>
-                             <input type="text" value={formData.occasionTitleAr} onChange={e => handleChange('occasionTitleAr', e.target.value)} className={inputClasses} placeholder="زفافنا الكبير" />
+                             <label className={labelClasses}>{t('عنوان المناسبة', 'Occasion Title')}</label>
+                             <input type="text" value={formData.occasionTitle || ''} onChange={e => handleChange('occasionTitle', e.target.value)} className={inputClasses} placeholder={t('اكتب عنوان المناسبة هنا...', 'Type occasion title here...')} />
                           </div>
                           <div className="space-y-2">
-                             <label className={labelClasses}>{t('Occasion (EN)', 'Occasion (EN)')}</label>
-                             <input type="text" value={formData.occasionTitleEn} onChange={e => handleChange('occasionTitleEn', e.target.value)} className={inputClasses} placeholder="Our Big Wedding" />
+                             <label className={labelClasses}>{t('وصف المناسبة', 'Occasion Description')}</label>
+                             <textarea value={formData.occasionDesc || ''} onChange={e => handleChange('occasionDesc', e.target.value)} className={`${inputClasses} min-h-[100px] resize-none`} placeholder={t('أدخل شرحاً مختصراً للمناسبة...', 'Enter a brief description...')} />
                           </div>
                        </div>
                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -554,23 +638,6 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
                              <div className="relative">
                                <MapPin className={`absolute ${isRtl ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-violet-500`} size={18} />
                                <input type="url" value={formData.occasionMapUrl} onChange={e => handleChange('occasionMapUrl', e.target.value)} className={`${inputClasses} ${isRtl ? 'pr-12' : 'pl-12'}`} placeholder="https://maps.google.com/..." />
-                             </div>
-                          </div>
-                       </div>
-                       
-                       <div className="p-10 bg-gray-50 dark:bg-gray-800 rounded-[3.5rem] space-y-8 border border-gray-100 dark:border-gray-700 shadow-inner">
-                          <div className="flex items-center gap-3">
-                             <Settings className="text-violet-500" size={18} />
-                             <label className={labelClasses.replace('mb-2', 'mb-0')}>{t('تخصيص أبعاد وألوان المناسبة', 'Layout & Colors Tuning')}</label>
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                             <div className="space-y-5">
-                                <div className="flex justify-between items-center px-1"><span className="text-[10px] font-black uppercase text-gray-400">{t('الإزاحة الرأسية', 'Vertical Y Offset')}</span><span className="text-[10px] font-black text-violet-600 bg-violet-50 dark:bg-violet-900/30 px-3 py-1 rounded-full">{formData.occasionOffsetY || 0}px</span></div>
-                                <input type="range" min="-250" max="150" value={formData.occasionOffsetY || 0} onChange={e => handleChange('occasionOffsetY', parseInt(e.target.value))} className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none accent-violet-600 cursor-pointer shadow-sm" />
-                             </div>
-                             <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-50 dark:border-gray-700">
-                                <div className="flex items-center gap-3"><Wind size={20} className="text-violet-500"/><span className="text-[10px] font-black uppercase dark:text-white tracking-widest">{t('تحريك الطفو', 'Float Animation')}</span></div>
-                                <button onClick={() => handleChange('occasionFloating', !formData.occasionFloating)} className={`w-12 h-6 rounded-full relative transition-all ${formData.occasionFloating !== false ? 'bg-violet-600' : 'bg-gray-200 dark:bg-gray-700'}`}><div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all shadow-sm ${isRtl ? (formData.occasionFloating !== false ? 'right-7' : 'right-1') : (formData.occasionFloating !== false ? 'left-7' : 'left-1')}`} /></button>
                              </div>
                           </div>
                        </div>
@@ -603,7 +670,6 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
           </div>
         </div>
 
-        {/* Desktop Fixed Preview */}
         <div className="hidden lg:block w-[450px] sticky top-[80px] self-start py-8">
            <div className="p-5 bg-white dark:bg-gray-950 rounded-[4.5rem] border border-gray-100 dark:border-gray-800 shadow-2xl overflow-hidden relative group">
               <div className="mb-8 flex items-center justify-between px-6">
@@ -627,21 +693,17 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
         </div>
       </div>
       
-      {/* Premium Centered Mobile Preview Modal - EXACT MATCH TO DESKTOP */}
       {showMobilePreview && (
         <div className="lg:hidden fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-2xl animate-fade-in">
            
            <div className="relative flex flex-col items-center max-h-full">
-              {/* Header Floating Label */}
               <div className="mb-6 flex items-center gap-3 bg-white/10 px-6 py-2.5 rounded-full border border-white/20 backdrop-blur-md">
                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.8)]"></div>
                  <span className="text-[10px] font-black text-white uppercase tracking-[0.3em]">{t('معاينة حية', 'Live Preview')}</span>
               </div>
 
-              {/* The "Phone" Frame - EXACTLY like desktop version */}
               <div className="relative w-[320px] max-h-[80vh] aspect-[1/2] border-[12px] border-gray-900 dark:border-[#1a1a1f] rounded-[4rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.8)] overflow-hidden bg-white dark:bg-black flex flex-col animate-zoom-in">
                  
-                 {/* Floating Close Button - Inside the top area but subtle */}
                  <button 
                    onClick={() => { setShowMobilePreview(false); document.body.style.overflow = 'auto'; }}
                    className="absolute top-4 right-4 z-[1200] p-2 bg-black/40 backdrop-blur-xl text-white rounded-full active:scale-90 transition-all border border-white/10"
@@ -653,13 +715,11 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
                     <CardPreview data={formData} lang={lang} customConfig={currentTemplate?.config} hideSaveButton={true} />
                  </div>
 
-                 {/* Bottom Indicator */}
                  <div className="h-6 flex items-center justify-center shrink-0 bg-white dark:bg-black/50 border-t border-gray-100/10">
                     <div className="w-20 h-1 bg-gray-300 dark:bg-gray-800 rounded-full opacity-40"></div>
                  </div>
               </div>
 
-              {/* Large CTA Button to close and save */}
               <button 
                  onClick={() => { setShowMobilePreview(false); document.body.style.overflow = 'auto'; }}
                  className="mt-8 px-12 py-4 bg-white text-blue-600 rounded-[1.5rem] font-black text-xs uppercase shadow-[0_20px_40px_-10px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
@@ -669,7 +729,6 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
               </button>
            </div>
            
-           {/* Dismiss Backdrop Area */}
            <div 
              className="absolute inset-0 -z-10" 
              onClick={() => { setShowMobilePreview(false); document.body.style.overflow = 'auto'; }}
@@ -677,7 +736,6 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
         </div>
       )}
 
-      {/* Global CSS for scrollbars */}
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes zoom-in {
           from { transform: scale(0.9) translateY(40px); opacity: 0; }
@@ -687,7 +745,6 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* تصفير أشرطة التمرير في كافة العناصر بشكل قطعي */
         .no-scrollbar::-webkit-scrollbar {
           display: none !important;
           width: 0 !important;
