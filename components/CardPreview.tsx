@@ -163,11 +163,12 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
     textAlign: config.contentAlign || 'center',
     marginLeft: headerType === 'side-left' ? '28%' : (headerType === 'side-right' ? '2%' : 'auto'),
     marginRight: headerType === 'side-right' ? '28%' : (headerType === 'side-left' ? '2%' : 'auto'),
+    // التأكد من أن الإزاحات الكبيرة لا تسبب مشاكل في العرض
+    minHeight: '400px'
   };
 
   const displayOccasionTitle = data.occasionTitle || config.occasionTitle || '';
   const displayOccasionDesc = data.occasionDesc || config.occasionDesc || '';
-  // تحديد قيمة الإزاحة الرأسية من بيانات البطاقة أو إعدادات القالب
   const occasionVerticalOffset = data.occasionOffsetY !== undefined ? data.occasionOffsetY : (config.occasionOffsetY || 0);
 
   return (
@@ -216,7 +217,6 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
              </div>
            )}
 
-           {/* قسم المناسبة الخاصة - تم فصل حاوية الإزاحة عن حاوية التحريك */}
            {data.showOccasion !== false && (data.occasionDate || config.occasionDate) && (
              <div style={{ transform: `translateY(${occasionVerticalOffset}px)` }} className="w-full transition-transform duration-300">
                <div className={`p-6 rounded-[2.5rem] shadow-xl border relative overflow-hidden mt-6 ${data.occasionFloating !== false ? 'animate-float' : ''}`}
@@ -291,7 +291,6 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
               </div>
            )}
 
-           {/* قسم الباركود */}
            {data.showQrCode !== false && (
              <div className="pt-8 flex flex-col items-center gap-3" style={{ transform: `translateY(${qrOffsetY}px)` }}>
                <div className="transition-all duration-500 overflow-hidden" 

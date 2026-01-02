@@ -308,7 +308,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
                            </button>
                          ))}
                     </div>
-                    <RangeControl label={t('ارتفاع الترويسة', 'Header Height')} min={40} max={450} value={template.config.headerHeight} onChange={(v: number) => updateConfig('headerHeight', v)} icon={Maximize2} />
+                    <RangeControl label={t('ارتفاع الترويسة', 'Header Height')} min={40} max={1000} value={template.config.headerHeight} onChange={(v: number) => updateConfig('headerHeight', v)} icon={Maximize2} />
                  </div>
               </div>
             )}
@@ -376,7 +376,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
                         <ToggleSwitch label={t('تأثير زجاجي (Glassmorphism)', 'Glassy Content')} value={template.config.bodyGlassy} onChange={(v: boolean) => updateConfig('bodyGlassy', v)} icon={GlassWater} />
                         <RangeControl label={t('شفافية الخلفية', 'Body Opacity')} min={0} max={100} unit="%" value={template.config.bodyOpacity ?? 100} onChange={(v: number) => updateConfig('bodyOpacity', v)} icon={Sun} />
                         <RangeControl label={t('انحناء الحواف', 'Border Radius')} min={0} max={100} value={template.config.bodyBorderRadius ?? 48} onChange={(v: number) => updateConfig('bodyBorderRadius', v)} icon={Ruler} />
-                        <RangeControl label={t('إزاحة منطقة المحتوى', 'Body Y Offset')} min={-150} max={250} value={template.config.bodyOffsetY || 0} onChange={(v: number) => updateConfig('bodyOffsetY', v)} icon={Move} />
+                        <RangeControl label={t('إزاحة منطقة المحتوى', 'Body Y Offset')} min={-1000} max={500} value={template.config.bodyOffsetY || 0} onChange={(v: number) => updateConfig('bodyOffsetY', v)} icon={Move} />
                      </div>
 
                      <div className="pt-6 border-t dark:border-gray-800">

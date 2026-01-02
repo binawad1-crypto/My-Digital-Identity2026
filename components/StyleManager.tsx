@@ -273,7 +273,7 @@ const StyleManager: React.FC<StyleManagerProps> = ({ lang }) => {
               <button 
                 onClick={handleSave} 
                 disabled={isSaving}
-                className="px-12 py-4 bg-indigo-600 text-white rounded-[1.8rem] font-black text-xs uppercase shadow-xl flex items-center gap-3 active:scale-95 transition-all"
+                className="px-12 py-4 bg-indigo-600 text-white rounded-[1.8rem] font-black text-xs uppercase shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all"
               >
                 {isSaving ? <Loader2 className="animate-spin" /> : <Save size={18} />} {t('اعتماد النمط في المختبر', 'Authorize Style')}
               </button>
@@ -324,7 +324,7 @@ const StyleManager: React.FC<StyleManagerProps> = ({ lang }) => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <RangeControl label={t('ارتفاع الترويسة', 'Header Depth')} min={40} max={450} value={editingStyle.config?.headerHeight || 180} onChange={(v: number) => updateConfig('headerHeight', v)} icon={Maximize2} />
+                      <RangeControl label={t('ارتفاع الترويسة', 'Header Depth')} min={40} max={1000} value={editingStyle.config?.headerHeight || 180} onChange={(v: number) => updateConfig('headerHeight', v)} icon={Maximize2} />
                       <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 space-y-4">
                           <div className="flex items-center gap-3">
                              <Code2 size={16} className="text-indigo-600" />
@@ -337,6 +337,10 @@ const StyleManager: React.FC<StyleManagerProps> = ({ lang }) => {
                             className="w-full h-20 bg-white dark:bg-black rounded-xl p-4 text-[10px] font-mono border dark:border-gray-700 resize-none outline-none focus:ring-2 focus:ring-indigo-100"
                           />
                        </div>
+                    </div>
+
+                    <div className="pt-6 border-t dark:border-gray-800">
+                        <RangeControl label={t('إزاحة منطقة البيانات (للتغطية)', 'Content Overlap Offset')} min={-1000} max={500} value={editingStyle.config?.bodyOffsetY || 0} onChange={(v: number) => updateConfig('bodyOffsetY', v)} icon={Move} />
                     </div>
                  </div>
 
