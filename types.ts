@@ -14,16 +14,22 @@ export interface TemplateConfig {
     | 'classic' | 'split-left' | 'split-right' | 'overlay' 
     | 'hero' | 'minimal' | 'side-left' | 'side-right' 
     | 'curved' | 'diagonal' | 'wave' | 'floating' 
-    | 'glass-card' | 'modern-split' | 'top-bar';
+    | 'glass-card' | 'modern-split' | 'top-bar' | 'custom-asset';
   headerHeight: number;
+  headerCustomAsset?: string; 
+  headerSvgRaw?: string;
+  headerPatternId?: string; // معرف النمط المختار
+  headerPatternOpacity?: number; // شفافية النمط (0-100)
+  headerPatternScale?: number; // حجم النمط
   avatarStyle: 'circle' | 'squircle' | 'none';
+  avatarStyle_v2?: string;
   avatarSize: number;
   avatarOffsetY: number;
   avatarOffsetX: number;
   avatarBorderWidth?: number;
   avatarBorderColor?: string;
   nameOffsetY: number;
-  titleOffsetY?: number; // Added for title/company positioning
+  titleOffsetY?: number; 
   bioOffsetY: number;
   emailOffsetY: number;
   websiteOffsetY: number;
@@ -63,12 +69,11 @@ export interface TemplateConfig {
   showSocialLinksByDefault?: boolean;
   showButtonsByDefault?: boolean;
 
-  // Occasion Settings
   showOccasionByDefault?: boolean;
   occasionTitle?: string;
   occasionDesc?: string;
-  occasionTitleAr?: string; // For backward compatibility
-  occasionTitleEn?: string; // For backward compatibility
+  occasionTitleAr?: string; 
+  occasionTitleEn?: string; 
   occasionDate?: string;
   occasionMapUrl?: string;
   occasionOffsetY?: number;
@@ -95,6 +100,16 @@ export interface TemplateConfig {
   customCss?: string;
 }
 
+export interface VisualStyle {
+  id: string;
+  nameAr: string;
+  nameEn: string;
+  isActive: boolean;
+  config: Partial<TemplateConfig>; 
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface TemplateCategory {
   id: string;
   nameAr: string;
@@ -105,7 +120,8 @@ export interface TemplateCategory {
 
 export interface CustomTemplate {
   id: string;
-  categoryId?: string; // الربط مع القسم
+  categoryId?: string; 
+  parentStyleId?: string; 
   nameAr: string;
   nameEn: string;
   descAr: string;
@@ -143,8 +159,6 @@ export interface CardData {
   socialLinks: SocialLink[];
   ownerId?: string;
   updatedAt?: string;
-
-  // Visibility Controls
   showName?: boolean;
   showTitle?: boolean;
   showCompany?: boolean;
@@ -156,13 +170,11 @@ export interface CardData {
   showSocialLinks?: boolean;
   showButtons?: boolean;
   showQrCode?: boolean;
-
-  // Occasion Data
   showOccasion?: boolean;
   occasionTitle?: string;
   occasionDesc?: string;
-  occasionTitleAr?: string;
-  occasionTitleEn?: string;
+  occasionTitleAr?: string; 
+  occasionTitleEn?: string; 
   occasionDate?: string;
   occasionMapUrl?: string;
   occasionOffsetY?: number;
@@ -170,7 +182,6 @@ export interface CardData {
   occasionPrimaryColor?: string;
   occasionBgColor?: string;
   occasionTitleColor?: string;
-
   nameColor?: string;
   titleColor?: string;
   bioTextColor?: string;

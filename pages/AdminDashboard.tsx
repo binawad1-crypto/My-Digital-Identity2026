@@ -5,19 +5,20 @@ import {
   getSiteSettings, updateSiteSettings, updateAdminSecurity,
   saveCustomTemplate, getAllTemplates, deleteTemplate,
   getAllCategories, saveTemplateCategory, deleteTemplateCategory,
-  auth, getAuthErrorMessage, toggleCardStatus
+  auth, getAuthErrorMessage, toggleCardStatus, getAllVisualStyles
 } from '../services/firebase';
 import { uploadImageToCloud } from '../services/uploadService';
-import { Language, CardData, CustomTemplate, TemplateCategory } from '../types';
+import { Language, CardData, CustomTemplate, TemplateCategory, VisualStyle } from '../types';
 import { generateShareUrl } from '../utils/share';
 import TemplateBuilder from '../components/TemplateBuilder';
+import StyleManager from '../components/StyleManager';
 import { 
   BarChart3, Users, Clock, Loader2,
   ShieldCheck, Trash2, Edit3, Eye, Settings, 
   Globe, Power, Save, Search, LayoutGrid,
   Lock, CheckCircle2, Image as ImageIcon, UploadCloud, X, Layout, 
   Plus, Palette, ShieldAlert, Key, Star, Hash, AlertTriangle, Pin, PinOff, ArrowUpAZ,
-  MoreVertical, ToggleLeft, ToggleRight, MousePointer2, TrendingUp, Filter, ListFilter, Activity, Type, FolderEdit, Check, ArrowDownWideZap, FolderOpen, Tag, PlusCircle
+  MoreVertical, ToggleLeft, ToggleRight, MousePointer2, TrendingUp, Filter, ListFilter, Activity, Type, FolderEdit, Check, FolderOpen, Tag, PlusCircle, Zap
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -30,9 +31,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang, onEditCard, onDel
   const isRtl = lang === 'ar';
   const logoInputRef = useRef<HTMLInputElement>(null);
   const iconInputRef = useRef<HTMLInputElement>(null);
-  const [activeTab, setActiveTab] = useState<'stats' | 'templates' | 'categories' | 'settings' | 'security' | 'builder'>('stats');
+  const [activeTab, setActiveTab] = useState<'stats' | 'templates' | 'styles' | 'categories' | 'settings' | 'security' | 'builder'>('stats');
   const [stats, setStats] = useState<{ totalCards: number; activeCards: number; totalViews: number; recentCards: any[] } | null>(null);
   const [customTemplates, setCustomTemplates] = useState<CustomTemplate[]>([]);
+  const [visualStyles, setVisualStyles] = useState<VisualStyle[]>([]);
   const [categories, setCategories] = useState<TemplateCategory[]>([]);
   const [editingTemplate, setEditingTemplate] = useState<CustomTemplate | undefined>(undefined);
   const [templateToDelete, setTemplateToDelete] = useState<string | null>(null);
@@ -66,11 +68,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang, onEditCard, onDel
     if (!auth.currentUser || auth.currentUser.email !== ADMIN_EMAIL) return;
     setLoading(true);
     try {
-      const [sData, stData, tData, cData] = await Promise.all([
+      const [sData, stData, tData, cData, vsData] = await Promise.all([
         getAdminStats().catch(() => ({ totalCards: 0, activeCards: 0, totalViews: 0, recentCards: [] })),
         getSiteSettings().catch(() => null),
         getAllTemplates().catch(() => []),
-        getAllCategories().catch(() => [])
+        getAllCategories().catch(() => []),
+        getAllVisualStyles().catch(() => [])
       ]);
       setStats(sData as any);
       if (stData) {
@@ -87,6 +90,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang, onEditCard, onDel
       }
       setCustomTemplates(tData as CustomTemplate[]);
       setCategories(cData as TemplateCategory[]);
+      setVisualStyles(vsData as VisualStyle[]);
     } finally {
       setLoading(false);
     }
@@ -210,7 +214,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang, onEditCard, onDel
           </div>
           <div className="flex bg-white dark:bg-gray-900 p-1.5 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-x-auto no-scrollbar">
             <TabButton id="stats" label={t('البطاقات', 'Cards')} icon={BarChart3} />
-            <TabButton id="templates" label={t('القوالب', 'Templates')} icon={Palette} />
+            <TabButton id="templates" label={t('القوالب', 'Templates')} icon={Layout} />
+            <TabButton id="styles" label={t('الأنماط', 'Styles')} icon={Palette} />
             <TabButton id="categories" label={t('الأقسام', 'Categories')} icon={FolderEdit} />
             <TabButton id="settings" label={t('الإعدادات', 'Settings')} icon={Settings} />
             <TabButton id="security" label={t('الأمان', 'Security')} icon={Lock} />
@@ -227,6 +232,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang, onEditCard, onDel
             initialTemplate={editingTemplate} 
           />
         )}
+
+        {activeTab === 'styles' && <StyleManager lang={lang} />}
 
         {activeTab === 'stats' && (
            <div className="space-y-8 animate-fade-in">
@@ -334,9 +341,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang, onEditCard, onDel
                              <td className="px-8 py-5">{t('القالب والتفاصيل', 'Template & Details')}</td>
                              <td className="px-8 py-5">{t('القسم', 'Category')}</td>
                              <td className="px-8 py-5 text-center">{t('الحالة', 'Status')}</td>
-                             <td className="px-8 py-5 text-center">{t('تثبيت', 'Pin')}</td>
-                             <td className="px-8 py-5 text-center">{t('الترتيب', 'Order')}</td>
-                             <td className="px-8 py-5">{t('الاستخدام', 'Usage')}</td>
+                             <td className="px-8 py-5 text-center">{t('البصمة الوراثية (DNA)', 'Design DNA')}</td>
+                             <td className="px-8 py-5 text-center">{t('الاستخدام', 'Usage')}</td>
                              <td className="px-8 py-5 text-center">{t('الإجراءات', 'Actions')}</td>
                           </tr>
                        </thead>
@@ -353,9 +359,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ lang, onEditCard, onDel
                                    </div>
                                 </td>
                                 <td className="px-8 py-6 text-center"><button onClick={() => saveCustomTemplate({...tmpl, isActive: !tmpl.isActive}).then(fetchData)} className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase transition-all ${tmpl.isActive ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-400'}`}>{tmpl.isActive ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}{tmpl.isActive ? t('نشط', 'Active') : t('معطل', 'Disabled')}</button></td>
-                                <td className="px-8 py-6 text-center"><button onClick={() => saveCustomTemplate({...tmpl, isFeatured: !tmpl.isFeatured}).then(fetchData)} className={`p-3 rounded-xl transition-all ${tmpl.isFeatured ? 'bg-amber-100 text-amber-600 shadow-lg' : 'bg-gray-50 text-gray-300'}`}><Pin size={18} fill={tmpl.isFeatured ? "currentColor" : "none"} /></button></td>
-                                <td className="px-8 py-6 text-center"><input type="number" value={tmpl.order || 0} onChange={(e) => saveCustomTemplate({...tmpl, order: parseInt(e.target.value) || 0}).then(fetchData)} className="w-16 px-2 py-2.5 bg-gray-50 dark:bg-gray-800 border rounded-xl text-[12px] font-black text-center outline-none focus:ring-4 focus:ring-blue-100" /></td>
-                                <td className="px-8 py-6"><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center text-indigo-600"><Activity size={18} /></div><div className="flex flex-col"><span className="text-lg font-black text-indigo-600 leading-none">{tmpl.usageCount || 0}</span><span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">{t('استخدام', 'Uses')}</span></div></div></td>
+                                <td className="px-8 py-6 text-center">
+                                   {tmpl.parentStyleId ? (
+                                      <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 rounded-xl border border-indigo-100">
+                                         <Zap size={10} fill="currentColor" />
+                                         <span className="text-[9px] font-black uppercase tracking-tighter">
+                                            {visualStyles.find(vs => vs.id === tmpl.parentStyleId) ? (isRtl ? visualStyles.find(vs => vs.id === tmpl.parentStyleId)!.nameAr : visualStyles.find(vs => vs.id === tmpl.parentStyleId)!.nameEn) : 'Linked DNA'}
+                                         </span>
+                                      </div>
+                                   ) : (
+                                      <span className="text-[8px] font-black text-gray-300 uppercase tracking-widest">{t('كلاسيك (لا يوجد DNA)', 'Classic / No DNA')}</span>
+                                   )}
+                                </td>
+                                <td className="px-8 py-6 text-center"><div className="flex flex-col"><span className="text-lg font-black text-indigo-600 leading-none">{tmpl.usageCount || 0}</span><span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">{t('استخدام', 'Uses')}</span></div></td>
                                 <td className="px-8 py-6 text-center"><div className="flex justify-center gap-2"><button onClick={() => { setEditingTemplate(tmpl); setActiveTab('builder'); }} className="p-3 text-blue-600 bg-blue-50 dark:bg-blue-900/20 rounded-xl hover:bg-blue-600 hover:text-white transition-all"><Edit3 size={18} /></button><button onClick={() => setTemplateToDelete(tmpl.id)} className="p-3 text-red-600 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-600 hover:text-white transition-all"><Trash2 size={18} /></button></div></td>
                              </tr>
                           ))}

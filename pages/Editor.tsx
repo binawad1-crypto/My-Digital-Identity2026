@@ -304,7 +304,7 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
                         <VisibilityToggle field="showEmail" label="Email" />
                       </div>
                       <div className="relative">
-                        <Mail className={`absolute ${isRtl ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-blue-500`} size={18} />
+                        <Mail className={`absolute ${isRtl ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-gray-400`} size={18} />
                         <input type="email" value={formData.email} onChange={e => handleChange('email', e.target.value)} className={`${inputClasses} ${isRtl ? 'pr-12' : 'pl-12'}`} />
                       </div>
                    </div>
@@ -591,7 +591,7 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
                    <div className="flex flex-col sm:flex-row gap-6 p-8 bg-blue-50/30 dark:bg-blue-900/5 rounded-[3rem] border border-blue-100/50 dark:border-blue-900/10">
                       <div className="flex-1 flex items-center justify-between gap-4">
                         <div className="flex flex-col">
-                           <span className="text-xs font-black dark:text-white uppercase leading-none mb-1">{t('الوضع الليلي', 'Dark Mode')}</span>
+                           <span className="text-xs font-black dark:text-white uppercase leading-none mb-1">{t('الوضع ليلي', 'Dark Mode')}</span>
                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{t('تفعيل المظهر الداكن للبطاقة', 'Toggle dark aesthetics')}</span>
                         </div>
                         <button onClick={() => handleChange('isDark', !formData.isDark)} className={`w-14 h-7 rounded-full relative transition-all ${formData.isDark ? 'bg-blue-600 shadow-lg shadow-blue-500/20' : 'bg-gray-300 dark:bg-gray-700'}`}>
@@ -652,6 +652,22 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
                                <input type="url" value={formData.occasionMapUrl} onChange={e => handleChange('occasionMapUrl', e.target.value)} className={`${inputClasses} ${isRtl ? 'pr-12' : 'pl-12'}`} placeholder="https://maps.google.com/..." />
                              </div>
                           </div>
+                       </div>
+                       
+                       <div className="pt-6 border-t dark:border-gray-800 space-y-4">
+                          <div className="flex justify-between items-center px-1">
+                             <div className="flex items-center gap-2">
+                               <Move size={14} className="text-violet-600" />
+                               <label className={labelClasses + " !mb-0"}>{t('إزاحة قسم المناسبة', 'Vertical Y Offset')}</label>
+                             </div>
+                             <span className="text-[10px] font-black text-violet-600 bg-violet-50 dark:bg-violet-900/20 px-2 py-0.5 rounded-full">{formData.occasionOffsetY || 0}px</span>
+                          </div>
+                          <input 
+                             type="range" min="-150" max="250" 
+                             value={formData.occasionOffsetY || 0} 
+                             onChange={e => handleChange('occasionOffsetY', parseInt(e.target.value))} 
+                             className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none accent-violet-600 cursor-pointer" 
+                          />
                        </div>
                     </div>
                  )}
