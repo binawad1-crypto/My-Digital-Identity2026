@@ -11,7 +11,6 @@ import CardPreview from '../components/CardPreview';
 import SocialIcon from '../components/SocialIcon';
 import { BACKGROUND_PRESETS, SAMPLE_DATA, SOCIAL_PLATFORMS, THEME_COLORS, THEME_GRADIENTS, TRANSLATIONS } from '../constants';
 import { isSlugAvailable, auth } from '../services/firebase';
-import { generateProfessionalBio } from '../services/geminiService';
 import { uploadImageToCloud } from '../services/uploadService';
 import { CardData, CustomTemplate, Language, SocialLink } from '../types';
 import { generateSerialId } from '../utils/share';
@@ -120,6 +119,7 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
          occasionFloating: selectedTmpl.config.occasionFloating ?? true,
          invitationPrefix: selectedTmpl.config.invitationPrefix || (isRtl ? 'يتشرف' : 'Invited by'),
          invitationWelcome: selectedTmpl.config.invitationWelcome || (isRtl ? 'بدعوتكم لحضور' : 'Welcomes you to'),
+         invitationWelcome_v2: selectedTmpl.config.invitationWelcome || (isRtl ? 'بدعوتكم لحضور' : 'Welcomes you to'),
          invitationYOffset: selectedTmpl.config.invitationYOffset || 0,
          bodyGlassy: selectedTmpl.config.bodyGlassy ?? false,
          bodyOpacity: selectedTmpl.config.bodyOpacity ?? 100
@@ -166,7 +166,6 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
     }
   }, [formData.templateId, templates]);
 
-  const [isGeneratingBio, setIsGeneratingBio] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isUploadingBg, setIsUploadingBg] = useState(false);
   const [socialInput, setSocialInput] = useState({ platformId: SOCIAL_PLATFORMS[0].id, url: '' });
@@ -253,17 +252,6 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
         <span className="text-[10px] font-black uppercase tracking-tighter">{isVisible ? t('إظهار', 'Show') : t('إخفاء', 'Hide')}</span>
       </button>
     );
-  };
-
-  const handleGenerateBio = async () => {
-    if (!formData.name || !formData.title) return;
-    setIsGeneratingBio(true);
-    try {
-      const bio = await generateProfessionalBio(formData.name, formData.title, formData.company, "", lang);
-      if (bio) handleChange('bio', bio);
-    } finally {
-      setIsGeneratingBio(false);
-    }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -723,14 +711,6 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
                             <label className={labelClasses}>{t('النبذة التعريفية (Bio)', 'Professional Bio')}</label>
                             <VisibilityToggle field="showBio" label="Bio" />
                           </div>
-                          <button 
-                            onClick={handleGenerateBio} 
-                            disabled={isGeneratingBio || !formData.name}
-                            className="text-[9px] font-black text-blue-600 uppercase flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 rounded-xl hover:bg-blue-100 transition-all border border-blue-100 dark:border-blue-900/30"
-                          >
-                            {isGeneratingBio ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
-                            {t('توليد بالذكاء الاصطناعي', 'AI Generate')}
-                          </button>
                        </div>
                        <textarea 
                          value={formData.bio} 

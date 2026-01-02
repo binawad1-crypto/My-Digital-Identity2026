@@ -36,11 +36,22 @@
                     },
                     animation: {
                         'float': 'float 3s ease-in-out infinite',
+                        'marquee': 'marquee 40s linear infinite',
+                        'marquee-slow': 'marquee 60s linear infinite',
+                        'marquee-reverse': 'marquee-reverse 50s linear infinite',
                     },
                     keyframes: {
                         float: {
                             '0%, 100%': { transform: 'translateY(0)' },
                             '50%': { transform: 'translateY(-10px)' },
+                        },
+                        marquee: {
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-50%)' }
+                        },
+                        'marquee-reverse': {
+                            '0%': { transform: 'translateX(-50%)' },
+                            '100%': { transform: 'translateX(0%)' }
                         }
                     }
                 },
@@ -73,11 +84,9 @@
             overflow-x: hidden !important;
             -ms-overflow-style: none !important;  /* IE and Edge */
             scrollbar-width: none !important;  /* Firefox */
-            /* منع حجز أي مساحة جانبية لضمان توازن التصميم */
             scrollbar-gutter: auto !important;
         }
 
-        /* إخفاء أشرطة التمرير العامة */
         .no-scrollbar::-webkit-scrollbar {
             display: none !important;
             width: 0 !important;
@@ -122,12 +131,10 @@
           to { opacity: 1; transform: translateY(0); }
         }
 
-        .animate-float {
-            animation: float 3s ease-in-out infinite;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        /* تحسين مظهر الماركي ليكون الاتجاه صحيح في الـ RTL */
+        .marquee-container {
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
         }
     </style>
 <script type="importmap">
