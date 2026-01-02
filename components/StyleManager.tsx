@@ -12,7 +12,7 @@ import {
   GlassWater, Box, Type, LayoutTemplate, Layers, ChevronLeft, 
   ChevronRight, Monitor, Zap, Wind, Waves, Square, AlignLeft, 
   AlignRight, Columns, Minus, Maximize2, Move, FileCode, HardDrive, Code2, Wand2, Grid, Shapes,
-  Check, RefreshCcw, Info, AlignCenter
+  Check, RefreshCcw, Info, AlignCenter, Tag
 } from 'lucide-react';
 
 interface StyleManagerProps {
@@ -88,7 +88,10 @@ const StyleManager: React.FC<StyleManagerProps> = ({ lang }) => {
   };
 
   const handleSave = async () => {
-    if (!editingStyle?.nameAr || !editingStyle?.nameEn) return;
+    if (!editingStyle?.nameAr || !editingStyle?.nameEn) {
+      alert(isRtl ? "يرجى إدخال اسم النمط" : "Please enter style name");
+      return;
+    }
     setIsSaving(true);
     try {
       await saveVisualStyle(editingStyle);
@@ -162,6 +165,9 @@ const StyleManager: React.FC<StyleManagerProps> = ({ lang }) => {
       </div>
     </div>
   );
+
+  const labelTextClasses = "text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest px-1 block mb-1.5";
+  const inputClasses = "w-full px-5 py-4 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700 text-sm font-bold dark:text-white outline-none focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/20 transition-all shadow-inner";
 
   if (loading && !editingStyle && !styleToDelete) return (
     <div className="flex flex-col items-center justify-center py-20">
@@ -281,6 +287,46 @@ const StyleManager: React.FC<StyleManagerProps> = ({ lang }) => {
 
            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
               <div className="lg:col-span-8 space-y-8">
+                 {/* 0. هوية النمط (Style Identity) */}
+                 <div className="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+                    <div className="flex items-center gap-4"><Tag className="text-indigo-600" size={24}/><h3 className="text-lg font-black dark:text-white uppercase tracking-widest">{t('تعريف النمط المبتكر', 'Style Identity & Naming')}</h3></div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                       <div className="space-y-2">
+                          <label className={labelTextClasses}>{t('اسم النمط (عربي)', 'Style Name (AR)')}</label>
+                          <input 
+                            type="text" 
+                            required 
+                            value={editingStyle.nameAr || ''} 
+                            onChange={e => setEditingStyle({...editingStyle, nameAr: e.target.value})} 
+                            className={inputClasses} 
+                            placeholder="مثلاً: الترويسة الزجاجية المتموجة"
+                          />
+                       </div>
+                       <div className="space-y-2">
+                          <label className={labelTextClasses}>{t('اسم النمط (EN)', 'Style Name (EN)')}</label>
+                          <input 
+                            type="text" 
+                            required 
+                            value={editingStyle.nameEn || ''} 
+                            onChange={e => setEditingStyle({...editingStyle, nameEn: e.target.value})} 
+                            className={inputClasses} 
+                            placeholder="Ex: Glassy Wave Header"
+                          />
+                       </div>
+                    </div>
+                    <div className="flex items-center justify-between pt-4 border-t dark:border-gray-800">
+                       <div className="flex items-center gap-3">
+                          <div className="flex flex-col">
+                             <span className="text-xs font-black dark:text-white uppercase leading-none mb-1">{t('تفعيل النمط', 'Active Style')}</span>
+                             <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{t('إتاحة النمط للاستخدام في القوالب', 'Make style available for templates')}</span>
+                          </div>
+                       </div>
+                       <button onClick={() => setEditingStyle({...editingStyle, isActive: !editingStyle.isActive})} className={`w-14 h-7 rounded-full relative transition-all ${editingStyle.isActive ? 'bg-indigo-600 shadow-lg' : 'bg-gray-200 dark:bg-gray-700'}`}>
+                          <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all shadow-md ${isRtl ? (editingStyle.isActive ? 'right-8' : 'right-1') : (editingStyle.isActive ? 'left-8' : 'left-1')}`} />
+                       </button>
+                    </div>
+                 </div>
+
                  {/* 1. قص الترويسة الهندسي (Shape Engine) */}
                  <div className="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
                     <div className="flex items-center justify-between">
