@@ -697,7 +697,10 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
               </div>
 
               <div className={`transition-all duration-500 border-[12px] border-gray-900 dark:border-gray-800 rounded-[4rem] shadow-2xl overflow-hidden mx-auto bg-white dark:bg-black ${previewDevice === 'mobile' ? 'w-[320px]' : previewDevice === 'tablet' ? 'w-[400px]' : 'w-[340px]'}`}>
-                <div className="h-[640px] overflow-y-auto no-scrollbar scroll-smooth">
+                <div 
+                  className="h-[640px] themed-scrollbar scroll-smooth relative"
+                  style={{ '--scrollbar-color': formData.themeColor } as any}
+                >
                   <CardPreview data={formData} lang={lang} customConfig={currentTemplate?.config} hideSaveButton={true} />
                 </div>
               </div>
@@ -723,7 +726,7 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
                    <X size={18} />
                  </button>
 
-                 <div className="flex-1 overflow-y-auto no-scrollbar scroll-smooth">
+                 <div className="flex-1 themed-scrollbar scroll-smooth" style={{ '--scrollbar-color': formData.themeColor } as any}>
                     <CardPreview data={formData} lang={lang} customConfig={currentTemplate?.config} hideSaveButton={true} />
                  </div>
 

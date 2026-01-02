@@ -79,12 +79,9 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
 
   const qrBorderWidth = data.qrBorderWidth ?? config.qrBorderWidth ?? 0;
   const qrBorderColor = data.qrBorderColor || config.qrBorderColor || 'transparent';
-  const qrBorderRadius = data.qrBorderRadius ?? config.qrBorderRadius ?? 0; // Default to 0
+  const qrBorderRadius = data.qrBorderRadius ?? config.qrBorderRadius ?? 0;
   const qrBgColor = data.qrBgColor || config.qrBgColor || (isDark ? '#111115' : '#ffffff');
-  
-  // If user sets a radius but no padding, we add a small automatic padding to prevent distortion
   const qrPadding = data.qrPadding ?? config.qrPadding ?? (qrBorderRadius > 10 ? 8 : 0); 
-  
   const qrSize = data.qrSize || config.qrSize || 90;
   const qrOffsetY = data.qrOffsetY || config.qrOffsetY || 0;
 
@@ -222,7 +219,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
   const displayOccasionDesc = data.occasionDesc || config.occasionDesc || '';
 
   return (
-    <div className={`w-full h-full flex flex-col transition-all duration-500 relative overflow-hidden rounded-t-[3rem] ${isDark ? 'bg-[#0f0f12] text-white' : 'bg-white text-gray-900'}`} style={{ textAlign: config.contentAlign }}>
+    <div className={`w-full min-h-full flex flex-col transition-all duration-500 relative overflow-hidden ${isDark ? 'bg-[#0f0f12] text-white' : 'bg-white text-gray-900'}`} style={{ textAlign: config.contentAlign }}>
       <div className="shrink-0 overflow-hidden" style={getHeaderStyles()} />
 
       <div className="flex flex-col items-center flex-1 px-4 sm:px-6" style={bodyStyles}>
@@ -350,7 +347,6 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
                     style={{ 
                       width: `${qrSize}px`, 
                       height: `${qrSize}px`,
-                      // The QR itself must remain square (radius 0) to avoid pixel distortion
                       borderRadius: '0px'
                     }} 
                   />
@@ -361,7 +357,8 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
         </div>
       </div>
       
-      <div className="h-24 shrink-0" />
+      {/* مساحة تباعد في الأسفل لضمان إمكانية التمرير لنهاية البطاقة */}
+      <div className="h-32 shrink-0" />
     </div>
   );
 };

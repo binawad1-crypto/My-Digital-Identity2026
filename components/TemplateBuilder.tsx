@@ -244,7 +244,10 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
         </div>
       </div>
       <div className={`transition-all duration-500 ease-in-out origin-top border-[10px] border-gray-900 dark:border-gray-800 rounded-[3.5rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] overflow-hidden bg-white dark:bg-gray-950 ${previewDevice === 'mobile' ? 'w-[320px]' : previewDevice === 'tablet' ? 'w-[440px]' : 'w-[360px]'}`}>
-        <div className="no-scrollbar overflow-x-hidden h-[620px] overflow-y-auto">
+        <div 
+          className="themed-scrollbar overflow-x-hidden h-[620px] scroll-smooth"
+          style={{ '--scrollbar-color': template.config.defaultThemeColor } as any}
+        >
            <CardPreview 
              data={{ 
                ...sampleCardData, 
@@ -484,32 +487,32 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
 
             {activeTab === 'avatar' && (
               <div className="space-y-6 animate-fade-in">
-                <div className="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
-                  <ToggleSwitch label={t('تفعيل ظهور الصورة الشخصية', 'Show Avatar')} value={template.config.avatarStyle !== 'none'} onChange={(v: boolean) => updateConfig('avatarStyle', v ? 'circle' : 'none')} icon={Camera} />
-                  <div>
-                    <label className="text-[10px] font-black text-gray-400 uppercase mb-4 block">{t('شكل الصورة', 'Avatar Shape')}</label>
-                    <div className="grid grid-cols-3 gap-3">
-                       {['circle', 'squircle', 'none'].map(style => (
-                         <button key={style} onClick={() => updateConfig('avatarStyle', style)} className={`py-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${template.config.avatarStyle === style ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-50 dark:bg-gray-800 text-gray-400'}`}>
-                           {style === 'circle' ? <Circle size={20}/> : style === 'squircle' ? <Box size={20}/> : <X size={20}/>}
-                           <span className="text-[10px] font-black uppercase">{t(style)}</span>
-                         </button>
-                       ))}
+                 <div className="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+                    <ToggleSwitch label={t('تفعيل ظهور الصورة الشخصية', 'Show Avatar')} value={template.config.avatarStyle !== 'none'} onChange={(v: boolean) => updateConfig('avatarStyle', v ? 'circle' : 'none')} icon={Camera} />
+                    <div>
+                      <label className="text-[10px] font-black text-gray-400 uppercase mb-4 block">{t('شكل الصورة', 'Avatar Shape')}</label>
+                      <div className="grid grid-cols-3 gap-3">
+                         {['circle', 'squircle', 'none'].map(style => (
+                           <button key={style} onClick={() => updateConfig('avatarStyle', style)} className={`py-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${template.config.avatarStyle === style ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-50 dark:bg-gray-800 text-gray-400'}`}>
+                             {style === 'circle' ? <Circle size={20}/> : style === 'squircle' ? <Box size={20}/> : <X size={20}/>}
+                             <span className="text-[10px] font-black uppercase">{t(style)}</span>
+                           </button>
+                         ))}
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     <RangeControl label={t('حجم الصورة', 'Avatar Size')} min={60} max={250} value={template.config.avatarSize} onChange={(v: number) => updateConfig('avatarSize', v)} icon={Maximize2} />
-                     <RangeControl label={t('سمك الإطار', 'Border Width')} min={0} max={20} value={template.config.avatarBorderWidth ?? 2} onChange={(v: number) => updateConfig('avatarBorderWidth', v)} icon={Ruler} />
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     <RangeControl label={t('إزاحة الرأسية (فوق/تحت)', 'Y Offset')} min={-200} max={200} value={template.config.avatarOffsetY} onChange={(v: number) => updateConfig('avatarOffsetY', v)} icon={Move} />
-                     <RangeControl label={t('الإزاحة الأفقية (يمين/شمال)', 'X Offset')} min={-200} max={200} value={template.config.avatarOffsetX} onChange={(v: number) => updateConfig('avatarOffsetX', v)} icon={Move} />
-                  </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                       <RangeControl label={t('حجم الصورة', 'Avatar Size')} min={60} max={250} value={template.config.avatarSize} onChange={(v: number) => updateConfig('avatarSize', v)} icon={Maximize2} />
+                       <RangeControl label={t('سمك الإطار', 'Border Width')} min={0} max={20} value={template.config.avatarBorderWidth ?? 2} onChange={(v: number) => updateConfig('avatarBorderWidth', v)} icon={Ruler} />
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                       <RangeControl label={t('إزاحة الرأسية (فوق/تحت)', 'Y Offset')} min={-200} max={200} value={template.config.avatarOffsetY} onChange={(v: number) => updateConfig('avatarOffsetY', v)} icon={Move} />
+                       <RangeControl label={t('الإزاحة الأفقية (يمين/شمال)', 'X Offset')} min={-200} max={200} value={template.config.avatarOffsetX} onChange={(v: number) => updateConfig('avatarOffsetX', v)} icon={Move} />
+                    </div>
 
-                  <ColorPicker label={t('لون الإطار', 'Border Color')} value={template.config.avatarBorderColor || '#ffffff'} onChange={(v: string) => updateConfig('avatarBorderColor', v)} />
-                </div>
+                    <ColorPicker label={t('لون الإطار', 'Border Color')} value={template.config.avatarBorderColor || '#ffffff'} onChange={(v: string) => updateConfig('avatarBorderColor', v)} />
+                  </div>
               </div>
             )}
 
@@ -720,7 +723,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
                     </div>
 
                     <div className="flex gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-3xl border border-gray-100 dark:border-gray-800">
-                       <ToggleSwitch label={t('تثبيت في المقدمة', 'Pin to Featured')} value={template.isFeatured} onChange={(v: boolean) => updateTemplate('isFeatured', v)} icon={Star} />
+                       <ToggleSwitch label={t('تفعيل في المقدمة', 'Pin to Featured')} value={template.isFeatured} onChange={(v: boolean) => updateTemplate('isFeatured', v)} icon={Star} />
                        <ToggleSwitch label={t('قالب نشط', 'Is Active')} value={template.isActive} onChange={(v: boolean) => updateTemplate('isActive', v)} icon={Check} />
                     </div>
                  </div>
