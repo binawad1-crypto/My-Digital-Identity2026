@@ -4,7 +4,7 @@ import {
   Mail, Phone, Globe, MessageCircle, Link as LinkIcon, 
   CheckCircle2, AlertCircle, UploadCloud, ImageIcon, 
   Palette, Layout, User as UserIcon, Camera, Share2, 
-  Pipette, Type as TypographyIcon, Smartphone, Tablet, Monitor, Eye, ArrowLeft, QrCode, RefreshCcw, FileText, Calendar, MapPin, PartyPopper, Move, Wind, ChevronRight, Info, Settings, LayoutGrid, ToggleLeft, ToggleRight, EyeOff, Ruler, Box, Maximize2, Wand2, Zap, Sliders, GlassWater
+  Pipette, Type as TypographyIcon, Smartphone, Tablet, Monitor, Eye, ArrowLeft, QrCode, RefreshCcw, FileText, Calendar, MapPin, PartyPopper, Move, Wind, ChevronRight, Info, Settings, LayoutGrid, ToggleLeft, ToggleRight, EyeOff, Ruler, Box, Maximize2, Wand2, Zap, Sliders, GlassWater, Link2, Check, AlertCircle as ErrorIcon, Sparkle
 } from 'lucide-react';
 import React, { useState, useEffect, useRef } from 'react';
 import CardPreview from '../components/CardPreview';
@@ -45,11 +45,13 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   
-  // التحكم في ظهور واختفاء الشريط عند التمرير بشكل أسرع وأقل "عوماً"
+  // خاص بالتحقق من الرابط المخصص
+  const [isCheckingSlug, setIsCheckingSlug] = useState(false);
+  const [slugStatus, setSlugStatus] = useState<'idle' | 'available' | 'taken' | 'invalid'>('idle');
+
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      // إذا كان التمرير لأسفل وبدأ المحتوى يتحرك، نخفي الشريط فوراً
       if (currentScrollY > lastScrollY && currentScrollY > 50) {
         setIsNavVisible(false);
       } else {
@@ -57,7 +59,6 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
       }
       setLastScrollY(currentScrollY);
     };
-
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
@@ -127,6 +128,33 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
     return baseData;
   });
 
+  // منطق التحقق من الاسم المستعار (Slug)
+  useEffect(() => {
+    if (!formData.id) {
+      setSlugStatus('idle');
+      return;
+    }
+
+    if (formData.id.length < 3) {
+      setSlugStatus('invalid');
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsCheckingSlug(true);
+      try {
+        const available = await isSlugAvailable(formData.id, auth.currentUser?.uid);
+        setSlugStatus(available ? 'available' : 'taken');
+      } catch (e) {
+        setSlugStatus('idle');
+      } finally {
+        setIsCheckingSlug(false);
+      }
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [formData.id]);
+
   useEffect(() => {
     const selectedTmpl = templates.find(t => t.id === formData.templateId);
     if (selectedTmpl?.config?.showOccasionByDefault) {
@@ -149,7 +177,9 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
   const relatedTemplates = templates.filter(t => t.categoryId === currentTemplate?.categoryId);
 
   const handleChange = (field: keyof CardData, value: any) => {
-    if (field === 'id') { value = (value || '').toLowerCase().replace(/[^a-z0-9-]/g, ''); }
+    if (field === 'id') { 
+      value = (value || '').toLowerCase().replace(/[^a-z0-9-]/g, ''); 
+    }
     if (field === 'templateId') {
       const newTmpl = templates.find(t => t.id === value);
       if (newTmpl) {
@@ -291,6 +321,27 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
   const inputClasses = "w-full px-5 py-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-950 text-gray-900 dark:text-white outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/10 transition-all font-bold text-sm shadow-none";
   const labelClasses = "block text-[10px] font-black text-gray-400 dark:text-gray-500 mb-2 uppercase tracking-widest px-1";
 
+  const handleFinalSave = () => {
+    if (slugStatus === 'taken' || slugStatus === 'invalid') {
+       alert(isRtl ? "يرجى اختيار رابط متاح قبل الحفظ" : "Please choose an available link before saving");
+       return;
+    }
+    onSave(formData, originalIdRef.current || undefined);
+  };
+
+  const ColorPickerInput = ({ label, value, onChange }: { label: string, value: string, onChange: (v: string) => void }) => (
+    <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800">
+      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{label}</span>
+      <div className="flex items-center gap-2">
+        <div className="relative w-8 h-8 rounded-lg overflow-hidden border shadow-none">
+          <input type="color" value={value || '#ffffff'} onChange={(e) => onChange(e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer scale-150" />
+          <div className="w-full h-full" style={{ backgroundColor: value }} />
+        </div>
+        <input type="text" value={value} onChange={(e) => onChange(e.target.value)} className="bg-transparent border-none outline-none font-mono text-[10px] font-black w-20 text-center dark:text-gray-400" />
+      </div>
+    </div>
+  );
+
   return (
     <div className="max-w-[1440px] mx-auto px-4 md:px-6">
       <div className="flex flex-col lg:flex-row gap-10 items-start">
@@ -312,6 +363,56 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
             
             {isSimpleMode ? (
               <div className="space-y-10 animate-fade-in relative z-10">
+                {/* الرابط المخصص لمحرر المناسبات - متميز وفي القمة */}
+                <div className="p-6 md:p-8 bg-gradient-to-br from-blue-50/50 via-white to-indigo-50/30 dark:from-blue-900/10 dark:via-[#121215] dark:to-indigo-900/5 rounded-[2.5rem] md:rounded-[3rem] border-2 border-blue-100/50 dark:border-blue-900/20 shadow-xl shadow-blue-500/5 space-y-6 group transition-all hover:border-blue-300 dark:hover:border-blue-800 relative overflow-hidden">
+                   <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-[50px] pointer-events-none rounded-full" />
+                   
+                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-3 md:gap-4">
+                         <div className="w-12 h-12 md:w-14 md:h-14 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-blue-600 shadow-md border border-blue-50 dark:border-gray-700 group-hover:rotate-12 transition-transform duration-500">
+                            <Link2 size={24} className="md:size-7" />
+                         </div>
+                         <div className="flex flex-col">
+                            <h4 className="text-base md:text-lg font-black dark:text-white uppercase tracking-tighter flex items-center gap-2">
+                               {t('رابط الدعوة الشخصي', 'Custom Invitation Link')}
+                               <Sparkle size={14} className="text-amber-400 animate-pulse" />
+                            </h4>
+                            <span className="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest">{t('عنوان الدعوة الرقمي الفريد', 'Unique invitation address')}</span>
+                         </div>
+                      </div>
+                      
+                      <div className="flex flex-col items-start sm:items-end w-full sm:w-auto">
+                         {isCheckingSlug ? (
+                            <div className="flex items-center gap-2 text-blue-500 font-black text-[9px] uppercase"><Loader2 size={12} className="animate-spin" /> {t('جاري التحقق...', 'Checking...')}</div>
+                         ) : slugStatus === 'available' ? (
+                            <div className="flex items-center gap-2 text-emerald-500 font-black text-[9px] md:text-[10px] uppercase bg-emerald-50 dark:bg-emerald-900/20 px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-emerald-100 dark:border-emerald-800 animate-fade-in shadow-sm"><CheckCircle2 size={14}/> {t('متاح للاستخدام', 'Available')}</div>
+                         ) : slugStatus === 'taken' ? (
+                            <div className="flex items-center gap-2 text-red-500 font-black text-[9px] md:text-[10px] uppercase bg-red-50 dark:bg-red-900/20 px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-red-100 dark:border-red-800 animate-fade-in shadow-sm"><AlertCircle size={14}/> {t('محجوز مسبقاً', 'Taken')}</div>
+                         ) : (
+                            <div className="flex items-center gap-2 text-gray-400 font-black text-[9px] md:text-[10px] uppercase">{t('اكتب اسم الرابط...', 'Type link name...')}</div>
+                         )}
+                      </div>
+                   </div>
+
+                   <div className="space-y-4">
+                      <div className="relative group/input">
+                         <div className={`absolute ${isRtl ? 'left-4 md:left-6' : 'right-4 md:right-6'} top-1/2 -translate-y-1/2 text-xs md:text-sm font-black text-gray-300 dark:text-gray-600 uppercase tracking-widest group-focus-within/input:text-blue-500 transition-colors pointer-events-none`}>
+                            .nextid.my
+                         </div>
+                         <input 
+                           type="text" 
+                           value={formData.id} 
+                           onChange={e => handleChange('id', e.target.value)} 
+                           className={`w-full px-5 md:px-8 py-4 md:py-6 rounded-[1.5rem] md:rounded-[2rem] border-2 bg-white/80 dark:bg-gray-950/50 text-xl md:text-2xl font-black lowercase tracking-tighter outline-none focus:ring-8 focus:ring-blue-100 dark:focus:ring-blue-900/10 transition-all shadow-inner ${slugStatus === 'available' ? 'border-emerald-200 dark:border-emerald-900/30' : slugStatus === 'taken' ? 'border-red-200 dark:border-red-900/30' : 'border-gray-100 dark:border-gray-800'} ${isRtl ? 'pl-24 md:pl-32' : 'pr-24 md:pr-32'}`} 
+                           placeholder="my-event" 
+                         />
+                      </div>
+                      <p className="text-[8px] md:text-[10px] text-gray-400 font-bold uppercase tracking-widest px-2 opacity-80">
+                         {t('* حروف، أرقام، وشرطة فقط (3 أحرف كحد أدنى).', '* letters, numbers, and hyphens only (min 3 chars).')}
+                      </p>
+                   </div>
+                </div>
+
                 <div className="p-8 bg-blue-50/50 dark:bg-blue-900/5 rounded-[2.5rem] border border-blue-100 dark:border-blue-900/20 space-y-8">
                    <div className="flex items-center gap-4">
                       <div className="w-10 h-10 bg-white dark:bg-gray-800 rounded-xl flex items-center justify-center text-blue-600 shadow-none"><UserIcon size={20} /></div>
@@ -526,7 +627,60 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
             ) : (
               <div className="mt-8">
                 {activeTab === 'identity' && (
-                  <div className="space-y-10 animate-fade-in relative z-10">
+                  <div className="space-y-8 animate-fade-in relative z-10">
+                    
+                    {/* قسم الرابط المخصص للبطاقات العادية */}
+                    <div className="p-6 md:p-8 bg-gradient-to-br from-blue-50/50 via-white to-indigo-50/30 dark:from-blue-900/10 dark:via-[#121215] dark:to-indigo-900/5 rounded-[2.5rem] md:rounded-[3rem] border-2 border-blue-100/50 dark:border-blue-900/20 shadow-xl shadow-blue-500/5 space-y-6 md:space-y-8 group transition-all hover:border-blue-300 dark:hover:border-blue-800 relative overflow-hidden">
+                       <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-[50px] pointer-events-none rounded-full" />
+                       
+                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                          <div className="flex items-center gap-3 md:gap-4">
+                             <div className="w-12 h-12 md:w-14 md:h-14 bg-white dark:bg-gray-800 rounded-2xl flex items-center justify-center text-blue-600 shadow-md border border-blue-50 dark:border-gray-700 group-hover:rotate-12 transition-transform duration-500">
+                                <Link2 size={24} className="md:size-7" />
+                             </div>
+                             <div className="flex flex-col">
+                                <h4 className="text-base md:text-lg font-black dark:text-white uppercase tracking-tighter flex items-center gap-2">
+                                   {t('رابط البطاقة الشخصي', 'Custom Identity Link')}
+                                   <Sparkle size={14} className="text-amber-400 animate-pulse" />
+                                </h4>
+                                <span className="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest">{t('عنوانك الرقمي الفريد', 'Your unique digital address')}</span>
+                             </div>
+                          </div>
+                          
+                          <div className="flex flex-col items-start sm:items-end w-full sm:w-auto">
+                             {isCheckingSlug ? (
+                                <div className="flex items-center gap-2 text-blue-500 font-black text-[9px] uppercase"><Loader2 size={12} className="animate-spin" /> {t('جاري التحقق...', 'Checking...')}</div>
+                             ) : slugStatus === 'available' ? (
+                                <div className="flex items-center gap-2 text-emerald-500 font-black text-[9px] md:text-[10px] uppercase bg-emerald-50 dark:bg-emerald-900/20 px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-emerald-100 dark:border-emerald-800 animate-fade-in shadow-sm"><CheckCircle2 size={14}/> {t('متاح للاستخدام', 'Available')}</div>
+                             ) : slugStatus === 'taken' ? (
+                                <div className="flex items-center gap-2 text-red-500 font-black text-[9px] md:text-[10px] uppercase bg-red-50 dark:bg-red-900/20 px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-red-100 dark:border-red-800 animate-fade-in shadow-sm"><AlertCircle size={14}/> {t('محجوز مسبقاً', 'Taken')}</div>
+                             ) : (
+                                <div className="flex items-center gap-2 text-gray-400 font-black text-[9px] md:text-[10px] uppercase">{t('اكتب اسمك المفضل...', 'Waiting...')}</div>
+                             )}
+                          </div>
+                       </div>
+
+                       <div className="space-y-4">
+                          <div className="relative group/input">
+                             <div className={`absolute ${isRtl ? 'left-4 md:left-6' : 'right-4 md:right-6'} top-1/2 -translate-y-1/2 text-xs md:text-sm font-black text-gray-300 dark:text-gray-600 uppercase tracking-widest group-focus-within/input:text-blue-500 transition-colors pointer-events-none`}>
+                                .nextid.my
+                             </div>
+                             <input 
+                               type="text" 
+                               value={formData.id} 
+                               onChange={e => handleChange('id', e.target.value)} 
+                               className={`w-full px-5 md:px-8 py-4 md:py-6 rounded-[1.5rem] md:rounded-[2rem] border-2 bg-white/80 dark:bg-gray-950/50 text-xl md:text-2xl font-black lowercase tracking-tighter outline-none focus:ring-8 focus:ring-blue-100 dark:focus:ring-blue-900/10 transition-all shadow-inner ${slugStatus === 'available' ? 'border-emerald-200 dark:border-emerald-900/30' : slugStatus === 'taken' ? 'border-red-200 dark:border-red-900/30' : 'border-gray-100 dark:border-gray-800'} ${isRtl ? 'pl-24 md:pl-32' : 'pr-24 md:pr-32'}`} 
+                               placeholder="yourname" 
+                             />
+                          </div>
+                          
+                          <p className="text-[8px] md:text-[10px] text-gray-400 font-bold uppercase tracking-widest px-2 opacity-80 leading-relaxed">
+                             {t('* يُسمح بالأحرف (a-z)، الأرقام (0-9)، والشرطة (-) فقط، بحد أدنى 3 أحرف.', '* a-z, 0-9, and hyphens (-) only, min 3 chars.')}
+                          </p>
+                       </div>
+                    </div>
+
+                    {/* قسم المعلومات الشخصية */}
                     <div className="flex flex-col md:flex-row gap-8 items-center md:items-start border-b border-gray-50 dark:border-gray-800/50 pb-10">
                        <div className="relative shrink-0 group">
                           <div className="w-32 h-32 rounded-[2.5rem] overflow-hidden border-4 border-white dark:border-gray-800 shadow-none bg-gray-50 dark:bg-gray-900 flex items-center justify-center relative">
@@ -867,7 +1021,7 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
 
           <div className="flex flex-col sm:flex-row gap-3 pt-10">
             <button 
-              onClick={() => onSave(formData, originalIdRef.current || undefined)}
+              onClick={handleFinalSave}
               className="flex-[2] py-5 bg-blue-600 text-white rounded-[2rem] font-black text-sm uppercase shadow-none flex items-center justify-center gap-3 hover:scale-[1.01] active:scale-95 transition-all"
             >
               <Save size={20} /> {t('حفظ التعديلات', 'Save Changes')}
@@ -950,18 +1104,5 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
     </div>
   );
 };
-
-const ColorPickerInput = ({ label, value, onChange }: { label: string, value: string, onChange: (v: string) => void }) => (
-  <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800">
-    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{label}</span>
-    <div className="flex items-center gap-2">
-      <div className="relative w-8 h-8 rounded-lg overflow-hidden border shadow-none">
-        <input type="color" value={value || '#ffffff'} onChange={(e) => onChange(e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer scale-150" />
-        <div className="w-full h-full" style={{ backgroundColor: value }} />
-      </div>
-      <input type="text" value={value} onChange={(e) => onChange(e.target.value)} className="bg-transparent border-none outline-none font-mono text-[10px] font-black w-20 text-center dark:text-gray-400" />
-    </div>
-  </div>
-);
 
 export default Editor;
