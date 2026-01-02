@@ -63,12 +63,13 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
          nameColor: selectedTmpl.config.nameColor || baseData.nameColor,
          titleColor: selectedTmpl.config.titleColor || baseData.titleColor,
          linksColor: selectedTmpl.config.linksColor || baseData.linksColor,
+         socialIconsColor: selectedTmpl.config.socialIconsColor || selectedTmpl.config.linksColor || baseData.linksColor,
          qrColor: selectedTmpl.config.qrColor || baseData.qrColor,
          qrBgColor: selectedTmpl.config.qrBgColor || 'transparent',
          qrPadding: 0,
          qrBorderWidth: selectedTmpl.config.qrBorderWidth || 0,
          qrBorderColor: selectedTmpl.config.qrBorderColor || '#ffffff',
-         qrBorderRadius: selectedTmpl.config.qrBorderRadius ?? 0, // Default to 0 for precision
+         qrBorderRadius: selectedTmpl.config.qrBorderRadius ?? 0, 
          qrSize: selectedTmpl.config.qrSize || 90,
          showName: selectedTmpl.config.showNameByDefault ?? true,
          showTitle: selectedTmpl.config.showTitleByDefault ?? true,
@@ -112,6 +113,7 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
           nameColor: newTmpl.config.nameColor || prev.nameColor,
           titleColor: newTmpl.config.titleColor || prev.titleColor,
           linksColor: newTmpl.config.linksColor || prev.linksColor,
+          socialIconsColor: newTmpl.config.socialIconsColor || newTmpl.config.linksColor || prev.socialIconsColor,
           qrColor: newTmpl.config.qrColor || prev.qrColor,
           qrBgColor: newTmpl.config.qrBgColor || prev.qrBgColor,
           qrPadding: newTmpl.config.qrPadding ?? prev.qrPadding,
@@ -484,7 +486,7 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
                       <button onClick={() => handleChange('templateId', formData.templateId)} className="text-[9px] font-black text-blue-600 uppercase flex items-center gap-2 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/10 rounded-xl hover:bg-blue-100 transition-all shadow-sm"><RefreshCcw size={12}/> {t('استعادة ألوان القالب', 'Reset Colors')}</button>
                    </div>
 
-                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-[2rem] space-y-4 shadow-sm border border-gray-100 dark:border-gray-700">
                          <label className={labelClasses}>{t('لون الاسم', 'Name Color')}</label>
                          <div className="flex items-center gap-3">
@@ -513,6 +515,16 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
                               <div className="w-full h-full" style={{ backgroundColor: formData.linksColor }} />
                             </div>
                             <span className="text-[11px] font-mono font-black uppercase dark:text-gray-400">{formData.linksColor}</span>
+                         </div>
+                      </div>
+                      <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-[2rem] space-y-4 shadow-sm border border-gray-100 dark:border-gray-700">
+                         <label className={labelClasses}>{t('لون أيقونات التواصل', 'Social Icons Color')}</label>
+                         <div className="flex items-center gap-3">
+                            <div className="relative w-10 h-10 rounded-xl overflow-hidden border shadow-sm">
+                              <input type="color" value={formData.socialIconsColor || formData.linksColor} onChange={e => handleChange('socialIconsColor', e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer scale-150" />
+                              <div className="w-full h-full" style={{ backgroundColor: formData.socialIconsColor || formData.linksColor }} />
+                            </div>
+                            <span className="text-[11px] font-mono font-black uppercase dark:text-gray-400">{formData.socialIconsColor || formData.linksColor}</span>
                          </div>
                       </div>
                       <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-[2rem] space-y-4 shadow-sm border border-gray-100 dark:border-gray-700">

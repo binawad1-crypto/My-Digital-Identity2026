@@ -83,6 +83,7 @@ export interface TemplateConfig {
   bioTextColor?: string;
   bioBgColor?: string;
   linksColor?: string;
+  socialIconsColor?: string;
   
   defaultThemeType?: ThemeType;
   defaultThemeColor?: string;
@@ -175,6 +176,7 @@ export interface CardData {
   bioTextColor?: string;
   bioBgColor?: string;
   linksColor?: string;
+  socialIconsColor?: string;
   qrSize?: number;
   qrColor?: string; 
   qrBgColor?: string;

@@ -13,7 +13,7 @@ import {
   AlignRight, LayoutTemplate, Info, Maximize2, UserCircle, Mail, 
   Phone, Globe, MessageCircle, Camera, Download, Tablet, Monitor, 
   Eye, QrCode, Wind, GlassWater, ChevronRight, ChevronLeft, 
-  Waves, Square, Columns, Minus, ToggleLeft, ToggleRight, Calendar, MapPin, Timer, PartyPopper, Link as LinkIcon, FolderOpen, Plus, Tag
+  Waves, Square, Columns, Minus, ToggleLeft, ToggleRight, Calendar, MapPin, Timer, PartyPopper, Link as LinkIcon, FolderOpen, Plus, Tag, Settings2, SlidersHorizontal, Share2
 } from 'lucide-react';
 
 interface TemplateBuilderProps {
@@ -23,7 +23,7 @@ interface TemplateBuilderProps {
   initialTemplate?: CustomTemplate;
 }
 
-type BuilderTab = 'info' | 'header' | 'avatar' | 'visuals' | 'typography' | 'layout' | 'occasion' | 'qrcode';
+type BuilderTab = 'info' | 'header' | 'avatar' | 'visuals' | 'design-system' | 'occasion' | 'qrcode';
 
 const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCancel, initialTemplate }) => {
   const isRtl = lang === 'ar';
@@ -124,6 +124,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
       bioTextColor: 'rgba(0,0,0,0.65)',
       bioBgColor: 'rgba(0,0,0,0.03)',
       linksColor: '#3b82f6',
+      socialIconsColor: '#3b82f6',
       defaultThemeType: 'gradient',
       defaultThemeColor: '#2563eb',
       defaultThemeGradient: THEME_GRADIENTS[0],
@@ -222,6 +223,16 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
     </button>
   );
 
+  const SectionHeader = ({ icon: Icon, title, desc }: any) => (
+    <div className="flex items-center gap-4 mb-8">
+       <div className="p-3 bg-blue-600 text-white rounded-2xl shadow-lg"><Icon size={24} /></div>
+       <div>
+          <h3 className="text-lg font-black dark:text-white uppercase leading-none mb-2">{title}</h3>
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{desc}</p>
+       </div>
+    </div>
+  );
+
   const PreviewContent = () => (
     <div className="flex flex-col items-center w-full">
       <div className="mb-6 w-full flex items-center justify-between px-4">
@@ -249,6 +260,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
                bioTextColor: template.config.bioTextColor, 
                bioBgColor: template.config.bioBgColor, 
                linksColor: template.config.linksColor, 
+               socialIconsColor: template.config.socialIconsColor,
                qrColor: template.config.qrColor, 
                qrBgColor: template.config.qrBgColor,
                qrPadding: template.config.qrPadding,
@@ -302,8 +314,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
           <NavItem id="header" label={t('نمط الترويسة', 'Header Layout')} icon={Layout} />
           <NavItem id="avatar" label={t('الصورة الشخصية', 'Avatar')} icon={Circle} />
           <NavItem id="visuals" label={t('المظهر العام', 'Visual Style')} icon={Palette} />
-          <NavItem id="typography" label={t('النصوص والخطوط', 'Typography')} icon={TypographyIcon} />
-          <NavItem id="layout" label={t('التموضع والخيارات', 'Layout & Options')} icon={Move} />
+          <NavItem id="design-system" label={t('هيكلة النصوص والتصميم', 'Structure & Typography')} icon={Settings2} />
           <NavItem id="occasion" label={t('مناسبة خاصة', 'Special Occasion')} icon={PartyPopper} />
           <NavItem id="qrcode" label={t('رمز الـ QR', 'QR Code')} icon={QrCode} />
         </div>
@@ -311,68 +322,120 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
         <div className="flex-1 p-8 overflow-y-auto no-scrollbar bg-gray-50/20 dark:bg-transparent">
           <div className="max-w-3xl mx-auto space-y-10 animate-fade-in pb-32">
             
-            {activeTab === 'layout' && (
-              <div className="space-y-8 animate-fade-in">
-                <div className="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="p-3 bg-blue-600 text-white rounded-2xl shadow-lg"><Move size={20} /></div>
-                    <div>
-                      <h4 className="text-sm font-black dark:text-white uppercase tracking-widest leading-none mb-1">{isRtl ? 'تحريك وتموضع عناصر البطاقة' : 'Element Positioning'}</h4>
-                      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{isRtl ? 'تحكم في إزاحة كل قسم داخل البطاقة' : 'Control the vertical offset of each section'}</p>
+            {activeTab === 'design-system' && (
+              <div className="space-y-12 animate-fade-in">
+                {/* المجموعة الأولى: نمط وهيكلة البطاقة */}
+                <div className="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+                  <SectionHeader icon={SlidersHorizontal} title={t('نمط وهيكلة البطاقة', 'Card Structure & Style')} desc={t('التحكم في المحاذاة، الانحناء، وشفافية البطاقة', 'Control card body properties')} />
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                       <label className="text-[10px] font-black text-gray-400 uppercase block">{t('محاذاة المحتوى', 'Content Alignment')}</label>
+                       <div className="grid grid-cols-3 gap-2 bg-gray-50 dark:bg-gray-800 p-1.5 rounded-2xl border">
+                        {['start', 'center', 'end'].map(align => (
+                          <button key={align} onClick={() => updateConfig('contentAlign', align)} className={`py-2.5 rounded-xl transition-all flex items-center justify-center ${template.config.contentAlign === align ? 'bg-blue-600 text-white shadow-md' : 'text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
+                            {align === 'start' ? <AlignLeft size={18}/> : align === 'center' ? <AlignCenter size={18}/> : <AlignRight size={18}/>}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                       <label className="text-[10px] font-black text-gray-400 uppercase block">{t('نمط الأزرار والتباعد', 'Buttons & Spacing')}</label>
+                       <div className="grid grid-cols-3 gap-2 bg-gray-50 dark:bg-gray-800 p-1.5 rounded-2xl border">
+                        {['pill', 'square', 'glass'].map(style => (
+                          <button key={style} onClick={() => updateConfig('buttonStyle', style)} className={`py-2.5 rounded-xl text-[8px] font-black uppercase transition-all ${template.config.buttonStyle === style ? 'bg-blue-600 text-white shadow-md' : 'text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
+                            {t(style)}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <RangeControl label={t('تحريك الأرضية العامة', 'Main Body Offset')} min={-400} max={600} value={template.config.bodyOffsetY || 0} onChange={(v: number) => updateConfig('bodyOffsetY', v)} icon={Layers} />
-                    <RangeControl label={t('زوايا البطاقة', 'Body Radius')} min={0} max={100} value={template.config.bodyBorderRadius !== undefined ? template.config.bodyBorderRadius : 48} onChange={(v: number) => updateConfig('bodyBorderRadius', v)} icon={Box} />
+                    <RangeControl label={t('زوايا البطاقة', 'Card Radius')} min={0} max={100} value={template.config.bodyBorderRadius !== undefined ? template.config.bodyBorderRadius : 48} onChange={(v: number) => updateConfig('bodyBorderRadius', v)} icon={Box} />
+                    <RangeControl label={t('تباعد العناصر', 'Global Spacing')} min={10} max={60} value={template.config.spacing === 'compact' ? 20 : template.config.spacing === 'relaxed' ? 50 : 35} onChange={(v: number) => updateConfig('spacing', v < 30 ? 'compact' : v > 40 ? 'relaxed' : 'normal')} icon={Ruler} />
                   </div>
 
                   <div className="pt-6 border-t border-gray-100 dark:border-gray-800 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <RangeControl label={t('إزاحة قسم البريد', 'Email Offset')} min={-400} max={400} value={template.config.emailOffsetY || 0} onChange={(v: number) => updateConfig('emailOffsetY', v)} icon={Mail} />
-                    <RangeControl label={t('إزاحة قسم الموقع', 'Website Offset')} min={-400} max={400} value={template.config.websiteOffsetY || 0} onChange={(v: number) => updateConfig('websiteOffsetY', v)} icon={Globe} />
-                    <RangeControl label={t('إزاحة أيقونات التواصل', 'Social Icons Offset')} min={-400} max={400} value={template.config.socialLinksOffsetY || 0} onChange={(v: number) => updateConfig('socialLinksOffsetY', v)} icon={LinkIcon} />
-                    <RangeControl label={t('إزاحة أزرار الاتصال', 'Contact Buttons Offset')} min={-400} max={400} value={template.config.contactButtonsOffsetY || 0} onChange={(v: number) => updateConfig('contactButtonsOffsetY', v)} icon={Phone} />
-                  </div>
-
-                  <div className="pt-6 border-t border-gray-100 dark:border-gray-800 space-y-6">
-                    <ToggleSwitch label={t('نمط زجاجي للبطاقة', 'Glass Effect')} value={template.config.bodyGlassy} onChange={(v: boolean) => updateConfig('bodyGlassy', v)} icon={GlassWater} />
+                    <ToggleSwitch label={t('نمط زجاجي للجسم', 'Glass Body')} value={template.config.bodyGlassy} onChange={(v: boolean) => updateConfig('bodyGlassy', v)} icon={GlassWater} />
                     <RangeControl label={t('شفافية البطاقة', 'Card Opacity')} min={0} max={100} value={template.config.bodyOpacity ?? 100} onChange={(v: number) => updateConfig('bodyOpacity', v)} unit="%" icon={Sun} />
                   </div>
                 </div>
 
-                <div className="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <ToggleSwitch label={t('ظهور البريد الإلكتروني', 'Show Email')} value={template.config.showEmailByDefault !== false} onChange={(v: boolean) => updateConfig('showEmailByDefault', v)} icon={Mail} />
-                    <ToggleSwitch label={t('ظهور رابط الموقع', 'Show Website')} value={template.config.showWebsiteByDefault !== false} onChange={(v: boolean) => updateConfig('showWebsiteByDefault', v)} icon={Globe} />
-                    <ToggleSwitch label={t('ظهور رقم الهاتف', 'Show Phone')} value={template.config.showPhoneByDefault !== false} onChange={(v: boolean) => updateConfig('showPhoneByDefault', v)} icon={Phone} />
-                    <ToggleSwitch label={t('ظهور الواتساب', 'Show WhatsApp')} value={template.config.showWhatsappByDefault !== false} onChange={(v: boolean) => updateConfig('showWhatsappByDefault', v)} icon={MessageCircle} />
-                    <ToggleSwitch label={t('ظهور روابط التواصل', 'Show Socials')} value={template.config.showSocialLinksByDefault !== false} onChange={(v: boolean) => updateConfig('showSocialLinksByDefault', v)} icon={MessageCircle} />
-                    <ToggleSwitch label={t('ظهور أزرار الاتصال', 'Show Buttons')} value={template.config.showButtonsByDefault !== false} onChange={(v: boolean) => updateConfig('showButtonsByDefault', v)} icon={Phone} />
-                  </div>
+                {/* المجموعة الثانية: إعدادات النصوص المتقدمة */}
+                <div className="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-10">
+                   <SectionHeader icon={TypographyIcon} title={t('إعدادات النصوص والخطوط', 'Typography Settings')} desc={t('تخصيص الحجم، اللون، وظهور نصوص الهوية', 'Customize name, title and bio typography')} />
+                   
+                   {/* الاسم */}
+                   <div className="p-6 bg-gray-50/50 dark:bg-gray-800/30 rounded-3xl border border-gray-100 dark:border-gray-800 space-y-6">
+                      <ToggleSwitch label={t('ظهور الاسم', 'Show Name')} value={template.config.showNameByDefault !== false} onChange={(v: boolean) => updateConfig('showNameByDefault', v)} icon={UserCircle} />
+                      {template.config.showNameByDefault !== false && (
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
+                            <ColorPicker label={t('لون الاسم', 'Name Color')} value={template.config.nameColor} onChange={(v: string) => updateConfig('nameColor', v)} compact />
+                            <RangeControl label={t('حجم الخط', 'Font Size')} min={16} max={50} value={template.config.nameSize} onChange={(v: number) => updateConfig('nameSize', v)} icon={TypographyIcon} />
+                         </div>
+                      )}
+                   </div>
+
+                   {/* المسمى والشركة */}
+                   <div className="p-6 bg-gray-50/50 dark:bg-gray-800/30 rounded-3xl border border-gray-100 dark:border-gray-800 space-y-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                         <ToggleSwitch label={t('ظهور المسمى الوظيفي', 'Show Job Title')} value={template.config.showTitleByDefault !== false} onChange={(v: boolean) => updateConfig('showTitleByDefault', v)} icon={BriefcaseIcon} />
+                         <ToggleSwitch label={t('ظهور الشركة', 'Show Company')} value={template.config.showCompanyByDefault !== false} onChange={(v: boolean) => updateConfig('showCompanyByDefault', v)} icon={Box} />
+                      </div>
+                      {template.config.showTitleByDefault !== false && (
+                         <div className="animate-fade-in pt-4">
+                            <ColorPicker label={t('لون المسمى', 'Title Color')} value={template.config.titleColor} onChange={(v: string) => updateConfig('titleColor', v)} compact />
+                         </div>
+                      )}
+                   </div>
+
+                   {/* النبذة */}
+                   <div className="p-6 bg-gray-50/50 dark:bg-gray-800/30 rounded-3xl border border-gray-100 dark:border-gray-800 space-y-6">
+                      <ToggleSwitch label={t('ظهور النبذة (Bio)', 'Show Bio')} value={template.config.showBioByDefault !== false} onChange={(v: boolean) => updateConfig('showBioByDefault', v)} icon={FileText} />
+                      {template.config.showBioByDefault !== false && (
+                         <div className="space-y-6 animate-fade-in pt-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                               <ColorPicker label={t('لون النص', 'Text Color')} value={template.config.bioTextColor} onChange={(v: string) => updateConfig('bioTextColor', v)} compact />
+                               <ColorPicker label={t('لون الخلفية', 'Background')} value={template.config.bioBgColor} onChange={(v: string) => updateConfig('bioBgColor', v)} compact />
+                            </div>
+                            <RangeControl label={t('حجم خط النبذة', 'Bio Font Size')} min={10} max={24} value={template.config.bioSize} onChange={(v: number) => updateConfig('bioSize', v)} icon={TypographyIcon} />
+                         </div>
+                      )}
+                   </div>
+
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <ColorPicker label={t('لون الروابط (بريد/موقع)', 'Links Color')} value={template.config.linksColor} onChange={(v: string) => updateConfig('linksColor', v)} />
+                      <ColorPicker label={t('لون أيقونات التواصل', 'Social Icons Color')} value={template.config.socialIconsColor || template.config.linksColor} onChange={(v: string) => updateConfig('socialIconsColor', v)} />
+                   </div>
+                </div>
+
+                {/* المجموعة الثالثة: خيارات الظهور السريعة */}
+                <div className="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-6">
+                   <SectionHeader icon={Eye} title={t('رؤية العناصر والبيانات', 'Element Visibility')} desc={t('تحديد ما يظهر بشكل افتراضي في البطاقة', 'Set default visibility for contact info')} />
+                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                      <ToggleSwitch label={t('البريد', 'Email')} value={template.config.showEmailByDefault !== false} onChange={(v: boolean) => updateConfig('showEmailByDefault', v)} icon={Mail} />
+                      <ToggleSwitch label={t('الموقع', 'Web')} value={template.config.showWebsiteByDefault !== false} onChange={(v: boolean) => updateConfig('showWebsiteByDefault', v)} icon={Globe} />
+                      <ToggleSwitch label={t('الهاتف', 'Phone')} value={template.config.showPhoneByDefault !== false} onChange={(v: boolean) => updateConfig('showPhoneByDefault', v)} icon={Phone} />
+                      <ToggleSwitch label={t('واتساب', 'WA')} value={template.config.showWhatsappByDefault !== false} onChange={(v: boolean) => updateConfig('showWhatsappByDefault', v)} icon={MessageCircle} />
+                      <ToggleSwitch label={t('روابط التواصل', 'Socials')} value={template.config.showSocialLinksByDefault !== false} onChange={(v: boolean) => updateConfig('showSocialLinksByDefault', v)} icon={LinkIcon} />
+                      <ToggleSwitch label={t('أزرار الحفظ', 'Buttons')} value={template.config.showButtonsByDefault !== false} onChange={(v: boolean) => updateConfig('showButtonsByDefault', v)} icon={Download} />
+                   </div>
+                </div>
+
+                {/* المجموعة الرابعة: الإزاحة والتموضع الدقيق */}
+                <div className="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+                  <SectionHeader icon={Move} title={t('الإزاحة والتموضع الدقيق', 'Precision Positioning')} desc={t('تحريك الأقسام رأسياً لضبط المسافات بدقة', 'Vertical offsets for perfect element alignment')} />
                   
-                  <div className="pt-8 border-t border-gray-100 dark:border-gray-800 space-y-8">
-                    <div>
-                      <label className="text-[10px] font-black text-gray-400 uppercase mb-4 block">{t('محاذاة المحتوى', 'Content Alignment')}</label>
-                      <div className="grid grid-cols-3 gap-3">
-                        {['start', 'center', 'end'].map(align => (
-                          <button key={align} onClick={() => updateConfig('contentAlign', align)} className={`py-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${template.config.contentAlign === align ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-50 dark:bg-gray-800 text-gray-400'}`}>
-                            {align === 'start' ? <AlignLeft size={20}/> : align === 'center' ? <AlignCenter size={20}/> : <AlignRight size={20}/>}
-                            <span className="text-[10px] font-black uppercase">{t(align)}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-black text-gray-400 uppercase mb-4 block">{t('نمط الأزرار', 'Button Style')}</label>
-                      <div className="grid grid-cols-3 gap-3">
-                        {['pill', 'square', 'glass'].map(style => (
-                          <button key={style} onClick={() => updateConfig('buttonStyle', style)} className={`py-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${template.config.buttonStyle === style ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-50 dark:bg-gray-800 text-gray-400'}`}>
-                            <span className="text-[10px] font-black uppercase">{t(style)}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <RangeControl label={t('التباعد بين العناصر', 'Spacing')} min={10} max={60} value={template.config.spacing === 'compact' ? 20 : template.config.spacing === 'relaxed' ? 50 : 35} onChange={(v: number) => updateConfig('spacing', v < 30 ? 'compact' : v > 40 ? 'relaxed' : 'normal')} icon={Ruler} />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <RangeControl label={t('إزاحة الجسم العام', 'Body Y Offset')} min={-400} max={600} value={template.config.bodyOffsetY || 0} onChange={(v: number) => updateConfig('bodyOffsetY', v)} icon={Layers} />
+                    <RangeControl label={t('إزاحة الاسم', 'Name Offset')} min={-400} max={400} value={template.config.nameOffsetY} onChange={(v: number) => updateConfig('nameOffsetY', v)} icon={UserCircle} />
+                    <RangeControl label={t('إزاحة المسمى', 'Title Offset')} min={-400} max={400} value={template.config.titleOffsetY || 0} onChange={(v: number) => updateConfig('titleOffsetY', v)} icon={BriefcaseIcon} />
+                    <RangeControl label={t('إزاحة النبذة', 'Bio Offset')} min={-400} max={400} value={template.config.bioOffsetY} onChange={(v: number) => updateConfig('bioOffsetY', v)} icon={FileText} />
+                    <RangeControl label={t('إزاحة قسم البريد', 'Email Offset')} min={-400} max={400} value={template.config.emailOffsetY || 0} onChange={(v: number) => updateConfig('emailOffsetY', v)} icon={Mail} />
+                    <RangeControl label={t('إزاحة قسم الموقع', 'Web Offset')} min={-400} max={400} value={template.config.websiteOffsetY || 0} onChange={(v: number) => updateConfig('websiteOffsetY', v)} icon={Globe} />
+                    <RangeControl label={t('إزاحة الأيقونات الاجتماعية', 'Social Icons Offset')} min={-400} max={400} value={template.config.socialLinksOffsetY || 0} onChange={(v: number) => updateConfig('socialLinksOffsetY', v)} icon={LinkIcon} />
+                    <RangeControl label={t('إزاحة أزرار الاتصال', 'Contact Buttons Offset')} min={-400} max={400} value={template.config.contactButtonsOffsetY || 0} onChange={(v: number) => updateConfig('contactButtonsOffsetY', v)} icon={Phone} />
                   </div>
                 </div>
               </div>
@@ -513,54 +576,6 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
                     <button onClick={() => updateConfig('defaultIsDark', !template.config.defaultIsDark)} className={`w-14 h-7 rounded-full relative transition-all ${template.config.defaultIsDark ? 'bg-blue-600 shadow-lg' : 'bg-gray-200 dark:bg-gray-700'}`}><div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all shadow-md ${isRtl ? (template.config.defaultIsDark ? 'right-8' : 'right-1') : (template.config.defaultIsDark ? 'left-8' : 'left-1')}`} /></button>
                   </div>
                 </div>
-              </div>
-            )}
-
-            {activeTab === 'typography' && (
-              <div className="space-y-6 animate-fade-in">
-                 <div className="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
-                    <div className="space-y-4">
-                       <ToggleSwitch label={t('تفعيل ظهور اسم العميل', 'Show Name')} value={template.config.showNameByDefault !== false} onChange={(v: boolean) => updateConfig('showNameByDefault', v)} icon={UserCircle} />
-                       {template.config.showNameByDefault !== false && (
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in border-l-2 border-blue-500 pl-4">
-                            <div className="md:col-span-2"><ColorPicker label={t('لون اسم العميل', 'Name Color')} value={template.config.nameColor} onChange={(v: string) => updateConfig('nameColor', v)} /></div>
-                            <RangeControl label={t('حجم اسم العميل', 'Name Font Size')} min={16} max={50} value={template.config.nameSize} onChange={(v: number) => updateConfig('nameSize', v)} icon={TypographyIcon} />
-                            <RangeControl label={t('إزاحة الاسم (فوق/تحت)', 'Name Y Offset')} min={-400} max={400} value={template.config.nameOffsetY} onChange={(v: number) => updateConfig('nameOffsetY', v)} icon={Move} />
-                         </div>
-                       )}
-                    </div>
-                    
-                    <div className="pt-8 border-t border-gray-100 dark:border-gray-800 space-y-4">
-                       <ToggleSwitch label={t('تفعيل ظهور المسمى الوظيفي', 'Show Job Title')} value={template.config.showTitleByDefault !== false} onChange={(v: boolean) => updateConfig('showTitleByDefault', v)} icon={Layers} />
-                       {template.config.showTitleByDefault !== false && (
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in border-l-2 border-blue-500 pl-4">
-                            <ColorPicker label={t('لون المسمى الوظيفي', 'Title Color')} value={template.config.titleColor} onChange={(v: string) => updateConfig('titleColor', v)} />
-                            <ToggleSwitch label={t('تفعيل ظهور الشركة', 'Show Company')} value={template.config.showCompanyByDefault !== false} onChange={(v: boolean) => updateConfig('showCompanyByDefault', v)} icon={Box} />
-                            <div className="md:col-span-2">
-                               <RangeControl label={t('إزاحة المسمى الوظيفي', 'Title Y Offset')} min={-400} max={400} value={template.config.titleOffsetY || 0} onChange={(v: number) => updateConfig('titleOffsetY', v)} icon={Move} />
-                            </div>
-                         </div>
-                       )}
-                    </div>
-
-                    <div className="pt-8 border-t border-gray-100 dark:border-gray-800 space-y-4">
-                       <ToggleSwitch label={t('تفعيل ظهور النبذة التعريفية', 'Show Bio')} value={template.config.showBioByDefault !== false} onChange={(v: boolean) => updateConfig('showBioByDefault', v)} icon={FileText} />
-                       {template.config.showBioByDefault !== false && (
-                         <div className="space-y-4 animate-fade-in border-l-2 border-blue-500 pl-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                               <ColorPicker label={t('لون نص النبذة', 'Bio Text Color')} value={template.config.bioTextColor} onChange={(v: string) => updateConfig('bioTextColor', v)} />
-                               <ColorPicker label={t('خلفية النبذة', 'Bio Bg Color')} value={template.config.bioBgColor} onChange={(v: string) => updateConfig('bioBgColor', v)} />
-                            </div>
-                            <RangeControl label={t('حجم النبذة', 'Bio Font Size')} min={10} max={24} value={template.config.bioSize} onChange={(v: number) => updateConfig('bioSize', v)} icon={TypographyIcon} />
-                            <RangeControl label={t('إزاحة النبذة', 'Bio Offset')} min={-400} max={400} value={template.config.bioOffsetY} onChange={(v: number) => updateConfig('bioOffsetY', v)} icon={Move} />
-                         </div>
-                       )}
-                    </div>
-
-                    <div className="pt-8 border-t border-gray-100 dark:border-gray-800">
-                       <ColorPicker label={t('لون الروابط والبريد', 'Links Color')} value={template.config.linksColor} onChange={(v: string) => updateConfig('linksColor', v)} />
-                    </div>
-                 </div>
               </div>
             )}
 
@@ -725,5 +740,13 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
     </div>
   );
 };
+
+// Internal icon for the job title section to keep UI clean
+const BriefcaseIcon = ({ size, className }: any) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <rect width="20" height="14" x="2" y="7" rx="2" ry="2"/>
+    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+  </svg>
+);
 
 export default TemplateBuilder;

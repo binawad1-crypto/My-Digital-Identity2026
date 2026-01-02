@@ -74,6 +74,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
   const bioTextColor = data.bioTextColor || config.bioTextColor || (isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)');
   const bioBgColor = data.bioBgColor || config.bioBgColor || (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)');
   const linksColor = data.linksColor || config.linksColor || '#3b82f6';
+  const socialIconsColor = data.socialIconsColor || config.socialIconsColor || linksColor;
   const qrColorVal = (data.qrColor || config.qrColor || themeColor || '#000000').replace('#', '');
 
   const qrBorderWidth = data.qrBorderWidth ?? config.qrBorderWidth ?? 0;
@@ -304,7 +305,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
              <div className="flex flex-wrap justify-center gap-3 py-6" style={{ transform: `translateY(${config.socialLinksOffsetY || 0}px)` }}>
                {data.socialLinks.map((link, idx) => (
                  <a key={idx} href={link.url} target="_blank" className="p-3 bg-gray-50 dark:bg-gray-800 rounded-2xl hover:scale-110 transition-all shadow-sm">
-                   <SocialIcon platformId={link.platformId} size={20} color={linksColor} />
+                   <SocialIcon platformId={link.platformId} size={20} color={socialIconsColor} />
                  </a>
                ))}
              </div>
@@ -323,7 +324,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
                   </a>
                 )}
                 {!hideSaveButton && data.showButtons !== false && (
-                  <button onClick={() => downloadVCard(data)} className="flex-1 flex items-center justify-center gap-2 px-3 py-4 rounded-full bg-gray-900 text-white font-black text-[10px] shadow-lg whitespace-nowrap">
+                  <button onClick={() => downloadVCard(data)} className="flex-1 flex items-center justify-center gap-3 px-3 py-4 rounded-full bg-gray-900 text-white font-black text-[10px] shadow-lg whitespace-nowrap">
                     <UserPlus size={14} /> {t('saveContact')}
                   </button>
                 )}
