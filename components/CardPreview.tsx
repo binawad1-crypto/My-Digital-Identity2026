@@ -219,7 +219,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
   const displayOccasionDesc = data.occasionDesc || config.occasionDesc || '';
 
   return (
-    <div className={`w-full min-h-full flex flex-col transition-all duration-500 relative overflow-hidden ${isDark ? 'bg-[#0f0f12] text-white' : 'bg-white text-gray-900'}`} style={{ textAlign: config.contentAlign }}>
+    <div className={`w-full min-h-full flex flex-col transition-all duration-500 relative overflow-hidden rounded-[2.5rem] ${isDark ? 'bg-[#0f0f12] text-white' : 'bg-white text-gray-900'}`} style={{ textAlign: config.contentAlign }}>
       <div className="shrink-0 overflow-hidden" style={getHeaderStyles()} />
 
       <div className="flex flex-col items-center flex-1 px-4 sm:px-6" style={bodyStyles}>
