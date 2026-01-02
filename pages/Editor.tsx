@@ -41,6 +41,7 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
 
   const [activeTab, setActiveTab] = useState<EditorTab>('identity');
   const [isSimpleMode, setIsSimpleMode] = useState(true); 
+  const [showMobilePreview, setShowMobilePreview] = useState(false);
   
   const [formData, setFormData] = useState<CardData>(() => {
     const targetTemplateId = initialData?.templateId || forcedTemplateId || templates[0]?.id || 'classic';
@@ -838,16 +839,25 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
             )}
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 pt-10">
+          <div className="flex flex-col sm:flex-row gap-3 pt-10">
             <button 
               onClick={() => onSave(formData, originalIdRef.current || undefined)}
-              className="flex-1 py-5 bg-blue-600 text-white rounded-[2rem] font-black text-sm uppercase shadow-2xl flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all"
+              className="flex-[2] py-5 bg-blue-600 text-white rounded-[2rem] font-black text-sm uppercase shadow-2xl flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all"
             >
               <Save size={20} /> {t('حفظ التعديلات', 'Save Changes')}
             </button>
+            
+            {/* Mobile/Tablet Preview Button */}
+            <button 
+              onClick={() => setShowMobilePreview(true)}
+              className="lg:hidden flex-1 py-5 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border border-gray-100 dark:border-gray-700 rounded-[2rem] font-black text-sm uppercase shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all"
+            >
+              <Eye size={20} /> {t('معاينة', 'Preview')}
+            </button>
+
             <button 
               onClick={onCancel}
-              className="px-10 py-5 bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 rounded-[2rem] font-black text-sm uppercase hover:bg-red-50 hover:text-red-500 transition-all"
+              className="flex-1 py-5 bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 rounded-[2rem] font-black text-sm uppercase hover:bg-red-50 hover:text-red-500 transition-all"
             >
               {t('إلغاء', 'Cancel')}
             </button>
@@ -875,6 +885,44 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
           </div>
         </div>
       </div>
+
+      {/* Mobile Preview Overlay */}
+      {showMobilePreview && (
+        <div className="fixed inset-0 z-[600] lg:hidden flex flex-col bg-white dark:bg-[#0a0a0c] animate-fade-in">
+           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+              <div className="flex items-center gap-3">
+                 <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></div>
+                 <h3 className="font-black dark:text-white uppercase text-sm tracking-widest">{t('معاينة البطاقة', 'Live Card Preview')}</h3>
+              </div>
+              <button 
+                onClick={() => setShowMobilePreview(false)}
+                className="p-3 bg-gray-100 dark:bg-gray-800 rounded-2xl text-gray-500 hover:text-red-500 transition-all"
+              >
+                <X size={20} />
+              </button>
+           </div>
+           
+           <div className="flex-1 overflow-y-auto no-scrollbar bg-gray-50 dark:bg-[#050507] p-4 flex items-start justify-center">
+              <div className="w-full max-w-[380px] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] rounded-[2.5rem] overflow-hidden">
+                 <CardPreview 
+                   data={formData} 
+                   lang={lang} 
+                   customConfig={currentTemplate?.config}
+                   hideSaveButton={true} 
+                 />
+              </div>
+           </div>
+
+           <div className="p-6 bg-white dark:bg-[#0a0a0c] border-t border-gray-100 dark:border-gray-800">
+              <button 
+                onClick={() => setShowMobilePreview(false)}
+                className="w-full py-5 bg-blue-600 text-white rounded-[2rem] font-black text-sm uppercase shadow-xl active:scale-95 transition-all"
+              >
+                {t('العودة للتعديل', 'Back to Editing')}
+              </button>
+           </div>
+        </div>
+      )}
     </div>
   );
 };
