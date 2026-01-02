@@ -28,7 +28,7 @@ import {
   getAggregateFromServer,
   sum
 } from "firebase/firestore";
-import { CardData } from "../types";
+import { CardData, TemplateCategory } from "../types";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCgsjOAeK2aGIWIFQBdOz3T0QFiefzeKnI",
@@ -59,6 +59,34 @@ const sanitizeData = (data: any) => {
   });
   return clean;
 };
+
+// --- Template Categories Functions ---
+
+export const getAllCategories = async () => {
+  try {
+    const snap = await getDocs(collection(db, "template_categories"));
+    const categories = snap.docs.map(doc => ({ ...doc.data(), id: doc.id } as TemplateCategory));
+    return categories.sort((a, b) => (a.order || 0) - (b.order || 0));
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    return [];
+  }
+};
+
+export const saveTemplateCategory = async (category: Partial<TemplateCategory>) => {
+  if (!auth.currentUser || auth.currentUser.email !== ADMIN_EMAIL) throw new Error("Admin only");
+  const catId = category.id || `cat_${Date.now()}`;
+  const clean = sanitizeData(category);
+  await setDoc(doc(db, "template_categories", catId), { ...clean, id: catId }, { merge: true });
+  return catId;
+};
+
+export const deleteTemplateCategory = async (id: string) => {
+  if (!auth.currentUser || auth.currentUser.email !== ADMIN_EMAIL) throw new Error("Admin only");
+  await deleteDoc(doc(db, "template_categories", id));
+};
+
+// --- End of Categories Functions ---
 
 export const getAuthErrorMessage = (code: string, lang: 'ar' | 'en'): string => {
   const isAr = lang === 'ar';
@@ -179,24 +207,16 @@ export const toggleCardStatus = async (cardId: string, ownerId: string, isActive
   ]);
 };
 
-/**
- * وظيفة جلب البطاقة المحسنة:
- * 1. تجلب البيانات فوراً لضمان سرعة التحميل.
- * 2. تزيد العداد وتسجل وقت الزيارة في الخلفية (يدعم الزوار الآن بفضل القواعد الجديدة).
- * 3. لا تتعطل أبداً في حال وجود خطأ تقني في العداد.
- */
 export const getCardBySerial = async (serialId: string) => {
   try {
     const cardRef = doc(db, "public_cards", serialId.toLowerCase());
     const snap = await getDoc(cardRef);
     
     if (snap.exists()) {
-      // تحديث العداد ووقت الزيارة - مسموح للجميع الآن
       updateDoc(cardRef, { 
         viewCount: increment(1),
         lastViewedAt: new Date().toISOString()
       }).catch(err => {
-        // فشل صامت فقط لمنع ظهور أخطاء للمستخدم النهائي
         console.debug("Analytics check failed:", err.message);
       });
       

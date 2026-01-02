@@ -1,8 +1,9 @@
 
-import React, { useState, useRef } from 'react';
-import { CustomTemplate, TemplateConfig, Language, CardData } from '../types';
+import React, { useState, useRef, useEffect } from 'react';
+import { CustomTemplate, TemplateConfig, Language, CardData, TemplateCategory } from '../types';
 import { TRANSLATIONS, SAMPLE_DATA, THEME_COLORS, THEME_GRADIENTS, BACKGROUND_PRESETS } from '../constants';
 import { uploadImageToCloud } from '../services/uploadService';
+import { getAllCategories, saveTemplateCategory } from '../services/firebase';
 import CardPreview from './CardPreview';
 import { 
   Save, Layout, Smartphone, Layers, Move, Check, X, 
@@ -12,7 +13,7 @@ import {
   AlignRight, LayoutTemplate, Info, Maximize2, UserCircle, Mail, 
   Phone, Globe, MessageCircle, Camera, Download, Tablet, Monitor, 
   Eye, QrCode, Wind, GlassWater, ChevronRight, ChevronLeft, 
-  Waves, Square, Columns, Minus, ToggleLeft, ToggleRight, Calendar, MapPin, Timer, PartyPopper, Link as LinkIcon
+  Waves, Square, Columns, Minus, ToggleLeft, ToggleRight, Calendar, MapPin, Timer, PartyPopper, Link as LinkIcon, FolderOpen, Plus, Tag
 } from 'lucide-react';
 
 interface TemplateBuilderProps {
@@ -40,13 +41,18 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
     return TRANSLATIONS[key] ? (TRANSLATIONS[key][lang] || TRANSLATIONS[key]['en']) : key;
   };
   
-  const [activeTab, setActiveTab] = useState<BuilderTab>('info');
+  const [activeTab, setActiveTab] = useState<BuilderTab>('header');
   const [previewDevice, setPreviewDevice] = useState<'mobile' | 'tablet' | 'desktop'>('mobile');
   const [loading, setLoading] = useState(false);
   const [uploadingImg, setUploadingImg] = useState(false);
+  const [categories, setCategories] = useState<TemplateCategory[]>([]);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [showNewCatForm, setShowNewCatForm] = useState(false);
+  const [newCatName, setNewCatName] = useState({ ar: '', en: '' });
   
   const [template, setTemplate] = useState<CustomTemplate>(initialTemplate || {
     id: `tmpl_${Date.now()}`,
+    categoryId: '',
     nameAr: 'قالب جديد مخصص',
     nameEn: 'New Custom Template',
     descAr: '',
@@ -84,7 +90,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
       qrOffsetY: 0,
       qrBorderWidth: 4,
       qrBorderColor: '#f9fafb',
-      qrBorderRadius: 0, // Default changed to 0 (Square)
+      qrBorderRadius: 0, 
       showQrCodeByDefault: true,
       showBioByDefault: true,
       showNameByDefault: true,
@@ -125,6 +131,10 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
     }
   });
 
+  useEffect(() => {
+    getAllCategories().then(setCategories);
+  }, []);
+
   const updateTemplate = (key: keyof CustomTemplate, value: any) => {
     setTemplate(prev => ({ ...prev, [key]: value }));
   };
@@ -134,6 +144,21 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
       ...prev,
       config: { ...prev.config, [key]: value }
     }));
+  };
+
+  const handleCreateCategory = async () => {
+    if (!newCatName.ar || !newCatName.en) return;
+    setLoading(true);
+    try {
+      const id = await saveTemplateCategory({ nameAr: newCatName.ar, nameEn: newCatName.en, order: categories.length, isActive: true });
+      const all = await getAllCategories();
+      setCategories(all);
+      updateTemplate('categoryId', id);
+      setShowNewCatForm(false);
+      setNewCatName({ ar: '', en: '' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, configKey: keyof TemplateConfig) => {
@@ -263,18 +288,17 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
   );
 
   return (
-    <div className="bg-white dark:bg-[#0a0a0c] rounded-[3rem] shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden flex flex-col h-[calc(100vh-100px)] min-h-[850px]">
+    <div className="bg-white dark:bg-[#0a0a0c] rounded-[3rem] shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden flex flex-col h-[calc(100vh-100px)] min-h-[850px] relative">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-8 py-4 bg-gray-50/50 dark:bg-white/5 border-b border-gray-100 dark:border-white/10 shrink-0">
         <div className="flex items-center gap-5">
           <button type="button" onClick={onCancel} className="p-2 bg-white dark:bg-gray-800 text-gray-400 hover:text-red-500 rounded-xl border border-gray-100 dark:border-gray-700 transition-all shadow-sm"><ArrowLeft size={18} className={isRtl ? 'rotate-180' : ''} /></button>
           <div className="flex flex-col"><h2 className="text-base font-black dark:text-white leading-none mb-1">{t('تصميم القالب المخصص', 'Custom Template Design')}</h2><div className="flex items-center gap-1.5"><Hash size={10} className="text-blue-500" /><span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">{template.id}</span></div></div>
         </div>
-        <button onClick={() => onSave(template)} disabled={loading} className="px-10 py-3 bg-blue-600 text-white rounded-xl font-black text-xs uppercase shadow-xl flex items-center gap-2">{loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />} {t('حفظ القالب', 'Save Template')}</button>
+        <button onClick={() => setShowSaveModal(true)} disabled={loading} className="px-10 py-3 bg-blue-600 text-white rounded-xl font-black text-xs uppercase shadow-xl flex items-center gap-2 hover:scale-105 active:scale-95 transition-all">{t('حفظ ونشر القالب', 'Save & Publish')}</button>
       </div>
 
       <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
         <div className="w-full lg:w-64 border-b lg:border-b-0 lg:border-l dark:border-gray-800 p-6 flex flex-col gap-1 overflow-y-auto no-scrollbar shrink-0 bg-gray-50/30 dark:bg-transparent">
-          <NavItem id="info" label={t('معلومات عامة', 'Basic Info')} icon={Info} />
           <NavItem id="header" label={t('نمط الترويسة', 'Header Layout')} icon={Layout} />
           <NavItem id="avatar" label={t('الصورة الشخصية', 'Avatar')} icon={Circle} />
           <NavItem id="visuals" label={t('المظهر العام', 'Visual Style')} icon={Palette} />
@@ -287,15 +311,6 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
         <div className="flex-1 p-8 overflow-y-auto no-scrollbar bg-gray-50/20 dark:bg-transparent">
           <div className="max-w-3xl mx-auto space-y-10 animate-fade-in pb-32">
             
-            {activeTab === 'info' && (
-              <div className="space-y-6 animate-fade-in">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div><label className="text-[10px] font-black text-gray-400 uppercase mb-2 block">{t('الاسم (عربي)', 'Name (AR)')}</label><input type="text" value={template.nameAr} onChange={e => updateTemplate('nameAr', e.target.value)} className="w-full px-5 py-3 rounded-2xl bg-white dark:bg-gray-800 border dark:text-white font-bold" /></div>
-                  <div><label className="text-[10px] font-black text-gray-400 uppercase mb-2 block">{t('الاسم (English)', 'Name (EN)')}</label><input type="text" value={template.nameEn} onChange={e => updateTemplate('nameEn', e.target.value)} className="w-full px-5 py-3 rounded-2xl bg-white dark:bg-gray-800 border dark:text-white font-bold" /></div>
-                </div>
-              </div>
-            )}
-
             {activeTab === 'layout' && (
               <div className="space-y-8 animate-fade-in">
                 <div className="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
@@ -624,6 +639,89 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
            <PreviewContent />
         </div>
       </div>
+
+      {/* Save Modal */}
+      {showSaveModal && (
+        <div className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-black/70 backdrop-blur-xl animate-fade-in">
+           <div className="bg-white dark:bg-gray-900 w-full max-w-lg rounded-[3.5rem] shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden relative animate-zoom-in">
+              <div className="p-8 md:p-12 space-y-8">
+                 <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-4">
+                       <div className="p-3 bg-blue-600 text-white rounded-2xl shadow-xl shadow-blue-500/20"><Save size={24} /></div>
+                       <h3 className="text-2xl font-black dark:text-white uppercase tracking-tighter">{isRtl ? 'خيارات الحفظ والنشر' : 'Save & Publish Options'}</h3>
+                    </div>
+                    <button onClick={() => setShowSaveModal(false)} className="p-2 text-gray-400 hover:text-red-500 transition-colors"><X size={24}/></button>
+                 </div>
+
+                 <div className="space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                       <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">{t('الاسم (عربي)', 'Name (AR)')}</label>
+                          <input type="text" value={template.nameAr} onChange={e => updateTemplate('nameAr', e.target.value)} className="w-full px-5 py-4 rounded-2xl bg-gray-50 dark:bg-gray-800 border dark:text-white font-bold outline-none focus:ring-4 focus:ring-blue-100" />
+                       </div>
+                       <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">{t('الاسم (EN)', 'Name (EN)')}</label>
+                          <input type="text" value={template.nameEn} onChange={e => updateTemplate('nameEn', e.target.value)} className="w-full px-5 py-4 rounded-2xl bg-gray-50 dark:bg-gray-800 border dark:text-white font-bold outline-none focus:ring-4 focus:ring-blue-100" />
+                       </div>
+                    </div>
+
+                    <div className="space-y-4">
+                       <div className="flex items-center justify-between px-1">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{isRtl ? 'تصنيف القالب (القسم)' : 'Template Category'}</label>
+                          <button onClick={() => setShowNewCatForm(!showNewCatForm)} className="text-[9px] font-black text-blue-600 uppercase flex items-center gap-1 hover:underline">
+                            <Plus size={10} /> {showNewCatForm ? (isRtl ? 'إلغاء' : 'Cancel') : (isRtl ? 'إنشاء قسم جديد' : 'New Section')}
+                          </button>
+                       </div>
+
+                       {!showNewCatForm ? (
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                             <button 
+                               onClick={() => updateTemplate('categoryId', '')}
+                               className={`px-4 py-3 rounded-xl border-2 text-[10px] font-black uppercase transition-all ${template.categoryId === '' ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'bg-white dark:bg-gray-800 text-gray-400 border-gray-100 dark:border-gray-700'}`}
+                             >
+                                {isRtl ? 'عام' : 'General'}
+                             </button>
+                             {categories.map(cat => (
+                               <button 
+                                 key={cat.id}
+                                 onClick={() => updateTemplate('categoryId', cat.id)}
+                                 className={`px-4 py-3 rounded-xl border-2 text-[10px] font-black uppercase transition-all truncate ${template.categoryId === cat.id ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'bg-white dark:bg-gray-800 text-gray-400 border-gray-100 dark:border-gray-700'}`}
+                               >
+                                  {isRtl ? cat.nameAr : cat.nameEn}
+                               </button>
+                             ))}
+                          </div>
+                       ) : (
+                          <div className="p-6 bg-blue-50 dark:bg-blue-900/10 rounded-3xl border border-blue-100 dark:border-blue-900/30 space-y-4 animate-fade-in">
+                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <input type="text" placeholder="الاسم بالعربي" value={newCatName.ar} onChange={e => setNewCatName({...newCatName, ar: e.target.value})} className="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-800 border text-xs font-bold" />
+                                <input type="text" placeholder="Name in EN" value={newCatName.en} onChange={e => setNewCatName({...newCatName, en: e.target.value})} className="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-800 border text-xs font-bold" />
+                             </div>
+                             <button onClick={handleCreateCategory} disabled={loading} className="w-full py-3 bg-blue-600 text-white rounded-xl font-black text-[10px] uppercase shadow-lg flex items-center justify-center gap-2">
+                                {loading ? <Loader2 size={14} className="animate-spin" /> : <Tag size={14} />} {isRtl ? 'حفظ القسم الجديد وتطبيقه' : 'Save & Apply New Category'}
+                             </button>
+                          </div>
+                       )}
+                    </div>
+
+                    <div className="flex gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-3xl border border-gray-100 dark:border-gray-800">
+                       <ToggleSwitch label={t('تثبيت في المقدمة', 'Pin to Featured')} value={template.isFeatured} onChange={(v: boolean) => updateTemplate('isFeatured', v)} icon={Star} />
+                       <ToggleSwitch label={t('قالب نشط', 'Is Active')} value={template.isActive} onChange={(v: boolean) => updateTemplate('isActive', v)} icon={Check} />
+                    </div>
+                 </div>
+
+                 <button 
+                   onClick={() => onSave(template)} 
+                   disabled={loading}
+                   className="w-full py-6 bg-blue-600 text-white rounded-[2rem] font-black text-lg uppercase shadow-2xl shadow-blue-500/30 flex items-center justify-center gap-4 hover:scale-[1.02] active:scale-95 transition-all"
+                 >
+                    {loading ? <Loader2 className="animate-spin" /> : <Save size={24} />}
+                    {isRtl ? 'تأكيد الحفظ والبدء في النشر' : 'Confirm Save & Publish'}
+                 </button>
+              </div>
+           </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -94,8 +94,17 @@ export interface TemplateConfig {
   customCss?: string;
 }
 
+export interface TemplateCategory {
+  id: string;
+  nameAr: string;
+  nameEn: string;
+  order: number;
+  isActive: boolean;
+}
+
 export interface CustomTemplate {
   id: string;
+  categoryId?: string; // الربط مع القسم
   nameAr: string;
   nameEn: string;
   descAr: string;
