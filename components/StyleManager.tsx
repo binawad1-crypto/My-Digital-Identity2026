@@ -12,7 +12,7 @@ import {
   GlassWater, Box, Type, LayoutTemplate, Layers, ChevronLeft, 
   ChevronRight, Monitor, Zap, Wind, Waves, Square, AlignLeft, 
   AlignRight, Columns, Minus, Maximize2, Move, FileCode, HardDrive, Code2, Wand2, Grid, Shapes,
-  Check, RefreshCcw, Info, AlignCenter, Tag
+  Check, RefreshCcw, Info, AlignCenter, Tag, Ruler
 } from 'lucide-react';
 
 interface StyleManagerProps {
@@ -82,7 +82,9 @@ const StyleManager: React.FC<StyleManagerProps> = ({ lang }) => {
         avatarSize: 120,
         headerPatternId: 'none',
         headerPatternOpacity: 20,
-        headerPatternScale: 100
+        headerPatternScale: 100,
+        bodyBorderRadius: 48,
+        bodyOffsetY: 0
       }
     });
   };
@@ -163,6 +165,18 @@ const StyleManager: React.FC<StyleManagerProps> = ({ lang }) => {
         </div>
         <input type="text" value={value} onChange={e => onChange(e.target.value)} className="bg-transparent border-none outline-none font-mono text-[10px] font-black w-20 text-center dark:text-gray-400" />
       </div>
+    </div>
+  );
+
+  const ToggleSwitch = ({ label, value, onChange, icon: Icon }: any) => (
+    <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
+      <div className="flex items-center gap-3">
+        {Icon && <Icon size={16} className={value ? "text-indigo-600" : "text-gray-300"} />}
+        <span className={`text-[10px] font-black uppercase tracking-widest ${value ? 'dark:text-white' : 'text-gray-400'}`}>{label}</span>
+      </div>
+      <button onClick={() => onChange(!value)} className={`w-12 h-6 rounded-full relative transition-all ${value ? 'bg-indigo-600 shadow-md' : 'bg-gray-200 dark:bg-gray-700'}`}>
+        <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all shadow-md ${isRtl ? (value ? 'right-7' : 'right-1') : (value ? 'left-7' : 'left-1')}`} />
+      </button>
     </div>
   );
 
@@ -256,7 +270,7 @@ const StyleManager: React.FC<StyleManagerProps> = ({ lang }) => {
                     </button>
                     <button 
                       onClick={() => setStyleToDelete(style.id)}
-                      className="p-3 bg-white dark:bg-gray-900 text-red-500 rounded-2xl border shadow-sm hover:bg-red-500 hover:text-white transition-all"
+                      className="p-3 bg-white dark:bg-gray-900 text-red-500 rounded-2xl border shadow-sm hover:bg-red-50 hover:text-red-500 hover:text-white transition-all"
                     >
                       <Trash2 size={16} />
                     </button>
@@ -314,88 +328,58 @@ const StyleManager: React.FC<StyleManagerProps> = ({ lang }) => {
                           />
                        </div>
                     </div>
-                    <div className="flex items-center justify-between pt-4 border-t dark:border-gray-800">
-                       <div className="flex items-center gap-3">
-                          <div className="flex flex-col">
-                             <span className="text-xs font-black dark:text-white uppercase leading-none mb-1">{t('تفعيل النمط', 'Active Style')}</span>
-                             <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{t('إتاحة النمط للاستخدام في القوالب', 'Make style available for templates')}</span>
-                          </div>
-                       </div>
-                       <button onClick={() => setEditingStyle({...editingStyle, isActive: !editingStyle.isActive})} className={`w-14 h-7 rounded-full relative transition-all ${editingStyle.isActive ? 'bg-indigo-600 shadow-lg' : 'bg-gray-200 dark:bg-gray-700'}`}>
-                          <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all shadow-md ${isRtl ? (editingStyle.isActive ? 'right-8' : 'right-1') : (editingStyle.isActive ? 'left-8' : 'left-1')}`} />
-                       </button>
-                    </div>
                  </div>
 
                  {/* 1. قص الترويسة الهندسي (Shape Engine) */}
                  <div className="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
-                    <div className="flex items-center justify-between">
-                       <div className="flex items-center gap-4"><Shapes className="text-indigo-600" size={24}/><h3 className="text-lg font-black dark:text-white uppercase tracking-widest">{t('محرك هندسة الترويسات', 'Structural Shape Engine')}</h3></div>
-                       <div className="flex items-center gap-3">
-                          <input type="file" ref={headerAssetInputRef} onChange={handleAssetUpload} className="hidden" accept="image/*,image/svg+xml" />
-                          <button 
-                            onClick={() => headerAssetInputRef.current?.click()}
-                            className="px-6 py-2.5 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 rounded-xl font-black text-[10px] uppercase border border-indigo-100 flex items-center gap-2 hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
-                          >
-                             {uploadingAsset ? <Loader2 size={14} className="animate-spin" /> : <HardDrive size={14} />}
-                             {t('رفع ملف خارجي', 'Upload External')}
-                          </button>
-                       </div>
-                    </div>
-                    
+                    <div className="flex items-center gap-4"><Shapes className="text-indigo-600" size={24}/><h3 className="text-lg font-black dark:text-white uppercase tracking-widest">{t('محرك هندسة الترويسات', 'Structural Shape Engine')}</h3></div>
                     <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
                          {[
                            {id: 'classic', icon: LayoutTemplate, label: 'كلاسيك'},
                            {id: 'overlay', icon: Layers, label: 'متداخل'},
-                           {id: 'side-left', icon: ChevronLeft, label: 'جانبي يسار', isSpecial: true},
-                           {id: 'side-right', icon: ChevronRight, label: 'جانبي يمين', isSpecial: true},
-                           {id: 'split-left', icon: AlignLeft, label: 'قطري يسار'},
-                           {id: 'split-right', icon: AlignRight, label: 'قطري يمين'},
+                           {id: 'side-left', icon: ChevronLeft, label: 'جانبي يسار'},
+                           {id: 'side-right', icon: ChevronRight, label: 'جانبي يمين'},
                            {id: 'curved', icon: Wind, label: 'منحني'},
                            {id: 'wave', icon: Waves, label: 'موجي'},
+                           {id: 'diagonal', icon: RefreshCcw, label: 'قطري'},
+                           {id: 'split-left', icon: AlignLeft, label: 'قطري يسار'},
+                           {id: 'split-right', icon: AlignRight, label: 'قطري يمين'},
                            {id: 'floating', icon: Square, label: 'عائم'},
-                           {id: 'modern-split', icon: Columns, label: 'حديث منقسم'},
-                           {id: 'minimal', icon: Minus, label: 'بسيط جداً'},
-                           {id: 'custom-asset', icon: FileCode, label: 'ملف خاص', isSpecial: true}
+                           {id: 'glass-card', icon: GlassWater, label: 'زجاجي'},
+                           {id: 'modern-split', icon: Columns, label: 'حديث'}
                          ].map(item => (
                            <button 
                             key={item.id} 
                             onClick={() => updateConfig('headerType', item.id)} 
                             className={`py-4 px-2 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${editingStyle.config?.headerType === item.id ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg scale-105' : 'bg-gray-50 dark:bg-gray-800 text-gray-400 border-gray-100 dark:border-gray-700'}`}
                            >
-                             <item.icon size={20} className={item.isSpecial ? "text-amber-500" : ""} /> 
+                             <item.icon size={20} /> 
                              <span className="text-[7px] font-black uppercase text-center leading-tight">{t(item.label, item.id)}</span>
                            </button>
                          ))}
                     </div>
-
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <RangeControl label={t('ارتفاع الترويسة', 'Header Depth')} min={40} max={1000} value={editingStyle.config?.headerHeight || 180} onChange={(v: number) => updateConfig('headerHeight', v)} icon={Maximize2} />
-                      <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 space-y-4">
-                          <div className="flex items-center gap-3">
-                             <Code2 size={16} className="text-indigo-600" />
-                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t('كود SVG المبتكر', 'Custom SVG Code')}</span>
-                          </div>
-                          <textarea 
-                            value={editingStyle.config?.headerSvgRaw || ''} 
-                            onChange={e => { updateConfig('headerSvgRaw', e.target.value); if(e.target.value) updateConfig('headerType', 'custom-asset'); }} 
-                            placeholder='<svg>...</svg>'
-                            className="w-full h-20 bg-white dark:bg-black rounded-xl p-4 text-[10px] font-mono border dark:border-gray-700 resize-none outline-none focus:ring-2 focus:ring-indigo-100"
-                          />
-                       </div>
-                    </div>
-
-                    <div className="pt-6 border-t dark:border-gray-800">
-                        <RangeControl label={t('إزاحة منطقة البيانات (للتغطية)', 'Content Overlap Offset')} min={-1000} max={500} value={editingStyle.config?.bodyOffsetY || 0} onChange={(v: number) => updateConfig('bodyOffsetY', v)} icon={Move} />
+                      <ToggleSwitch label={t('ترويسة زجاجية', 'Glassy Header')} value={editingStyle.config?.headerGlassy} onChange={(v: boolean) => updateConfig('headerGlassy', v)} icon={GlassWater} />
                     </div>
                  </div>
 
-                 {/* 2. الأنماط الهندسية (The Patterns) */}
+                 {/* 2. هندسة جسم البطاقة (Body Geometry) */}
+                 <div className="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
+                    <div className="flex items-center gap-4"><Box className="text-indigo-600" size={24}/><h3 className="text-lg font-black dark:text-white uppercase tracking-widest">{t('هندسة إطار البيانات', 'Body Geometry & Effects')}</h3></div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                       <ToggleSwitch label={t('تأثير زجاجي فاخر للجسم', 'Glassmorphism Body')} value={editingStyle.config?.bodyGlassy} onChange={(v: boolean) => updateConfig('bodyGlassy', v)} icon={GlassWater} />
+                       <RangeControl label={t('درجة شفافية الجسم', 'Body Transparency')} min={0} max={100} unit="%" value={editingStyle.config?.bodyOpacity ?? 100} onChange={(v: number) => updateConfig('bodyOpacity', v)} icon={Sun} />
+                       <RangeControl label={t('إزاحة منطقة البيانات', 'Overlap Y Offset')} min={-1000} max={500} value={editingStyle.config?.bodyOffsetY || 0} onChange={(v: number) => updateConfig('bodyOffsetY', v)} icon={Move} />
+                       <RangeControl label={t('انحناء زوايا الجسم', 'Border Radius')} min={0} max={120} value={editingStyle.config?.bodyBorderRadius ?? 48} onChange={(v: number) => updateConfig('bodyBorderRadius', v)} icon={Ruler} />
+                    </div>
+                 </div>
+
+                 {/* 3. الأنماط الهندسية (The Patterns) */}
                  <div className="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
                     <div className="flex items-center justify-between">
                        <div className="flex items-center gap-4"><Grid className="text-indigo-600" size={24}/><h3 className="text-lg font-black dark:text-white uppercase tracking-widest">{t('معرض الأنماط التكرارية', 'Pattern Overlay Gallery')}</h3></div>
                     </div>
-                    
                     <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
                        {PATTERN_PRESETS.map(pattern => (
                          <button 
@@ -418,17 +402,15 @@ const StyleManager: React.FC<StyleManagerProps> = ({ lang }) => {
                          </button>
                        ))}
                     </div>
-
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                        <RangeControl label={t('شفافية النمط', 'Pattern Opacity')} min={0} max={100} unit="%" value={editingStyle.config?.headerPatternOpacity ?? 20} onChange={(v: number) => updateConfig('headerPatternOpacity', v)} icon={Sun} />
                        <RangeControl label={t('حجم النمط', 'Pattern Scale')} min={20} max={300} unit="%" value={editingStyle.config?.headerPatternScale ?? 100} onChange={(v: number) => updateConfig('headerPatternScale', v)} icon={Maximize2} />
                     </div>
                  </div>
 
-                 {/* 3. الألوان والسمة */}
+                 {/* 4. الألوان والسمة */}
                  <div className="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-8">
                     <div className="flex items-center gap-4"><Sparkles className="text-indigo-600" size={24}/><h3 className="text-lg font-black dark:text-white uppercase tracking-widest">{t('البصمة الوراثية للسمة', 'Visual DNA')}</h3></div>
-                    
                     <div className="grid grid-cols-3 gap-3 bg-gray-50 dark:bg-gray-800 p-1.5 rounded-2xl">
                        {(['color', 'gradient', 'image'] as ThemeType[]).map(type => (
                          <button key={type} onClick={() => updateConfig('defaultThemeType', type)} className={`py-3 rounded-xl transition-all flex flex-col items-center gap-1 ${editingStyle.config?.defaultThemeType === type ? 'bg-indigo-600 text-white shadow-md' : 'text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
@@ -437,25 +419,10 @@ const StyleManager: React.FC<StyleManagerProps> = ({ lang }) => {
                          </button>
                        ))}
                     </div>
-
-                    {editingStyle.config?.defaultThemeType === 'color' && (
-                       <div className="space-y-4 animate-fade-in">
-                          <div className="grid grid-cols-10 gap-2">
-                             {THEME_COLORS.map(c => <button key={c} onClick={() => updateConfig('defaultThemeColor', c)} className={`h-6 w-6 rounded-full border-2 ${editingStyle.config?.defaultThemeColor === c ? 'border-indigo-600 scale-110' : 'border-white dark:border-gray-700'}`} style={{backgroundColor: c}} />)}
-                          </div>
-                          <ColorInput label={t('لون السمة', 'Base Theme Color')} value={editingStyle.config?.defaultThemeColor} onChange={(v: string) => updateConfig('defaultThemeColor', v)} />
-                       </div>
-                    )}
-
-                    {editingStyle.config?.defaultThemeType === 'gradient' && (
-                       <div className="grid grid-cols-6 gap-2 animate-fade-in">
-                          {THEME_GRADIENTS.map((g, i) => <button key={i} onClick={() => updateConfig('defaultThemeGradient', g)} className={`h-10 rounded-lg border-2 ${editingStyle.config?.defaultThemeGradient === g ? 'border-indigo-600 scale-110' : 'border-transparent'}`} style={{background: g}} />)}
-                       </div>
-                    )}
                  </div>
               </div>
 
-              {/* 4. المعاينة الحية */}
+              {/* 5. المعاينة الحية */}
               <div className="lg:col-span-4 sticky top-[100px] self-start space-y-6">
                  <div className="bg-white dark:bg-[#050507] p-5 rounded-[4rem] border border-gray-100 dark:border-gray-800 shadow-2xl overflow-hidden relative">
                     <div className="mb-6 flex items-center justify-between px-4">
@@ -465,19 +432,18 @@ const StyleManager: React.FC<StyleManagerProps> = ({ lang }) => {
                        </div>
                        <Zap size={14} className="text-indigo-600" />
                     </div>
-
                     <div className="transition-all duration-500 border-[10px] border-gray-900 dark:border-gray-800 rounded-[3.5rem] shadow-2xl overflow-hidden mx-auto bg-white dark:bg-black w-full">
                        <div className="h-[550px] themed-scrollbar scroll-smooth relative">
                           <CardPreview 
                             data={{ 
-                               name: isRtl ? 'معاينة النمط' : 'Pattern Preview',
-                               title: t('اختبر شفافية الأنماط', 'Test Pattern Transparency'),
-                               company: 'DNA LAB v2.5',
-                               bio: t('الأنماط الجانبية والهندسية الجديدة تمنح البطاقة عمقاً لم يسبق له مثيل.', 'New side-bars and geometric cuts provide unprecedented depth.'),
-                               themeType: editingStyle.config?.defaultThemeType || 'gradient',
+                               name: isRtl ? 'معاينة النمط الزجاجي' : 'Glassy DNA Preview',
+                               title: t('تأثير شفاف مذهل', 'Stunning Transparency'),
+                               company: 'NEXT-ID PREMIUM',
+                               bio: t('تم تفعيل التأثير الزجاجي الفاخر. يمنح هذا التصميم البطاقة عمقاً استثنائياً وشفافية تجذب الأنظار.', 'Premium Glassmorphism activated. This design gives the card exceptional depth and eye-catching transparency.'),
+                               themeType: 'image',
                                themeColor: editingStyle.config?.defaultThemeColor || '#2563eb',
                                themeGradient: editingStyle.config?.defaultThemeGradient || THEME_GRADIENTS[0],
-                               backgroundImage: editingStyle.config?.defaultBackgroundImage || '',
+                               backgroundImage: BACKGROUND_PRESETS[1],
                                isDark: editingStyle.config?.defaultIsDark || false,
                                socialLinks: [
                                   { platformId: 'linkedin', platform: 'LinkedIn', url: '#' }
@@ -490,13 +456,6 @@ const StyleManager: React.FC<StyleManagerProps> = ({ lang }) => {
                           />
                        </div>
                     </div>
-                 </div>
-
-                 <div className="bg-amber-50 dark:bg-amber-900/10 p-6 rounded-[2.5rem] border border-amber-100 dark:border-amber-900/20">
-                    <h4 className="text-xs font-black text-amber-700 dark:text-amber-400 uppercase tracking-widest mb-3 flex items-center gap-2"><Info size={14} /> {t('نصيحة المختبر', 'Lab Tip')}</h4>
-                    <p className="text-[10px] font-bold text-amber-800/60 dark:text-amber-300/60 leading-relaxed">
-                       {t('الأنماط الجانبية مثالية لعرض الصور الشخصية الكبيرة بوضوح تام، بينما الأنماط القطرية تعطي طابعاً رياضياً وحيوياً.', 'Side bars are perfect for displaying large profile photos clearly, while diagonal cuts give a sporty and vibrant look.')}
-                    </p>
                  </div>
               </div>
            </div>
@@ -511,7 +470,7 @@ const StyleManager: React.FC<StyleManagerProps> = ({ lang }) => {
              <p className="text-sm font-bold text-gray-400 mb-10 leading-relaxed">{t('هل أنت متأكد من تدمير هذا النمط المبتكر؟', 'Are you sure you want to destroy this DNA?')}</p>
              <div className="flex flex-col gap-3">
                <button onClick={handleDelete} className="py-5 bg-red-600 text-white rounded-3xl font-black text-sm uppercase shadow-xl shadow-red-500/20 active:scale-95 transition-all">تأكيد الحذف</button>
-               <button onClick={() => setStyleToDelete(null)} className="py-5 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-3xl font-black text-sm uppercase">تراجع</button>
+               <button onClick={() => setStyleToDelete(null)} className="py-5 bg-gray-50 dark:bg-gray-800 text-gray-400 rounded-3xl font-black text-sm uppercase">تراجع</button>
              </div>
           </div>
         </div>

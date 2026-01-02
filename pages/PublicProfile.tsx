@@ -4,7 +4,7 @@ import { CardData, Language, TemplateConfig } from '../types';
 import CardPreview from '../components/CardPreview';
 import { TRANSLATIONS } from '../constants';
 import { downloadVCard } from '../utils/vcard';
-import { Plus, UserPlus, Share2, AlertCircle } from 'lucide-react';
+import { Plus, UserPlus, Share2, AlertCircle, Coffee } from 'lucide-react';
 
 interface PublicProfileProps {
   data: CardData;
@@ -114,10 +114,7 @@ const PublicProfile: React.FC<PublicProfileProps> = ({ data, lang, customConfig,
       <main className="w-full max-w-sm z-10 animate-fade-in-up pt-10 pb-32">
         <CardPreview data={data} lang={lang} customConfig={customConfig} hideSaveButton={true} />
         
-        <div className="mt-12 text-center">
-          <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4">
-            {lang === 'ar' ? `هوية رقمية بواسطة ${TRANSLATIONS.appName.ar}` : `Digital ID by ${TRANSLATIONS.appName.en}`}
-          </p>
+        <div className="mt-12 text-center flex flex-col items-center gap-8">
           <nav>
             <a href="/" className="inline-flex items-center gap-3 px-8 py-4 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-2xl font-black text-sm shadow-2xl hover:scale-105 transition-all border group">
               <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white group-hover:rotate-12 transition-transform">
@@ -126,6 +123,23 @@ const PublicProfile: React.FC<PublicProfileProps> = ({ data, lang, customConfig,
               {lang === 'ar' ? 'أنشئ بطاقتك الرقمية الآن' : 'Create Your Digital Card Now'}
             </a>
           </nav>
+
+          {/* Buy Me A Coffee - Small & Beautiful */}
+          <a 
+            href="https://buymeacoffee.com/guidai" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="group flex items-center gap-2 px-6 py-2.5 bg-white dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+          >
+            <Coffee size={14} className="text-[#FFDD00] group-hover:animate-bounce" />
+            <span className="text-[10px] font-black uppercase text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-white transition-colors">
+              {isRtl ? 'ادعم استمرار المشروع' : 'Support this project'}
+            </span>
+          </a>
+
+          <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em]">
+            {lang === 'ar' ? `هوية رقمية بواسطة ${TRANSLATIONS.appName.ar}` : `Digital ID by ${TRANSLATIONS.appName.en}`}
+          </p>
         </div>
       </main>
 

@@ -14,6 +14,113 @@ export const LANGUAGES_CONFIG: Record<Language, { name: string, native: string, 
   hi: { name: 'Hindi', native: 'हिंदी', dir: 'ltr', flag: '🇮🇳' },
 };
 
+// Fix: Adding missing theme colors constant
+export const THEME_COLORS = [
+  '#2563eb', '#1e40af', '#3b82f6', '#0ea5e9', '#06b6d4', 
+  '#14b8a6', '#10b981', '#22c55e', '#84cc16', '#eab308', 
+  '#f97316', '#ef4444', '#f43f5e', '#db2777', '#d946ef', 
+  '#a855f7', '#7c3aed', '#6366f1', '#4b5563', '#0f172a'
+];
+
+// Fix: Adding missing theme gradients constant
+export const THEME_GRADIENTS = [
+  'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+  'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+  'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)',
+  'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
+  'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)',
+  'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+  'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+  'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+  'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)'
+];
+
+// Fix: Adding missing social platforms constant
+export const SOCIAL_PLATFORMS = [
+  { id: 'linkedin', name: 'LinkedIn' },
+  { id: 'x', name: 'X (Twitter)' },
+  { id: 'facebook', name: 'Facebook' },
+  { id: 'instagram', name: 'Instagram' },
+  { id: 'whatsapp_social', name: 'WhatsApp' },
+  { id: 'telegram', name: 'Telegram' },
+  { id: 'snapchat', name: 'Snapchat' },
+  { id: 'tiktok', name: 'TikTok' },
+  { id: 'threads', name: 'Threads' },
+  { id: 'youtube', name: 'YouTube' },
+  { id: 'github', name: 'GitHub' },
+  { id: 'behance', name: 'Behance' },
+  { id: 'dribbble', name: 'Dribbble' },
+  { id: 'pinterest', name: 'Pinterest' },
+  { id: 'discord', name: 'Discord' },
+  { id: 'twitch', name: 'Twitch' },
+  { id: 'spotify', name: 'Spotify' }
+];
+
+// Fix: Adding missing background presets constant
+export const BACKGROUND_PRESETS = [
+  'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?q=80&w=1000&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=1000&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=1000&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=1000&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1000&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?q=80&w=1000&auto=format&fit=crop'
+];
+
+// Fix: Adding missing pattern presets constant
+export const PATTERN_PRESETS = [
+  { id: 'none', name: 'None', svg: '' },
+  { id: 'dots', name: 'Dots', svg: '<svg width="20" height="20" viewBox="0 0 20 20"><circle cx="2" cy="2" r="1" fill="currentColor"/></svg>' },
+  { id: 'grid', name: 'Grid', svg: '<svg width="20" height="20" viewBox="0 0 20 20"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="currentColor" stroke-width="0.5"/></svg>' },
+  { id: 'lines', name: 'Lines', svg: '<svg width="20" height="20" viewBox="0 0 20 20"><path d="M 0 10 L 20 10" fill="none" stroke="currentColor" stroke-width="0.5"/></svg>' },
+  { id: 'cross', name: 'Cross', svg: '<svg width="20" height="20" viewBox="0 0 20 20"><path d="M 10 0 L 10 20 M 0 10 L 20 10" fill="none" stroke="currentColor" stroke-width="0.5"/></svg>' }
+];
+
+// Fix: Adding missing SVG presets constant
+export const SVG_PRESETS = [
+  { id: 'wave', name: 'Wave', svg: '<svg viewBox="0 0 1440 320"><path fill="currentColor" d="M0,160L48,176C96,192,192,224,288,224C384,224,480,192,576,165.3C672,139,768,117,864,128C960,139,1056,181,1152,197.3C1248,213,1344,203,1392,197.3L1440,192L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path></svg>' },
+  { id: 'curve', name: 'Curve', svg: '<svg viewBox="0 0 1440 320"><path fill="currentColor" d="M0,96L120,122.7C240,149,480,203,720,213.3C960,224,1200,192,1320,176L1440,160L1440,0L1320,0C1200,0,960,0,720,0C480,0,240,0,120,0L0,0Z"></path></svg>' }
+];
+
+// Fix: Adding missing sample data constant
+export const SAMPLE_DATA: Record<string, Partial<CardData>> = {
+  en: {
+    name: 'John Doe',
+    title: 'Senior Software Engineer',
+    company: 'Tech Innovations',
+    bio: 'Passionate about building scalable web applications and exploring the latest AI technologies.',
+    email: 'john.doe@example.com',
+    phone: '+1 234 567 8900',
+    whatsapp: '12345678900',
+    website: 'https://johndoe.dev',
+    isDark: false,
+    themeType: 'gradient',
+    themeGradient: THEME_GRADIENTS[0],
+    socialLinks: [
+      { platformId: 'linkedin', platform: 'LinkedIn', url: '#' },
+      { platformId: 'github', platform: 'GitHub', url: '#' }
+    ]
+  },
+  ar: {
+    name: 'أحمد محمد',
+    title: 'مهندس برمجيات أول',
+    company: 'ابتكارات التقنية',
+    bio: 'شغوف ببناء تطبيقات الويب القابلة للتوسع واستكشاف أحدث تقنيات الذكاء الاصطناعي.',
+    email: 'ahmed.m@example.com',
+    phone: '+966 50 123 4567',
+    whatsapp: '966501234567',
+    website: 'https://ahmed.dev',
+    isDark: false,
+    themeType: 'gradient',
+    themeGradient: THEME_GRADIENTS[0],
+    socialLinks: [
+      { platformId: 'linkedin', platform: 'LinkedIn', url: '#' },
+      { platformId: 'x', platform: 'X', url: '#' }
+    ]
+  }
+};
+
 export const TRANSLATIONS: TranslationStrings = {
   appName: { en: 'NextID', ar: 'هويتي', es: 'NextID', fr: 'NextID', de: 'NextID', zh: 'NextID', ja: 'NextID', pt: 'NextID', ru: 'NextID', hi: 'NextID' },
   home: { en: 'Home', ar: 'الرئيسية', es: 'Inicio', fr: 'Accueil', de: 'Startseite', zh: '首页', ja: 'ホーム', pt: 'Início', ru: 'Главная', hi: 'होम' },
@@ -27,22 +134,22 @@ export const TRANSLATIONS: TranslationStrings = {
   fullName: { en: 'Full Name', ar: 'الاسم الكامل', es: 'Nombre completo', fr: 'Nom complet', de: 'Vollständiger Name', zh: '全名', ja: 'フルネーム', pt: 'Nome Completo', ru: 'Полное имя', hi: 'पूرا नाम' },
   placeholderName: { en: 'Enter your name', ar: 'أدخل اسمك الكامل', es: 'Ingresa tu nombre', fr: 'Entrez votre nom', de: 'Name eingeben', zh: '输入姓名', ja: '名前を入力', pt: 'Digite seu nome', ru: 'Введите имя', hi: 'अपना नाम दर्ज करें' },
   theme: { en: 'Theme', ar: 'السمة', es: 'Tema', fr: 'Thème', de: 'Theما', zh: '主题', ja: 'テーマ', pt: 'Tema', ru: 'Теما', hi: 'थीم' },
-  saveContact: { en: 'Save Contact', ar: 'حفظ جهة الاتصال', es: 'Guardar contacto', fr: 'Enregistrer le contact', de: 'Kontakt speichern', zh: '保存联系人', ja: '連絡先を保存', pt: 'Salvar contato', ru: 'Сохранить контакт', hi: 'संपर्क سيهجين' },
+  saveContact: { en: 'Save Contact', ar: 'حفظ جهة الاتصال', es: 'Guardar contacto', fr: 'Enregistrer le contact', de: 'Kontakt speichern', zh: '保存联系人', ja: '連絡先を保存', pt: 'Salvar contato', ru: 'Сохранить контакт', hi: 'संपرك سيهجين' },
   call: { en: 'Call', ar: 'اتصال', es: 'Llamar', fr: 'Appeler', de: 'Anrufen', zh: '呼叫', ja: '電話', pt: 'Ligar', ru: 'Позвонить', hi: 'كول كرين' },
   whatsappBtn: { en: 'WhatsApp', ar: 'واتساب', es: 'WhatsApp', fr: 'WhatsApp', de: 'WhatsApp', zh: 'WhatsApp', ja: 'WhatsApp', pt: 'WhatsApp', ru: 'WhatsApp', hi: 'واتساب' },
-  heroBadge: { en: 'Create your digital identity', ar: 'أنشئ هويتك الرقمية الآن', es: 'Crea tu identidad digital', fr: 'Créez votre identيتé numérique', de: 'Erstellen Sie Ihre digitale Identität', zh: '创建您的数字身份', ja: 'デジタルアイデンティティを作成', pt: 'Crie sua identidade digital', ru: 'Создайте цифровую личность', hi: 'अपनी डिजिटल पहचान बनाएं' },
+  heroBadge: { en: 'Create your digital identity', ar: 'أنشئ هويتك الرقمية الآن', es: 'Crea tu identidad digital', fr: 'Créez votre حديتé numérique', de: 'Erstellen Sie Ihre digitale Identität', zh: '创建您的数字身份', ja: 'デジタルアイデンティティを作成', pt: 'Crie sua identidade digital', ru: 'Создайте цифровую личность', hi: 'अपनी डिजिटल पहचान बनाएं' },
   heroTitle: { en: 'Professional Digital Business Cards', ar: 'بطاقات أعمال رقمية احترافية', es: 'Tarjetas de visita digitales', fr: 'Cartes de visite numériques', de: 'Digitale Visitenكarten', zh: '专业数字名片', ja: 'プロフェッショナルな名片', pt: 'Cartões de Visita Digitais', ru: 'Цифровые визитки', hi: 'पेशेवर डिजिटल बिजनेस कार्ड' },
-  heroDesc: { en: 'The easiest way to share your professional profile with the world.', ar: 'الطريقة الأسهل لمشاركة ملفك المهني مع العالم.', es: 'La forma más fácil de compartir tu perfil.', fr: 'Le moyen le plus simple de partager votre profil.', de: 'Der einfachste Weg, Ihr Profil zu teilen.', zh: '分享您的个人资料的最简单方法。', ja: 'プロフィールを共有する最も簡単な方法。', pt: 'A maneira mais fácil de compartilhar seu perfil.', ru: 'Самый простой способ поделиться своим профилем.', hi: 'अपनी प्रोफ़ाइल साझा करने का सबसे आसान तरीका।' },
+  heroDesc: { en: 'The easiest way to share your professional profile with the world.', ar: 'الطريقة الأسهل لمشاركة ملفك المهني مع العالم.', es: 'La forma más fácil de compartir tu perfil.', fr: 'Le moyen le plus simple de partager votre profil.', de: 'Der einfachste Weg, Ihr Profil zu teilen.', zh: '分享您的个人资料的最简单方法。', ja: 'プロフィールを共有する最も簡単な方法。', pt: 'A maneira más fácil de compartilhar seu perfil.', ru: 'Самый простой способ поделиться своим профилем.', hi: 'अपनी प्रोफ़ाइल साझा करने का सबसे आसान तरीका।' },
   createBtn: { en: 'Create Now', ar: 'ابدأ الآن', es: 'Creار ahora', fr: 'Créer maintenant', de: 'Jetzt erstellen', zh: '立即创建', ja: '今すぐ作成', pt: 'Criار agora', ru: 'Создать сейчас', hi: 'अभी बनाएं' },
-  template: { en: 'Layout Template', ar: 'قالب التوزيع', es: 'Plantilla', fr: 'Modèle', de: 'Layout', zh: '布局模板', ja: 'レイアウト', pt: 'Modelo de Layout', ru: 'Шаблон макета', hi: 'लेआउट टेम्पलेट' },
-  selectTemplate: { en: 'Select Style', ar: 'اختر النمط الهيكلي', es: 'Seleccionar estilo', fr: 'Choisir le style', de: 'Stil wählen', zh: '选择样式', ja: 'スタイルを選択', pt: 'Selecionar Estilo', ru: 'Выбрать стиль', hi: 'शैली चुनें' },
-  bio: { en: 'Professional Bio', ar: 'النبذة المهنية', es: 'Bio profesional', fr: 'Bio professionnelle', de: 'Professionelle Bio', zh: '职业简介', ja: 'プロフィールの概要', pt: 'Bio Profissional', ru: 'Биография', hi: 'पेशेवर जैव' },
-  email: { en: 'Email Address', ar: 'البريد الإلكتروني', es: 'Correo electrónico', fr: 'Email', de: 'E-Mail', zh: '电子邮件', ja: 'メールアドレス', pt: 'E-mail', ru: 'Эل. почта', hi: 'ईमेल पता' },
+  template: { en: 'Layout Template', ar: 'قالب التوزيع', es: 'Plantilla', fr: 'Modèle', de: 'Layout', zh: '布局模板', ja: 'レイアウト', pt: 'Modelo de Layout', ru: 'Шаблон макета', hi: 'लेاولٹ टेम्पलेट' },
+  selectTemplate: { en: 'Select Style', ar: 'اختر النمط الهيكلي', es: 'Seleccionar estilo', fr: 'Choisir le style', de: 'Stil wählen', zh: '选择样式', ja: 'スタイルを選択', pt: 'Selecionار Estilo', ru: 'Выбрать стиль', hi: 'शैली चुनें' },
+  bio: { en: 'Professional Bio', ar: 'النبذة المهنية', es: 'Bio profesional', fr: 'Bio professionnelle', de: 'Professionelle Bio', zh: '职业简介', ja: 'プロフィールの概要', pt: 'Bio Profissional', ru: 'Биография', hi: 'पेशेور जैव' },
+  email: { en: 'Email Address', ar: 'البريد الإلكتروني', es: 'Correo electrónico', fr: 'Email', de: 'E-Mail', zh: '电子邮件', ja: 'メールアドレス', pt: 'E-mail', ru: 'Эл. почта', hi: 'ईमेल पता' },
   phone: { en: 'Phone Number', ar: 'رقم الهاتف', es: 'Teléfono', fr: 'Téléphone', de: 'Telefon', zh: '电话号码', ja: '電話番号', pt: 'Telefone', ru: 'Телефон', hi: 'फ़ोन नंबर' },
   whatsapp: { en: 'WhatsApp', ar: 'رقم الواتساب', es: 'WhatsApp', fr: 'WhatsApp', de: 'WhatsApp', zh: 'WhatsApp', ja: 'WhatsApp', pt: 'WhatsApp', ru: 'WhatsApp', hi: 'واتس اب' },
-  website: { en: 'Website URL', ar: 'رابط الموقع', es: 'Sitio web', fr: 'Site web', de: 'Webseite', zh: '网址', ja: 'ウェブサイト', pt: 'Website', ru: 'Веб-сайт', hi: 'वेب사이트' },
+  website: { en: 'Website URL', ar: 'رابط الموقع', es: 'Sitio web', fr: 'Site web', de: 'Webseite', zh: '网址', ja: 'ウェブサイト', pt: 'Website', ru: 'Веб-сайт', hi: 'वेबसाइट' },
   socials: { en: 'Social Links', ar: 'روابط التواصل', es: 'Redes sociales', fr: 'Réseaux sociaux', de: 'Soziale Netzwerke', zh: '社交链接', ja: 'ソーシャルリンク', pt: 'Redes Sociais', ru: 'Соцсети', hi: 'सोशल लिंक' },
-  jobTitle: { en: 'Job Title', ar: 'المسمى الوظيفي', es: 'Cargo', fr: 'Poste', de: 'Berufsbezeichnung', zh: '职位', ja: '役職', pt: 'Cargo', ru: 'Доلжность', hi: 'पद' },
+  jobTitle: { en: 'Job Title', ar: 'المسمى الوظيفي', es: 'Cargo', fr: 'Poste', de: 'Berufsbezeichnung', zh: '职位', ja: '役職', pt: 'Cargo', ru: 'Должность', hi: 'पद' },
   company: { en: 'Company', ar: 'الشركة', es: 'Empresa', fr: 'Entreprise', de: 'Firma', zh: '公司', ja: '会社', pt: 'Empresa', ru: 'Компания', hi: 'कंपनी' },
   templatesTitle: { en: 'Discover Our Templates', ar: 'اكتشف قوالبنا الاحترافية', es: 'Descubre plantillas', fr: 'Découvrez nos modèles', de: 'Vorlagen entdecken', zh: '发现我们的模板', ja: 'テンプレートを探す', pt: 'Descubra nossos modelos', ru: 'Наши шаблоны', hi: 'हमारे टेम्पलेट्स' },
   templatesDesc: { en: 'Choose the perfect design that reflects your professional identity.', ar: 'اختر التصميم المثالي الذي يعكس هويتك المهنية الراقية.', es: 'Elige el diseño perfecto.', fr: 'Choisissez le design parfait.', de: 'Wählen Sie das perfekte Design.', zh: '选择反映您身份的完美设计。', ja: 'あなたのアイデンティティを反映するデザインを選択してください。', pt: 'Escolha o design perfeito.', ru: 'Выберите идеальный дизайн.', hi: 'अपनी पहचान को दर्शाने वाला डिज़ाइन चुनें।' },
@@ -51,20 +158,24 @@ export const TRANSLATIONS: TranslationStrings = {
   supportProject: { en: 'Support this free project', ar: 'ادعم استمرارية هذا المشروع المجاني', es: 'Apoya este proyecto', fr: 'Soutenir ce projet', de: 'Projekt unterstützen', zh: '支持这个项目', ja: 'プロジェクトを支援する', pt: 'Apoie este projeto', ru: 'Поддержать проект', hi: 'परियोजना का समर्थन करें' },
   buyMeCoffee: { en: 'Buy Me a Coffee', ar: 'ادعمني بكوب قهوة', es: 'Invítame a un café', fr: 'Payez-moi un café', de: 'Kaffee ausgeben', zh: '请我喝杯咖啡', ja: 'コーヒーをおごる', pt: 'Pague-me um café', ru: 'Купить мне кофе', hi: 'मुझे एक कॉफ़ी पिलाएँ' },
   
+  // Occasion Specific
+  invitationPrefix: { en: 'Invited by', ar: 'يتشرف', es: 'Invitado por', fr: 'Invité par', de: 'Eingeladen von', zh: '受邀于', ja: '招待者', pt: 'Convidado por', ru: 'Приглашен', hi: 'के द्वारा आमंत्रित' },
+  invitationWelcome: { en: 'Welcomes you to', ar: 'بدعوتكم لحضور', es: 'Te invita a', fr: 'Vous invite à', de: 'Lädt Sie ein zu', zh: '欢迎您参加', ja: 'あなたを歓迎します', pt: 'Convida você para', ru: 'Приглашает вас на', hi: 'आपका स्वागत करता है' },
+
   // Template Builder
   editTemplate: { en: 'Edit Template', ar: 'تعديل القالب', es: 'Editar plantilla', fr: 'Modifier le modèle', de: 'Vorlage bearbeiten', zh: '编辑模板', ja: 'テンプレートを編集', pt: 'Editار Modelo', ru: 'Изменить шаблон', hi: 'टेम्पलेट संपादित करें' },
   saveTemplate: { en: 'Save Template', ar: 'حفظ القالب', es: 'Guardار plantilla', fr: 'Enregistrer le modèle', de: 'Vorlage speichern', zh: '保存模板', ja: 'テンプレートを保存', pt: 'Salvار Modelo', ru: 'Сохранить шаблон', hi: 'टेम्पलेट سيهجين' },
   appearance: { en: 'Appearance', ar: 'المظهر', es: 'Apariencia', fr: 'Apparence', de: 'Aussehen', zh: '外观', ja: '外観', pt: 'Apارência', ru: 'Внешний вид', hi: 'ديكاوت' },
   color: { en: 'Color', ar: 'لون', es: 'Color', fr: 'Couleur', de: 'Farbe', zh: '颜色', ja: '色', pt: 'Cor', ru: 'Цвет', hi: 'रنگ' },
   gradient: { en: 'Gradient', ar: 'تدرج', es: 'Degradado', fr: 'Dégradé', de: 'Verlauf', zh: '渐变', ja: 'グラデーション', pt: 'Grاديante', ru: 'Гراضيانت', hi: 'تدرج' },
-  image: { en: 'Image', ar: 'صورة', es: 'Imagen', fr: 'Image', de: 'Bild', zh: '图片', ja: '画像', pt: 'Imagem', ru: 'Изображение', hi: 'छवि' },
+  image: { en: 'Image', ar: 'صورة', es: 'Imagen', fr: 'Image', de: 'Bild', zh: '图片', ja: '画像', pt: 'Imagem', ru: 'Изображение', hi: 'छви' },
   upload: { en: 'Upload', ar: 'رفع', es: 'Subir', fr: 'Télécharger', de: 'Hochladen', zh: '上传', ja: 'アップロード', pt: 'Carregar', ru: 'Загрузить', hi: 'अपलोड' },
-  header: { en: 'Header', ar: 'الترويسة', es: 'Encabezado', fr: 'En-tête', de: 'Header', zh: '页眉', ja: 'ヘッダー', pt: 'Cabeçalho', ru: 'Шапка', hi: 'हेडर' },
+  header: { en: 'Header', ar: 'الترويسة', es: 'Encabezado', fr: 'En-tête', de: 'Header', zh: '页眉', ja: 'ヘッダー', pt: 'Cabeçalho', ru: 'Шапка', hi: 'हेڈر' },
   avatar: { en: 'Avatar', ar: 'الصورة الشخصية', es: 'Avatar', fr: 'Avatar', de: 'Avatar', zh: '头像', ja: 'アバター', pt: 'Avatar', ru: 'Аватар', hi: 'अवتار' },
   positioning: { en: 'Positioning', ar: 'التموضع', es: 'Posicionamiento', fr: 'Positionnement', de: 'Positionierung', zh: '定位', ja: '配置', pt: 'Posicionamento', ru: 'Позиционирование', hi: 'التموضع' },
-  height: { en: 'Height', ar: 'الارتفاع', es: 'Altura', fr: 'Hauteur', de: 'Höhe', zh: '高度', ja: '高さ', pt: 'Altura', ru: 'Высота', hi: 'ऊंचाई' },
+  height: { en: 'Height', ar: 'الارتفاع', es: 'Altura', fr: 'Hauteur', de: 'Höhe', zh: '高度', ja: '高さ', pt: 'Altura', ru: 'Высоتا', hi: 'ऊंचाई' },
   size: { en: 'Size', ar: 'الحجم', es: 'Tamaño', fr: 'Taille', de: 'Größe', zh: '尺寸', ja: 'サイズ', pt: 'Tamanho', ru: 'Размер', hi: 'أكار' },
-  yOffset: { en: 'Y Offset', ar: 'الإزاحة الرأسية', es: 'Desplazamiento Y', fr: 'Décalage Y', de: 'Y-Versatz', zh: 'Y偏移', ja: 'Yオフセット', pt: 'Deslocamento Y', ru: 'Смещение по Y', hi: 'Y ऑफसेट' },
+  yOffset: { en: 'Y Offset', ar: 'الإزاحة الرأسية', es: 'Desplazamiento Y', fr: 'Décalage Y', de: 'Y-Versatz', zh: 'Y偏移', ja: 'Yオフセット', pt: 'Deslocamento Y', ru: 'Смещение по Y', hi: 'Y অফसेट' },
   name: { en: 'Name', ar: 'الاسم', es: 'Nombre', fr: 'Nom', de: 'Name', zh: '名称', ja: '名前', pt: 'Nome', ru: 'Имя', hi: 'نام' },
   buttons: { en: 'Buttons', ar: 'الأزرار', es: 'Botones', fr: 'Boutons', de: 'Buttons', zh: '按钮', ja: 'ボタン', pt: 'Botões', ru: 'Кнопки', hi: 'بتون' },
   socialLinks: { en: 'Socials', ar: 'التواصل', es: 'Social', fr: 'Social', de: 'Soziales', zh: '社交', ja: 'ソーシャル', pt: 'Social', ru: 'Соцсети', hi: 'सोशल' },
@@ -76,204 +187,4 @@ export const TRANSLATIONS: TranslationStrings = {
   squircle: { en: 'Squircle', ar: 'منحنٍ', es: 'Squircle', fr: 'Squircle', de: 'Squircle', zh: '圆角', ja: 'スクワークル', pt: 'Squircle', ru: 'سكويركل', hi: 'اسكويكل' },
   hidden: { en: 'Hidden', ar: 'إخفاء', es: 'Oculto', fr: 'Caché', de: 'Verborgen', zh: '隐藏', ja: '非表示', pt: 'Oculto', ru: 'Скрыتو', hi: 'تشبا هوا' },
   showQrCode: { en: 'Show QR Code', ar: 'إظهار رمز الـ QR', es: 'Mostrar código QR', fr: 'Afficher le code QR', de: 'QR-Code anzeigen' }
-};
-
-export const THEME_COLORS = ['#2563eb', '#7c3aed', '#db2777', '#059669', '#d97706', '#0f172a', '#C5A059', '#1e293b', '#e11d48'];
-
-export const THEME_GRADIENTS = [
-  'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)', 
-  'linear-gradient(135deg, #581c87 0%, #a855f7 100%)', 
-  'linear-gradient(135deg, #064e3b 0%, #10b981 100%)', 
-  'linear-gradient(135deg, #9a3412 0%, #f97316 100%)', 
-  'linear-gradient(135deg, #b45309 0%, #facc15 100%)', 
-  'linear-gradient(135deg, #4b5563 0%, #9ca3af 100%)', 
-  'linear-gradient(135deg, #831843 0%, #db2777 100%)', 
-  'linear-gradient(135deg, #0f172a 0%, #1e40af 100%)', 
-  'linear-gradient(135deg, #059669 0%, #34d399 100%)', 
-  'linear-gradient(135deg, #6d28d9 0%, #c084fc 100%)', 
-  'linear-gradient(135deg, #78350f 0%, #d97706 100%)', 
-  'linear-gradient(135deg, #0369a1 0%, #0ea5e9 100%)', 
-  'linear-gradient(135deg, #111827 0%, #374151 100%)', 
-  'linear-gradient(135deg, #14532d 0%, #22c55e 100%)', 
-  'linear-gradient(135deg, #e11d48 0%, #fb7185 100%)', 
-  'linear-gradient(135deg, #2563eb 0%, #7dd3fc 100%)', 
-  'linear-gradient(135deg, #4c0519 0%, #9f1239 100%)', 
-  'linear-gradient(135deg, #ea580c 0%, #fbbf24 100%)', 
-  'linear-gradient(135deg, #312e81 0%, #6366f1 100%)', 
-  'linear-gradient(135deg, #334155 0%, #64748b 100%)', 
-  'linear-gradient(135deg, #064e3b 0%, #059669 100%)', 
-  'linear-gradient(135deg, #701a75 0%, #d946ef 100%)', 
-  'linear-gradient(135deg, #0f172a 0%, #334155 100%)', 
-  'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 
-  'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', 
-  'linear-gradient(135deg, #5ee7df 0%, #b490ca 100%)', 
-];
-
-export const SOCIAL_PLATFORMS = [
-  { id: 'linkedin', name: 'LinkedIn' },
-  { id: 'x', name: 'X' },
-  { id: 'facebook', name: 'Facebook' },
-  { id: 'instagram', name: 'Instagram' },
-  { id: 'whatsapp_social', name: 'WhatsApp' },
-  { id: 'telegram', name: 'Telegram' },
-  { id: 'tiktok', name: 'TikTok' },
-  { id: 'github', name: 'GitHub' },
-  { id: 'youtube', name: 'YouTube' },
-  { id: 'threads', name: 'Threads' },
-  { id: 'snapchat', name: 'Snapchat' },
-  { id: 'behance', name: 'Behance' },
-  { id: 'dribbble', name: 'Dribbble' },
-  { id: 'pinterest', name: 'Pinterest' },
-  { id: 'discord', name: 'Discord' },
-  { id: 'twitch', name: 'Twitch' },
-  { id: 'spotify', name: 'Spotify' }
-];
-
-export const BACKGROUND_PRESETS = [
-  'https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=600&auto=format&fit=crop', 
-  'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=600&auto=format&fit=crop', 
-  'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=600&auto=format&fit=crop', 
-  'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=600&auto=format&fit=crop', 
-  'https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=600&auto=format&fit=crop', 
-  'https://images.unsplash.com/photo-1516550893923-42d28e5677af?q=80&w=600&auto=format&fit=crop', 
-  'https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?q=80&w=600&auto=format&fit=crop', 
-  'https://images.unsplash.com/photo-1541450805268-4822a3a774ca?q=80&w=600&auto=format&fit=crop', 
-  'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop', 
-  'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=600&auto=format&fit=crop', 
-  'https://images.unsplash.com/photo-1533035353720-f1c6a75cd8ab?q=80&w=600&auto=format&fit=crop', 
-  'https://images.unsplash.com/photo-1519750783826-e2420f4d687f?q=80&w=600&auto=format&fit=crop', 
-];
-
-export const PATTERN_PRESETS = [
-  { id: 'none', name: 'None', svg: '' },
-  { 
-    id: 'dots', 
-    name: 'Tech Dots', 
-    svg: `<svg width='20' height='20' xmlns='http://www.w3.org/2000/svg'><circle cx='2' cy='2' r='1' fill='currentColor'/></svg>`
-  },
-  { 
-    id: 'grid', 
-    name: 'Blueprint Grid', 
-    svg: `<svg width='40' height='40' xmlns='http://www.w3.org/2000/svg'><path d='M 40 0 L 0 0 0 40' fill='none' stroke='currentColor' stroke-width='0.5'/></svg>`
-  },
-  { 
-    id: 'circuit', 
-    name: 'Tech Circuit', 
-    svg: `<svg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><path d='M10 10h20v20h-20zM40 10h20v20h-20zM70 10h20v20h-20zM10 40h20v20h-20zM40 40h20v20h-20zM70 40h20v20h-20zM10 70h20v20h-20zM40 70h20v20h-20zM70 70h20v20h-20z' fill='none' stroke='currentColor' stroke-width='0.5' opacity='0.5'/><path d='M30 20h10M60 20h10M30 50h10M60 50h10M30 80h10M60 80h10M20 30v10M50 30v10M80 30v10M20 60v10M50 60v10' stroke='currentColor' stroke-width='0.5'/></svg>`
-  },
-  { 
-    id: 'topography', 
-    name: 'Topography', 
-    svg: `<svg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><path d='M0 20c10-5 20-5 30 0s20 5 30 0 20-5 40 10M0 50c15-10 30-10 45 0s30 10 55-5M0 80c20-5 40-5 60 5s20 5 40-10' fill='none' stroke='currentColor' stroke-width='0.5' opacity='0.8'/></svg>`
-  },
-  { 
-    id: 'hex', 
-    name: 'Hexagon Lab', 
-    svg: `<svg width='28' height='49' viewBox='0 0 28 49' xmlns='http://www.w3.org/2000/svg'><path d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5z' fill='none' stroke='currentColor' stroke-width='0.5'/></svg>`
-  },
-  {
-    id: 'diagonal',
-    name: 'Speed Lines',
-    svg: `<svg width='40' height='40' xmlns='http://www.w3.org/2000/svg'><path d='M-10,10 l20,-20 M0,40 l40,-40 M30,50 l20,-20' stroke='currentColor' stroke-width='1'/></svg>`
-  },
-  {
-    id: 'rhombus',
-    name: 'Royal Rhombus',
-    svg: `<svg width='40' height='40' xmlns='http://www.w3.org/2000/svg'><path d='M20 0L40 20L20 40L0 20z' fill='none' stroke='currentColor' stroke-width='0.5'/></svg>`
-  },
-  {
-    id: 'zigzag',
-    name: 'ZigZag Flow',
-    svg: `<svg width='40' height='10' xmlns='http://www.w3.org/2000/svg'><path d='M0 5 l5 -5 l5 5 l5 -5 l5 5 l5 -5 l5 5 l5 -5' fill='none' stroke='currentColor' stroke-width='0.5'/></svg>`
-  },
-  {
-    id: 'circles',
-    name: 'Orbit Rings',
-    svg: `<svg width='50' height='50' xmlns='http://www.w3.org/2000/svg'><circle cx='25' cy='25' r='15' fill='none' stroke='currentColor' stroke-width='0.5'/><circle cx='25' cy='25' r='5' fill='currentColor' opacity='0.3'/></svg>`
-  },
-  {
-    id: 'cross',
-    name: 'Modern Cross',
-    svg: `<svg width='20' height='20' xmlns='http://www.w3.org/2000/svg'><path d='M10 0v20M0 10h20' stroke='currentColor' stroke-width='0.5'/></svg>`
-  }
-];
-
-export const SVG_PRESETS = [
-  {
-    name: "Modern Wave",
-    id: "wave-1",
-    svg: `<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,144C672,139,768,181,864,181.3C960,181,1056,139,1152,122.7C1248,107,1344,117,1392,122.7L1440,128L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path></svg>`
-  },
-  {
-    name: "Geometric Spike",
-    id: "spike-1",
-    svg: `<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M0,224L120,192C240,160,480,96,720,106.7C960,117,1200,203,1320,245.3L1440,288L1440,0L1320,0C1200,0,960,0,720,0C480,0,240,0,120,0L0,0Z"></path></svg>`
-  },
-  {
-    name: "Soft Curve",
-    id: "curve-1",
-    svg: `<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M0,64C240,192,480,192,720,128C960,64,1200,64,1440,160L1440,0L0,0Z"></path></svg>`
-  },
-  {
-    name: "Liquid Edge",
-    id: "liquid-1",
-    svg: `<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M0,192C120,224,240,256,360,256C480,256,600,224,720,192C840,160,960,96,1080,85.3C1200,75,1320,117,1380,138.7L1440,160L1440,0L0,0Z"></path></svg>`
-  },
-  {
-    name: "Deep Steps",
-    id: "steps-1",
-    svg: `<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M0,128L288,128L288,64L576,64L576,192L864,192L864,96L1152,96L1152,224L1440,224L1440,0L0,0Z"></path></svg>`
-  },
-  {
-    name: "Sharp Zigzag",
-    id: "zigzag-1",
-    svg: `<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M0,64L240,192L480,64L720,192L960,64L1200,192L1440,64L1440,0L0,0Z"></path></svg>`
-  }
-];
-
-export const SAMPLE_DATA: Record<string, Partial<CardData>> = {
-  ar: { 
-    name: 'عبدالله محمد', 
-    title: 'مستشار تطوير أعمال', 
-    company: 'هويتي التقنية', 
-    bio: 'خبير في استراتيجيات التحول الرقمي مع خبرة تزيد عن 10 سنوات في بناء الهوية الرقمية للشركات والأفراد.', 
-    showBio: true,
-    email: 'abdullah@example.com',
-    phone: '+966500000000',
-    whatsapp: '966500000000',
-    website: 'www.myidentity.sa',
-    templateId: 'classic', 
-    themeType: 'gradient', 
-    themeGradient: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
-    profileImage: '',
-    isDark: false, 
-    showQrCode: true,
-    socialLinks: [
-      { platformId: 'linkedin', platform: 'LinkedIn', url: 'https://linkedin.com' },
-      { platformId: 'x', platform: 'X', url: 'https://x.com' },
-      { platformId: 'instagram', platform: 'Instagram', url: 'https://instagram.com' }
-    ] 
-  },
-  en: { 
-    name: 'Alexander Smith', 
-    title: 'Senior Solutions Architect', 
-    company: 'NextID Global', 
-    bio: 'Passionate about crafting seamless digital experiences and architectural solutions for modern businesses.', 
-    showBio: true,
-    email: 'alex@example.com',
-    phone: '+1 555 123 4567',
-    whatsapp: '15551234567',
-    website: 'www.nextid.com',
-    templateId: 'classic', 
-    themeType: 'gradient', 
-    themeGradient: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
-    profileImage: '',
-    isDark: false, 
-    showQrCode: true,
-    socialLinks: [
-      { platformId: 'linkedin', platform: 'LinkedIn', url: 'https://linkedin.com' },
-      { platformId: 'x', platform: 'X', url: 'https://x.com' },
-      { platformId: 'github', platform: 'GitHub', url: 'https://github.com' }
-    ] 
-  }
 };

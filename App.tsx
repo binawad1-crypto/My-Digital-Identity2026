@@ -13,7 +13,7 @@ import ShareModal from './components/ShareModal';
 import AuthModal from './components/AuthModal';
 import { auth, getCardBySerial, saveCardToDB, ADMIN_EMAIL, getUserCards, getSiteSettings, deleteUserCard, getAllTemplates } from './services/firebase';
 import { onAuthStateChanged, User, signOut } from 'firebase/auth';
-import { Sun, Moon, Loader2, Plus, Edit2, Trash2, ExternalLink, User as UserIcon, LogIn, AlertCircle, Home as HomeIcon } from 'lucide-react';
+import { Sun, Moon, Loader2, Plus, Edit2, Trash2, ExternalLink, User as UserIcon, LogIn, AlertCircle, Home as HomeIcon, Coffee, Heart } from 'lucide-react';
 
 const App: React.FC = () => {
   const [lang, setLang] = useState<Language>(() => {
@@ -292,15 +292,42 @@ const App: React.FC = () => {
         {activeTab === 'account' && currentUser && <UserAccount lang={lang} />}
       </main>
 
-      <footer className="w-full pt-16 pb-10 bg-white/50 dark:bg-black/20 backdrop-blur-sm border-t border-gray-100 dark:border-gray-800">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col items-center gap-4 text-center">
-            <div className="flex items-center gap-2 text-[11px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-              {isRtl ? 'كافة الحقوق محفوظة 2025' : 'All Rights Reserved 2025'}
-              <span className="mx-2 opacity-30">|</span>
-              <a href="mailto:info@nextid.my" className="text-blue-600 hover:underline">info@nextid.my</a>
+      <footer className="w-full pt-16 pb-12 bg-white/50 dark:bg-black/20 backdrop-blur-sm border-t border-gray-100 dark:border-gray-800">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col items-center gap-8 text-center">
+            {/* Buy Me A Coffee - Elegant Integration */}
+            <div className="animate-fade-in">
+              <a 
+                href="https://buymeacoffee.com/guidai" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="group relative flex items-center gap-4 px-8 py-4 bg-[#FFDD00] hover:bg-[#FFC400] text-black rounded-[2rem] shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95"
+              >
+                <div className="p-2 bg-white/40 rounded-full group-hover:rotate-12 transition-transform duration-500">
+                   <Coffee size={24} className="animate-pulse" />
+                </div>
+                <div className="flex flex-col items-start leading-tight">
+                  <span className="text-[10px] font-black uppercase opacity-60 tracking-widest">
+                    {isRtl ? 'ادعم استمرارية الموقع مجاناً' : 'Keep this project free'}
+                  </span>
+                  <span className="text-sm font-black uppercase">
+                    {isRtl ? 'تبرع بكوب قهوة' : 'Buy me a coffee'}
+                  </span>
+                </div>
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white animate-bounce">
+                   <Heart size={12} fill="currentColor" />
+                </div>
+              </a>
             </div>
-            <div className="text-[9px] font-bold text-gray-300 dark:text-gray-600 uppercase tracking-[0.3em]">
-              {isRtl ? 'بواسطة هويتي الرقمية' : 'By My Digital Identity'}
+
+            <div className="flex flex-col items-center gap-2">
+                <div className="flex items-center gap-2 text-[11px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+                  {isRtl ? 'كافة الحقوق محفوظة 2025' : 'All Rights Reserved 2025'}
+                  <span className="mx-2 opacity-30">|</span>
+                  <a href="mailto:info@nextid.my" className="text-blue-600 hover:underline">info@nextid.my</a>
+                </div>
+                <div className="text-[9px] font-bold text-gray-300 dark:text-gray-600 uppercase tracking-[0.3em]">
+                  {isRtl ? 'بواسطة هويتي الرقمية' : 'By My Digital Identity'}
+                </div>
             </div>
         </div>
       </footer>

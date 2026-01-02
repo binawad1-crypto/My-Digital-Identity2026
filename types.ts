@@ -18,9 +18,9 @@ export interface TemplateConfig {
   headerHeight: number;
   headerCustomAsset?: string; 
   headerSvgRaw?: string;
-  headerPatternId?: string; // معرف النمط المختار
-  headerPatternOpacity?: number; // شفافية النمط (0-100)
-  headerPatternScale?: number; // حجم النمط
+  headerPatternId?: string; 
+  headerPatternOpacity?: number; 
+  headerPatternScale?: number; 
   avatarStyle: 'circle' | 'squircle' | 'none';
   avatarStyle_v2?: string;
   avatarSize: number;
@@ -81,7 +81,19 @@ export interface TemplateConfig {
   occasionPrimaryColor?: string;
   occasionBgColor?: string;
   occasionTitleColor?: string;
+  occasionGlassy?: boolean;
+  occasionOpacity?: number;
   showCountdown?: boolean;
+
+  // Invitation Texts Colors
+  occasionPrefixColor?: string;
+  occasionNameColor?: string;
+  occasionWelcomeColor?: string;
+
+  // Invitation Texts
+  invitationPrefix?: string;
+  invitationWelcome?: string;
+  invitationYOffset?: number;
 
   nameColor?: string;
   titleColor?: string;
@@ -97,6 +109,8 @@ export interface TemplateConfig {
   defaultThemeGradient?: string;
   defaultBackgroundImage?: string;
   defaultProfileImage?: string;
+  defaultName?: string;
+  defaultNameSize?: number;
   defaultIsDark?: boolean;
   
   customCss?: string;
@@ -184,6 +198,21 @@ export interface CardData {
   occasionPrimaryColor?: string;
   occasionBgColor?: string;
   occasionTitleColor?: string;
+  occasionGlassy?: boolean;
+  occasionOpacity?: number;
+
+  // New Invitation Specific
+  invitationPrefix?: string;
+  invitationWelcome?: string;
+  invitationYOffset?: number;
+  occasionPrefixColor?: string;
+  occasionNameColor?: string;
+  occasionWelcomeColor?: string;
+
+  // Glassmorphism Overrides
+  bodyGlassy?: boolean;
+  bodyOpacity?: number;
+
   nameColor?: string;
   titleColor?: string;
   bioTextColor?: string;

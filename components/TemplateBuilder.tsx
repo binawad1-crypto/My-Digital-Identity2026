@@ -111,7 +111,15 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
       occasionPrimaryColor: '#7c3aed',
       occasionBgColor: '#ffffff',
       occasionTitleColor: '#111827',
+      occasionGlassy: false,
+      occasionOpacity: 100,
+      occasionPrefixColor: '#2563eb',
+      occasionNameColor: '#111827',
+      occasionWelcomeColor: 'rgba(0,0,0,0.4)',
       showCountdown: true,
+      invitationPrefix: isRtl ? 'يتشرف' : 'Invited by',
+      invitationWelcome: isRtl ? 'بدعوتكم لحضور' : 'Welcomes you to',
+      invitationYOffset: 0,
       headerGlassy: false,
       headerOpacity: 100,
       bodyGlassy: false,
@@ -129,6 +137,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
       defaultThemeType: 'gradient',
       defaultThemeColor: '#2563eb',
       defaultThemeGradient: THEME_GRADIENTS[0],
+      defaultName: '',
       defaultIsDark: false,
       headerPatternId: 'none',
       headerPatternOpacity: 20,
@@ -258,6 +267,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
             
             {activeTab === 'header' && (
               <div className="space-y-8 animate-fade-in">
+                 {/* Header Tab Content... */}
                  <div className="bg-indigo-50 dark:bg-indigo-950/20 p-8 rounded-[3rem] border border-indigo-100 dark:border-indigo-900/30 space-y-6 shadow-sm">
                     <div className="flex items-center justify-between">
                        <div className="flex items-center gap-3">
@@ -373,21 +383,29 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
                      <div className="flex items-center gap-3"><Box className="text-blue-600" size={24} /><h4 className="text-[12px] font-black uppercase tracking-widest dark:text-white">{t('تنسيق جسم البطاقة', 'Card Content Area Style')}</h4></div>
                      
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <ToggleSwitch label={t('تأثير زجاجي (Glassmorphism)', 'Glassy Content')} value={template.config.bodyGlassy} onChange={(v: boolean) => updateConfig('bodyGlassy', v)} icon={GlassWater} />
-                        <RangeControl label={t('شفافية الخلفية', 'Body Opacity')} min={0} max={100} unit="%" value={template.config.bodyOpacity ?? 100} onChange={(v: number) => updateConfig('bodyOpacity', v)} icon={Sun} />
-                        <RangeControl label={t('انحناء الحواف', 'Border Radius')} min={0} max={100} value={template.config.bodyBorderRadius ?? 48} onChange={(v: number) => updateConfig('bodyBorderRadius', v)} icon={Ruler} />
-                        <RangeControl label={t('إزاحة منطقة المحتوى', 'Body Y Offset')} min={-1000} max={500} value={template.config.bodyOffsetY || 0} onChange={(v: number) => updateConfig('bodyOffsetY', v)} icon={Move} />
+                        <ToggleSwitch label={t('تأثير زجاجي شفاف (Glassmorphism)', 'Premium Glass Body')} value={template.config.bodyGlassy} onChange={(v: boolean) => updateConfig('bodyGlassy', v)} icon={GlassWater} color="bg-indigo-600" />
+                        <RangeControl label={t('شفافية جسم البطاقة', 'Body Transparency')} min={0} max={100} unit="%" value={template.config.bodyOpacity ?? 100} onChange={(v: number) => updateConfig('bodyOpacity', v)} icon={Sun} />
+                        <RangeControl label={t('انحناء الحواف العلوي', 'Border Radius')} min={0} max={120} value={template.config.bodyBorderRadius ?? 48} onChange={(v: number) => updateConfig('bodyBorderRadius', v)} icon={Ruler} />
+                        <RangeControl label={t('إزاحة منطقة المحتوى (أعلى/أسفل)', 'Body Y Offset')} min={-1000} max={500} value={template.config.bodyOffsetY || 0} onChange={(v: number) => updateConfig('bodyOffsetY', v)} icon={Move} />
                      </div>
 
-                     <div className="pt-6 border-t dark:border-gray-800">
-                        <label className="text-[10px] font-black text-gray-400 uppercase mb-4 block">{t('نمط التباعد العام', 'Spacing Presets')}</label>
-                        <div className="grid grid-cols-3 gap-3">
-                           {['compact', 'normal', 'relaxed'].map(s => (
-                              <button key={s} onClick={() => updateConfig('spacing', s)} className={`py-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${template.config.spacing === s ? 'bg-blue-600 text-white border-blue-600 shadow-lg' : 'bg-gray-50 dark:bg-gray-800 text-gray-400'}`}>
-                                 <AlignJustify size={20}/>
-                                 <span className="text-[9px] font-black uppercase">{t(s === 'compact' ? 'مضغوط' : (s === 'normal' ? 'عادي' : 'مريح'), s.toUpperCase())}</span>
-                              </button>
-                           ))}
+                     <div className="pt-8 border-t dark:border-gray-800 space-y-6">
+                        <div className="flex items-center gap-3"><AlignJustify className="text-indigo-600" size={20} /><label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t('محاذاة المحتوى ونمط التباعد', 'Alignment & Spacing DNA')}</label></div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="grid grid-cols-3 gap-2">
+                             {['start', 'center', 'end'].map(align => (
+                                <button key={align} onClick={() => updateConfig('contentAlign', align)} className={`py-3 rounded-xl border-2 transition-all flex items-center justify-center ${template.config.contentAlign === align ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'bg-gray-50 dark:bg-gray-800 text-gray-400'}`}>
+                                   {align === 'start' ? <AlignLeft size={18}/> : align === 'center' ? <AlignCenter size={18}/> : <AlignRight size={18}/>}
+                                </button>
+                             ))}
+                          </div>
+                          <div className="grid grid-cols-3 gap-2">
+                             {['compact', 'normal', 'relaxed'].map(s => (
+                                <button key={s} onClick={() => updateConfig('spacing', s)} className={`py-3 rounded-xl border-2 transition-all font-black text-[8px] uppercase ${template.config.spacing === s ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'bg-gray-50 dark:bg-gray-800 text-gray-400'}`}>
+                                   {t(s === 'compact' ? 'مضغوط' : (s === 'normal' ? 'عادي' : 'مريح'), s.toUpperCase())}
+                                </button>
+                             ))}
+                          </div>
                         </div>
                      </div>
                   </div>
@@ -500,6 +518,26 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
                      
                      <div className="grid grid-cols-1 gap-6 pt-4 border-t dark:border-gray-800">
                         <div className="space-y-2">
+                           <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">{t('صاحب الدعوة الافتراضي', 'Default Organizer Name')}</label>
+                           <div className="relative">
+                              <UserCircle className={`absolute ${isRtl ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-blue-500`} size={16} />
+                              <input type="text" value={template.config.defaultName || ''} onChange={e => updateConfig('defaultName', e.target.value)} className={`w-full ${isRtl ? 'pr-12' : 'pl-12'} py-4 rounded-2xl bg-gray-50 dark:bg-gray-800 border dark:text-white font-bold outline-none focus:ring-2 focus:ring-blue-100 transition-all`} placeholder={t('أدخل اسم صاحب الدعوة...', 'Enter organizer name...')} />
+                           </div>
+                        </div>
+
+                        {/* Admin Text Controls for Protocol */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                           <div className="space-y-2">
+                              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">{t('نص البادئة الافتراضي (يتشرف)', 'Default Prefix')}</label>
+                              <input type="text" value={template.config.invitationPrefix || ''} onChange={e => updateConfig('invitationPrefix', e.target.value)} className={`w-full py-4 rounded-2xl bg-gray-50 dark:bg-gray-800 border dark:text-white font-bold px-5`} />
+                           </div>
+                           <div className="space-y-2">
+                              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">{t('نص الترحيب الافتراضي (بدعوتكم)', 'Default Welcome')}</label>
+                              <input type="text" value={template.config.invitationWelcome || ''} onChange={e => updateConfig('invitationWelcome', e.target.value)} className={`w-full py-4 rounded-2xl bg-gray-50 dark:bg-gray-800 border dark:text-white font-bold px-5`} />
+                           </div>
+                        </div>
+
+                        <div className="space-y-2">
                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">{t('عنوان المناسبة', 'Occasion Title')}</label>
                            <div className="relative">
                               <TypographyIcon className={`absolute ${isRtl ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-blue-500`} size={16} />
@@ -533,11 +571,21 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
 
                      <div className="pt-6 border-t dark:border-gray-800 space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                           <ColorPicker label={t('لون البادئة الافتراضي', 'Default Prefix Color')} value={template.config.occasionPrefixColor || '#2563eb'} onChange={(v: string) => updateConfig('occasionPrefixColor', v)} />
+                           <ColorPicker label={t('لون الاسم الافتراضي', 'Default Name Color')} value={template.config.occasionNameColor || '#111827'} onChange={(v: string) => updateConfig('occasionNameColor', v)} />
+                           <ColorPicker label={t('لون الترحيب الافتراضي', 'Default Welcome Color')} value={template.config.occasionWelcomeColor || 'rgba(0,0,0,0.4)'} onChange={(v: string) => updateConfig('occasionWelcomeColor', v)} />
                            <ColorPicker label={t('اللون الأساسي للمناسبة', 'Primary Accent Color')} value={template.config.occasionPrimaryColor || '#7c3aed'} onChange={(v: string) => updateConfig('occasionPrimaryColor', v)} />
                            <ColorPicker label={t('لون خلفية الصندوق', 'Box Background Color')} value={template.config.occasionBgColor || '#ffffff'} onChange={(v: string) => updateConfig('occasionBgColor', v)} />
                         </div>
                         
-                        <RangeControl label={t('إزاحة قسم المناسبة', 'Vertical Y Offset')} min={-150} max={250} value={template.config.occasionOffsetY || 0} onChange={(v: number) => updateConfig('occasionOffsetY', v)} icon={Move} />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                           <ToggleSwitch label={t('تأثير زجاجي للصندوق', 'Glass Occasion Box')} value={template.config.occasionGlassy} onChange={(v: boolean) => updateConfig('occasionGlassy', v)} icon={GlassWater} color="bg-indigo-600" />
+                           <RangeControl label={t('شفافية صندوق المناسبة', 'Occasion Box Transparency')} min={0} max={100} unit="%" value={template.config.occasionOpacity ?? 100} onChange={(v: number) => updateConfig('occasionOpacity', v)} icon={Sun} />
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-6">
+                           <RangeControl label={t('إزاحة كتلة الدعوة كاملة (نصوص وصندوق)', 'Full Invitation Block Displacement')} min={-200} max={300} value={template.config.invitationYOffset || 0} onChange={(v: number) => updateConfig('invitationYOffset', v)} icon={Move} />
+                        </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                            <ToggleSwitch label={t('تفعيل العد التنازلي', 'Enable Countdown')} value={template.config.showCountdown} onChange={(v: boolean) => updateConfig('showCountdown', v)} icon={Timer} />
@@ -588,6 +636,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
                    <CardPreview 
                      data={{ 
                        ...sampleCardData, 
+                       name: template.config.defaultName || sampleCardData.name,
                        templateId: template.id, 
                        themeType: template.config.defaultThemeType, 
                        themeColor: template.config.defaultThemeColor, 
@@ -606,7 +655,14 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
                        occasionTitle: template.config.occasionTitle,
                        occasionPrimaryColor: template.config.occasionPrimaryColor,
                        occasionDate: template.config.occasionDate,
-                       occasionOffsetY: template.config.occasionOffsetY, 
+                       occasionGlassy: template.config.occasionGlassy,
+                       occasionOpacity: template.config.occasionOpacity,
+                       occasionPrefixColor: template.config.occasionPrefixColor,
+                       occasionNameColor: template.config.occasionNameColor,
+                       occasionWelcomeColor: template.config.occasionWelcomeColor,
+                       invitationPrefix: template.config.invitationPrefix,
+                       invitationWelcome: template.config.invitationWelcome,
+                       invitationYOffset: template.config.invitationYOffset,
                        showQrCode: template.config.showQrCodeByDefault,
                        showName: template.config.showNameByDefault,
                        showTitle: template.config.showTitleByDefault,
