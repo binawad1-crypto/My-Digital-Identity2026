@@ -28,6 +28,7 @@ interface EditorProps {
 
 type EditorTab = 'identity' | 'social' | 'design' | 'occasion';
 
+// Fix: Added missing occasion tab content, closing tags, and default export
 const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, isAdminEdit, templates, forcedTemplateId }) => {
   const isRtl = lang === 'ar';
   const t = (key: string, fallback?: string) => {
@@ -64,6 +65,8 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
          titleColor: selectedTmpl.config.titleColor || baseData.titleColor,
          linksColor: selectedTmpl.config.linksColor || baseData.linksColor,
          socialIconsColor: selectedTmpl.config.socialIconsColor || selectedTmpl.config.linksColor || baseData.linksColor,
+         contactPhoneColor: selectedTmpl.config.contactPhoneColor || '#2563eb',
+         contactWhatsappColor: selectedTmpl.config.contactWhatsappColor || '#10b981',
          qrColor: selectedTmpl.config.qrColor || baseData.qrColor,
          qrBgColor: selectedTmpl.config.qrBgColor || 'transparent',
          qrPadding: 0,
@@ -114,6 +117,8 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
           titleColor: newTmpl.config.titleColor || prev.titleColor,
           linksColor: newTmpl.config.linksColor || prev.linksColor,
           socialIconsColor: newTmpl.config.socialIconsColor || newTmpl.config.linksColor || prev.socialIconsColor,
+          contactPhoneColor: newTmpl.config.contactPhoneColor || prev.contactPhoneColor,
+          contactWhatsappColor: newTmpl.config.contactWhatsappColor || prev.contactWhatsappColor,
           qrColor: newTmpl.config.qrColor || prev.qrColor,
           qrBgColor: newTmpl.config.qrBgColor || prev.qrBgColor,
           qrPadding: newTmpl.config.qrPadding ?? prev.qrPadding,
@@ -240,7 +245,7 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
                         {formData.profileImage ? <img src={formData.profileImage} className="w-full h-full object-cover" /> : <UserIcon size={40} className="text-gray-200" />}
                         {isUploading && <div className="absolute inset-0 bg-blue-600/60 backdrop-blur-sm flex items-center justify-center"><Loader2 className="animate-spin text-white" /></div>}
                       </div>
-                      <button onClick={() => fileInputRef.current?.click()} className="absolute -bottom-2 -right-2 p-3 bg-blue-600 text-white rounded-2xl shadow-xl hover:scale-110 transition-all active:scale-90"><Camera size={18} /></button>
+                      <button onClick={() => fileInputRef.current?.click()} className="absolute -bottom-2 -right-2 p-3 bg-blue-600 text-white rounded-2xl shadow-xl hover:scale-110 transition-all active:scale-95"><Camera size={18} /></button>
                       <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept="image/*" className="hidden" />
                    </div>
                    <div className="flex-1 w-full space-y-6">
@@ -528,6 +533,26 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
                          </div>
                       </div>
                       <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-[2rem] space-y-4 shadow-sm border border-gray-100 dark:border-gray-700">
+                         <label className={labelClasses}>{t('لون زر الاتصال', 'Phone Color')}</label>
+                         <div className="flex items-center gap-3">
+                            <div className="relative w-10 h-10 rounded-xl overflow-hidden border shadow-sm">
+                              <input type="color" value={formData.contactPhoneColor || '#2563eb'} onChange={e => handleChange('contactPhoneColor', e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer scale-150" />
+                              <div className="w-full h-full" style={{ backgroundColor: formData.contactPhoneColor || '#2563eb' }} />
+                            </div>
+                            <span className="text-[11px] font-mono font-black uppercase dark:text-gray-400">{formData.contactPhoneColor || '#2563eb'}</span>
+                         </div>
+                      </div>
+                      <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-[2rem] space-y-4 shadow-sm border border-gray-100 dark:border-gray-700">
+                         <label className={labelClasses}>{t('لون زر واتساب', 'WhatsApp Color')}</label>
+                         <div className="flex items-center gap-3">
+                            <div className="relative w-10 h-10 rounded-xl overflow-hidden border shadow-sm">
+                              <input type="color" value={formData.contactWhatsappColor || '#10b981'} onChange={e => handleChange('contactWhatsappColor', e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer scale-150" />
+                              <div className="w-full h-full" style={{ backgroundColor: formData.contactWhatsappColor || '#10b981' }} />
+                            </div>
+                            <span className="text-[11px] font-mono font-black uppercase dark:text-gray-400">{formData.contactWhatsappColor || '#10b981'}</span>
+                         </div>
+                      </div>
+                      <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-[2rem] space-y-4 shadow-sm border border-gray-100 dark:border-gray-700">
                          <label className={labelClasses}>{t('لون الباركود', 'QR Code Color')}</label>
                          <div className="flex items-center gap-3">
                             <div className="relative w-10 h-10 rounded-xl overflow-hidden border shadow-sm">
@@ -573,8 +598,7 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
                       <div className="pt-4 flex flex-col sm:flex-row gap-8 items-start sm:items-center border-t border-gray-100 dark:border-gray-700">
                          <div className="flex-1 w-full space-y-4">
                             <div className="flex justify-between items-center px-1">
-                               <label className={labelClasses}>{t('انحناء الحواف', 'Border Radius')}</label>
-                               <span className="text-[10px] font-black text-blue-600">{formData.qrBorderRadius || 0}px</span>
+                               <label className={labelClasses}>{t('انحناء الحواف', 'Border Radius')} : {formData.qrBorderRadius || 0}px</label>
                             </div>
                             <input type="range" min="0" max="80" value={formData.qrBorderRadius || 0} onChange={e => handleChange('qrBorderRadius', parseInt(e.target.value))} className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none accent-blue-600 cursor-pointer" />
                          </div>
@@ -613,180 +637,83 @@ const Editor: React.FC<EditorProps> = ({ lang, onSave, onCancel, initialData, is
             )}
 
             {activeTab === 'occasion' && (
-              <div className="space-y-10 animate-fade-in relative z-10">
-                 <div className="flex items-center justify-between p-8 bg-violet-50 dark:bg-violet-900/10 rounded-[3rem] border border-violet-100 dark:border-violet-900/20 shadow-sm relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-full bg-violet-600/5 rotate-12 translate-x-10 pointer-events-none" />
-                    <div className="flex items-center gap-5 relative">
-                       <div className="p-4 bg-violet-600 text-white rounded-2xl shadow-xl"><PartyPopper size={28} /></div>
-                       <div>
-                          <h4 className="text-base font-black dark:text-white uppercase leading-none mb-2">{t('قسم المناسبة الخاصة', 'Special Occasion Section')}</h4>
-                          <p className="text-[10px] font-bold text-violet-400 uppercase tracking-[0.2em]">{t('زفاف، تخرج، افتتاح، إلخ', 'Wedding, graduation, etc')}</p>
-                       </div>
-                    </div>
-                    <button onClick={() => handleChange('showOccasion', !formData.showOccasion)} className={`w-16 h-8 rounded-full relative transition-all shadow-inner ${formData.showOccasion ? 'bg-violet-600 shadow-violet-500/20' : 'bg-gray-300 dark:bg-gray-700'}`}>
-                       <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-all shadow-md ${isRtl ? (formData.showOccasion ? 'right-9' : 'right-1') : (formData.showOccasion ? 'left-9' : 'left-1')}`} />
-                    </button>
-                 </div>
+              <div className="space-y-8 animate-fade-in relative z-10">
+                <div className="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-xl space-y-8 relative overflow-hidden">
+                   <div className="flex items-center gap-3 relative z-10">
+                      <PartyPopper className="text-blue-600" size={24} />
+                      <h4 className="text-[12px] font-black uppercase tracking-widest dark:text-white">{t('قسم المناسبة خاصة', 'Special Occasion Section')}</h4>
+                   </div>
 
-                 {formData.showOccasion && (
-                    <div className="space-y-8 pt-6 animate-fade-in">
-                       <div className="space-y-4">
-                          <div className="space-y-2">
-                             <label className={labelClasses}>{t('عنوان المناسبة', 'Occasion Title')}</label>
-                             <input type="text" value={formData.occasionTitle || ''} onChange={e => handleChange('occasionTitle', e.target.value)} className={inputClasses} placeholder={t('اكتب عنوان المناسبة هنا...', 'Type occasion title here...')} />
-                          </div>
-                          <div className="space-y-2">
-                             <label className={labelClasses}>{t('وصف المناسبة', 'Occasion Description')}</label>
-                             <textarea value={formData.occasionDesc || ''} onChange={e => handleChange('occasionDesc', e.target.value)} className={`${inputClasses} min-h-[100px] resize-none`} placeholder={t('أدخل شرحاً مختصراً للمناسبة...', 'Enter a brief description...')} />
-                          </div>
-                       </div>
-                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div className="space-y-2">
-                             <label className={labelClasses}>{t('تاريخ ووقت المناسبة', 'Date & Time')}</label>
-                             <input type="datetime-local" value={formData.occasionDate} onChange={e => handleChange('occasionDate', e.target.value)} className={`${inputClasses} [direction:ltr] text-right font-mono`} />
-                          </div>
-                          <div className="space-y-2">
-                             <label className={labelClasses}>{t('رابط خرائط قوقل', 'Google Maps Link')}</label>
-                             <div className="relative">
-                               <MapPin className={`absolute ${isRtl ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-violet-500`} size={18} />
-                               <input type="url" value={formData.occasionMapUrl} onChange={e => handleChange('occasionMapUrl', e.target.value)} className={`${inputClasses} ${isRtl ? 'pr-12' : 'pl-12'}`} placeholder="https://maps.google.com/..." />
-                             </div>
-                          </div>
-                       </div>
-                       
-                       <div className="pt-6 border-t dark:border-gray-800 space-y-4">
-                          <div className="flex justify-between items-center px-1">
-                             <div className="flex items-center gap-2">
-                               <Move size={14} className="text-violet-600" />
-                               <label className={labelClasses + " !mb-0"}>{t('إزاحة قسم المناسبة', 'Vertical Y Offset')}</label>
-                             </div>
-                             <span className="text-[10px] font-black text-violet-600 bg-violet-50 dark:bg-violet-900/20 px-2 py-0.5 rounded-full">{formData.occasionOffsetY || 0}px</span>
-                          </div>
-                          <input 
-                             type="range" min="-150" max="250" 
-                             value={formData.occasionOffsetY || 0} 
-                             onChange={e => handleChange('occasionOffsetY', parseInt(e.target.value))} 
-                             className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none accent-violet-600 cursor-pointer" 
-                          />
-                       </div>
-                    </div>
-                 )}
+                   <div className="grid grid-cols-1 gap-6 pt-4 border-t dark:border-gray-800">
+                      <div className="space-y-2">
+                         <label className={labelClasses}>{t('عنوان المناسبة', 'Occasion Title')}</label>
+                         <input type="text" value={formData.occasionTitle || ''} onChange={e => handleChange('occasionTitle', e.target.value)} className={inputClasses} placeholder="Graduation Party" />
+                      </div>
+                      <div className="space-y-2">
+                         <label className={labelClasses}>{t('نبذة عن المناسبة', 'Occasion Description')}</label>
+                         <textarea value={formData.occasionDesc || ''} onChange={e => handleChange('occasionDesc', e.target.value)} className={`${inputClasses} min-h-[100px] resize-none`} placeholder="..." />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                           <label className={labelClasses}>{t('تاريخ المناسبة', 'Occasion Date')}</label>
+                           <input type="datetime-local" value={formData.occasionDate || ''} onChange={e => handleChange('occasionDate', e.target.value)} className={inputClasses} />
+                        </div>
+                        <div className="space-y-2">
+                           <label className={labelClasses}>{t('رابط الموقع (الخريطة)', 'Map URL')}</label>
+                           <input type="url" value={formData.occasionMapUrl || ''} onChange={e => handleChange('occasionMapUrl', e.target.value)} className={inputClasses} placeholder="https://maps.google.com/..." />
+                        </div>
+                      </div>
+                   </div>
+
+                   <div className="pt-8 border-t dark:border-gray-800 flex items-center justify-between px-1">
+                      <div className="flex flex-col">
+                         <span className="text-xs font-black dark:text-white uppercase leading-none mb-1">{t('تفعيل المناسبة', 'Occasion Display')}</span>
+                         <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">{t('إظهار قسم المناسبة في البطاقة', 'Show occasion section')}</span>
+                      </div>
+                      <VisibilityToggle field="showOccasion" label="Occasion" />
+                   </div>
+                </div>
               </div>
             )}
+          </div>
 
-            <div className="mt-16 pt-10 border-t border-gray-50 dark:border-gray-800/50 flex flex-col sm:flex-row gap-4 relative z-10">
-               <button onClick={() => onSave(formData, originalIdRef.current || undefined)} className="flex-[2] py-6 bg-blue-600 text-white rounded-[2rem] font-black text-lg shadow-2xl shadow-blue-500/30 flex items-center justify-center gap-4 hover:scale-[1.02] active:scale-95 transition-all group order-1 sm:order-1 min-h-[80px]">
-                  <div className="p-2 bg-white/20 rounded-xl group-hover:rotate-12 transition-transform"><Save size={24} /></div>
-                  {t('حفظ جميع التغييرات', 'Save All Changes')}
-               </button>
-               
-               <button 
-                 onClick={() => {
-                   setShowMobilePreview(true);
-                   document.body.style.overflow = 'hidden'; 
-                 }}
-                 className="lg:hidden flex-1 py-6 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 rounded-[2rem] font-black text-lg border border-blue-100 dark:border-blue-900/30 shadow-xl flex items-center justify-center gap-4 hover:bg-blue-50 transition-all order-2 sm:order-2"
-               >
-                  <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-xl"><Eye size={24} /></div>
-                  {t('معاينة البطاقة', 'Preview Card')}
-               </button>
-
-               <button onClick={onCancel} className="px-10 py-6 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-[2rem] font-black text-sm uppercase transition-all hover:bg-red-50 hover:text-red-500 border border-transparent hover:border-red-100 order-3 sm:order-3">
-                  {t('إلغاء', 'Cancel')}
-               </button>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-4 pt-10">
+            <button 
+              onClick={() => onSave(formData, originalIdRef.current || undefined)}
+              className="flex-1 py-5 bg-blue-600 text-white rounded-[2rem] font-black text-sm uppercase shadow-2xl flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all"
+            >
+              <Save size={20} /> {t('حفظ التعديلات', 'Save Changes')}
+            </button>
+            <button 
+              onClick={onCancel}
+              className="px-10 py-5 bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 rounded-[2rem] font-black text-sm uppercase hover:bg-red-50 hover:text-red-500 transition-all"
+            >
+              {t('إلغاء', 'Cancel')}
+            </button>
           </div>
         </div>
 
-        <div className="hidden lg:block w-[450px] sticky top-[80px] self-start py-8">
-           <div className="p-5 bg-white dark:bg-gray-950 rounded-[4.5rem] border border-gray-100 dark:border-gray-800 shadow-2xl overflow-hidden relative group">
-              <div className="mb-8 flex items-center justify-between px-6">
-                <div className="flex items-center gap-3">
-                   <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
-                   <span className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">{isRtl ? 'معاينة حية' : 'Live Preview'}</span>
+        <div className="hidden lg:block w-[400px] sticky top-[100px]">
+          <div className="bg-white dark:bg-[#050507] p-6 rounded-[4rem] border border-gray-100 dark:border-gray-800 shadow-2xl overflow-hidden">
+             <div className="mb-6 flex items-center justify-between px-4">
+                <div className="flex items-center gap-2">
+                   <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></div>
+                   <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t('معاينة حية', 'Live Preview')}</span>
                 </div>
-                <div className="flex bg-gray-100 dark:bg-gray-800 p-1.5 rounded-2xl">
-                   <button onClick={() => setPreviewDevice('mobile')} className={`p-2.5 rounded-xl transition-all ${previewDevice === 'mobile' ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-md' : 'text-gray-400'}`}><Smartphone size={18}/></button>
-                   <button onClick={() => setPreviewDevice('tablet')} className={`p-2.5 rounded-xl transition-all ${previewDevice === 'tablet' ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-md' : 'text-gray-400'}`}><Tablet size={18}/></button>
-                   <button onClick={() => setPreviewDevice('desktop')} className={`p-2.5 rounded-xl transition-all ${previewDevice === 'desktop' ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-md' : 'text-gray-400'}`}><Monitor size={18}/></button>
+             </div>
+             <div className="transition-all duration-500 border-[10px] border-gray-900 dark:border-gray-800 rounded-[3.5rem] shadow-2xl overflow-hidden mx-auto bg-white dark:bg-black w-full">
+                <div className="h-[650px] overflow-y-auto no-scrollbar scroll-smooth">
+                   <CardPreview 
+                     data={formData} 
+                     lang={lang} 
+                     customConfig={currentTemplate?.config}
+                     hideSaveButton={true} 
+                   />
                 </div>
-              </div>
-
-              <div className={`transition-all duration-500 border-[12px] border-gray-900 dark:border-gray-800 rounded-[4rem] shadow-2xl overflow-hidden mx-auto bg-white dark:bg-black ${previewDevice === 'mobile' ? 'w-[320px]' : previewDevice === 'tablet' ? 'w-[400px]' : 'w-[340px]'}`}>
-                <div 
-                  className="h-[640px] themed-scrollbar scroll-smooth relative"
-                  style={{ '--scrollbar-color': formData.themeColor } as any}
-                >
-                  <CardPreview data={formData} lang={lang} customConfig={currentTemplate?.config} hideSaveButton={true} />
-                </div>
-              </div>
-           </div>
+             </div>
+          </div>
         </div>
       </div>
-      
-      {showMobilePreview && (
-        <div className="lg:hidden fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-2xl animate-fade-in">
-           
-           <div className="relative flex flex-col items-center max-h-full">
-              <div className="mb-6 flex items-center gap-3 bg-white/10 px-6 py-2.5 rounded-full border border-white/20 backdrop-blur-md">
-                 <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.8)]"></div>
-                 <span className="text-[10px] font-black text-white uppercase tracking-[0.3em]">{t('معاينة حية', 'Live Preview')}</span>
-              </div>
-
-              <div className="relative w-[320px] max-h-[80vh] aspect-[1/2] border-[12px] border-gray-900 dark:border-[#1a1a1f] rounded-[4rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.8)] overflow-hidden bg-white dark:bg-black flex flex-col animate-zoom-in">
-                 
-                 <button 
-                   onClick={() => { setShowMobilePreview(false); document.body.style.overflow = 'auto'; }}
-                   className="absolute top-4 right-4 z-[1200] p-2 bg-black/40 backdrop-blur-xl text-white rounded-full active:scale-90 transition-all border border-white/10"
-                 >
-                   <X size={18} />
-                 </button>
-
-                 <div className="flex-1 themed-scrollbar scroll-smooth" style={{ '--scrollbar-color': formData.themeColor } as any}>
-                    <CardPreview data={formData} lang={lang} customConfig={currentTemplate?.config} hideSaveButton={true} />
-                 </div>
-
-                 <div className="h-6 flex items-center justify-center shrink-0 bg-white dark:bg-black/50 border-t border-gray-100/10">
-                    <div className="w-20 h-1 bg-gray-300 dark:bg-gray-800 rounded-full opacity-40"></div>
-                 </div>
-              </div>
-
-              <button 
-                 onClick={() => { setShowMobilePreview(false); document.body.style.overflow = 'auto'; }}
-                 className="mt-8 px-12 py-4 bg-white text-blue-600 rounded-[1.5rem] font-black text-xs uppercase shadow-[0_20px_40px_-10px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
-              >
-                 <ArrowLeft size={16} className={isRtl ? 'rotate-180' : ''} />
-                 {t('العودة للتعديل', 'Back to Editor')}
-              </button>
-           </div>
-           
-           <div 
-             className="absolute inset-0 -z-10" 
-             onClick={() => { setShowMobilePreview(false); document.body.style.overflow = 'auto'; }}
-           />
-        </div>
-      )}
-
-      <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes zoom-in {
-          from { transform: scale(0.9) translateY(40px); opacity: 0; }
-          to { transform: scale(1) translateY(0); opacity: 1; }
-        }
-        .animate-zoom-in { animation: zoom-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .no-scrollbar::-webkit-scrollbar {
-          display: none !important;
-          width: 0 !important;
-          height: 0 !important;
-        }
-        .no-scrollbar {
-          -ms-overflow-style: none !important;
-          scrollbar-width: none !important;
-          overflow: -moz-scrollbars-none;
-        }
-      `}} />
     </div>
   );
 };

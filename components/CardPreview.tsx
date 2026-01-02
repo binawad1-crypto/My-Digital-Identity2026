@@ -76,6 +76,8 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
   const bioBgColor = data.bioBgColor || config.bioBgColor || (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)');
   const linksColor = data.linksColor || config.linksColor || '#3b82f6';
   const socialIconsColor = data.socialIconsColor || config.socialIconsColor || linksColor;
+  const phoneBtnColor = data.contactPhoneColor || config.contactPhoneColor || '#2563eb';
+  const whatsappBtnColor = data.contactWhatsappColor || config.contactWhatsappColor || '#10b981';
 
   const qrColorVal = (data.qrColor || config.qrColor || themeColor || '#000000').replace('#', '');
   const qrBgColor = data.qrBgColor || config.qrBgColor || (isDark ? '#111115' : '#ffffff');
@@ -272,12 +274,12 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
            {hasContactButtons && (
               <div className="flex flex-row items-center justify-center gap-2 w-full mt-4 px-1" style={{ transform: `translateY(${config.contactButtonsOffsetY || 0}px)` }}>
                 {data.showPhone !== false && data.phone && (
-                  <a href={`tel:${data.phone}`} className="flex-1 flex items-center justify-center gap-2 px-3 py-4 rounded-full bg-blue-600 text-white font-black text-[10px] shadow-lg">
+                  <a href={`tel:${data.phone}`} style={{ backgroundColor: phoneBtnColor }} className="flex-1 flex items-center justify-center gap-2 px-3 py-4 rounded-full text-white font-black text-[10px] shadow-lg">
                     <Phone size={14} /> {t('call')}
                   </a>
                 )}
                 {data.showWhatsapp !== false && data.whatsapp && (
-                  <a href={`https://wa.me/${data.whatsapp}`} target="_blank" className="flex-1 flex items-center justify-center gap-2 px-3 py-4 rounded-full bg-emerald-500 text-white font-black text-[10px] shadow-lg">
+                  <a href={`https://wa.me/${data.whatsapp}`} target="_blank" style={{ backgroundColor: whatsappBtnColor }} className="flex-1 flex items-center justify-center gap-2 px-3 py-4 rounded-full text-white font-black text-[10px] shadow-lg">
                     <MessageCircle size={14} /> {t('whatsappBtn')}
                   </a>
                 )}

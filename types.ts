@@ -89,6 +89,8 @@ export interface TemplateConfig {
   bioBgColor?: string;
   linksColor?: string;
   socialIconsColor?: string;
+  contactPhoneColor?: string;
+  contactWhatsappColor?: string;
   
   defaultThemeType?: ThemeType;
   defaultThemeColor?: string;
@@ -188,6 +190,8 @@ export interface CardData {
   bioBgColor?: string;
   linksColor?: string;
   socialIconsColor?: string;
+  contactPhoneColor?: string;
+  contactWhatsappColor?: string;
   qrSize?: number;
   qrColor?: string; 
   qrBgColor?: string;

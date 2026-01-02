@@ -24,7 +24,7 @@ interface TemplateBuilderProps {
   initialTemplate?: CustomTemplate;
 }
 
-type BuilderTab = 'header' | 'avatar' | 'design-system' | 'body-style' | 'visuals' | 'occasion' | 'qrcode';
+type BuilderTab = 'header' | 'avatar' | 'design-system' | 'body-style' | 'elements' | 'visuals' | 'occasion' | 'qrcode';
 
 const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCancel, initialTemplate }) => {
   const isRtl = lang === 'ar';
@@ -124,6 +124,8 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
       bioBgColor: 'rgba(0,0,0,0.03)',
       linksColor: '#3b82f6',
       socialIconsColor: '#3b82f6',
+      contactPhoneColor: '#2563eb',
+      contactWhatsappColor: '#10b981',
       defaultThemeType: 'gradient',
       defaultThemeColor: '#2563eb',
       defaultThemeGradient: THEME_GRADIENTS[0],
@@ -245,6 +247,7 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
           <NavItem id="avatar" label={t('الصورة الشخصية', 'Avatar Style')} icon={Circle} />
           <NavItem id="design-system" label={t('هيكلة النصوص والتصميم', 'Structure & Typography')} icon={Settings2} />
           <NavItem id="body-style" label={t('جسم البطاقة', 'Card Body Style')} icon={Box} />
+          <NavItem id="elements" label={t('ألوان العناصر', 'Element Colors')} icon={Palette} />
           <NavItem id="visuals" label={t('الألوان والسمة', 'Colors & Theme')} icon={Palette} />
           <NavItem id="occasion" label={t('المناسبة الخاصة', 'Special Occasion')} icon={PartyPopper} />
           <NavItem id="qrcode" label={t('رمز الـ QR', 'QR Code Style')} icon={QrCode} />
@@ -389,6 +392,34 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
                      </div>
                   </div>
                </div>
+            )}
+
+            {activeTab === 'elements' && (
+              <div className="space-y-8 animate-fade-in">
+                 <div className="bg-white dark:bg-gray-900 p-8 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-xl space-y-10">
+                    <div className="flex items-center gap-4"><div className="p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-2xl"><Palette size={24} /></div><h2 className="text-2xl font-black dark:text-white">{t('ألوان عناصر الواجهة', 'Element UI Colors')}</h2></div>
+                    
+                    <div className="space-y-6">
+                       <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{t('ألوان النصوص الأساسية', 'Primary Text Colors')}</h4>
+                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <ColorPicker label={t('لون الاسم', 'Name Color')} value={template.config.nameColor || '#111827'} onChange={(v: string) => updateConfig('nameColor', v)} />
+                          <ColorPicker label={t('لون المسمى', 'Title Color')} value={template.config.titleColor || '#2563eb'} onChange={(v: string) => updateConfig('titleColor', v)} />
+                          <ColorPicker label={t('لون النبذة', 'Bio Text Color')} value={template.config.bioTextColor || 'rgba(0,0,0,0.65)'} onChange={(v: string) => updateConfig('bioTextColor', v)} />
+                       </div>
+                    </div>
+
+                    <div className="pt-8 border-t border-gray-100 dark:border-gray-800 space-y-6">
+                       <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{t('ألوان التفاعل والأيقونات', 'Interactive & Icon Colors')}</h4>
+                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <ColorPicker label={t('لون الروابط', 'Links Color')} value={template.config.linksColor || '#3b82f6'} onChange={(v: string) => updateConfig('linksColor', v)} />
+                          <ColorPicker label={t('أيقونات التواصل', 'Social Icons Color')} value={template.config.socialIconsColor || '#3b82f6'} onChange={(v: string) => updateConfig('socialIconsColor', v)} />
+                          <ColorPicker label={t('خلفية النبذة', 'Bio Background Color')} value={template.config.bioBgColor || 'rgba(0,0,0,0.03)'} onChange={(v: string) => updateConfig('bioBgColor', v)} />
+                          <ColorPicker label={t('لون زر الاتصال', 'Phone Button Color')} value={template.config.contactPhoneColor || '#2563eb'} onChange={(v: string) => updateConfig('contactPhoneColor', v)} />
+                          <ColorPicker label={t('لون زر واتساب', 'WhatsApp Button Color')} value={template.config.contactWhatsappColor || '#10b981'} onChange={(v: string) => updateConfig('contactWhatsappColor', v)} />
+                       </div>
+                    </div>
+                 </div>
+              </div>
             )}
 
             {activeTab === 'visuals' && (
@@ -563,11 +594,19 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ lang, onSave, onCance
                        themeGradient: template.config.defaultThemeGradient,
                        backgroundImage: template.config.defaultBackgroundImage,
                        isDark: template.config.defaultIsDark,
+                       nameColor: template.config.nameColor,
+                       titleColor: template.config.titleColor,
+                       bioTextColor: template.config.bioTextColor,
+                       bioBgColor: template.config.bioBgColor,
+                       linksColor: template.config.linksColor,
+                       socialIconsColor: template.config.socialIconsColor,
+                       contactPhoneColor: template.config.contactPhoneColor,
+                       contactWhatsappColor: template.config.contactWhatsappColor,
                        showOccasion: template.config.showOccasionByDefault,
                        occasionTitle: template.config.occasionTitle,
                        occasionPrimaryColor: template.config.occasionPrimaryColor,
                        occasionDate: template.config.occasionDate,
-                       occasionOffsetY: template.config.occasionOffsetY, // تمرير الإزاحة للمعاينة
+                       occasionOffsetY: template.config.occasionOffsetY, 
                        showQrCode: template.config.showQrCodeByDefault,
                        showName: template.config.showNameByDefault,
                        showTitle: template.config.showTitleByDefault,
