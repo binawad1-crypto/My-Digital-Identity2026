@@ -218,8 +218,14 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
   const displayOccasionTitle = data.occasionTitle || (isRtl ? data.occasionTitleAr : data.occasionTitleEn) || data.occasionTitleAr || data.occasionTitleEn || '';
   const displayOccasionDesc = data.occasionDesc || config.occasionDesc || '';
 
+  // تصحيح رابط الموقع لمنع التكرار
+  const getWebsiteUrl = (url: string) => {
+    if (!url) return '';
+    return url.startsWith('http') ? url : `https://${url}`;
+  };
+
   return (
-    <div className={`w-full min-h-full flex flex-col transition-all duration-500 relative overflow-hidden rounded-[2.5rem] ${isDark ? 'bg-[#0f0f12] text-white' : 'bg-white text-gray-900'}`} style={{ textAlign: config.contentAlign }}>
+    <div className={`w-full min-h-full flex flex-col transition-all duration-500 relative overflow-hidden rounded-[2.25rem] ${isDark ? 'bg-[#0f0f12] text-white' : 'bg-white text-gray-900'}`} style={{ textAlign: config.contentAlign }}>
       <div className="shrink-0 overflow-hidden" style={getHeaderStyles()} />
 
       <div className="flex flex-col items-center flex-1 px-4 sm:px-6" style={bodyStyles}>
@@ -292,7 +298,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ data, lang, customConfig, hid
                 </a>
               )}
               {data.showWebsite !== false && data.website && (
-                <a href={`https://${data.website}`} target="_blank" className="flex items-center gap-3 justify-center text-sm font-bold opacity-80 hover:opacity-100 transition-opacity" style={{ color: linksColor, transform: `translateY(${config.websiteOffsetY || 0}px)` }}>
+                <a href={getWebsiteUrl(data.website)} target="_blank" className="flex items-center gap-3 justify-center text-sm font-bold opacity-80 hover:opacity-100 transition-opacity" style={{ color: linksColor, transform: `translateY(${config.websiteOffsetY || 0}px)` }}>
                   <Globe size={16} /> {data.website}
                 </a>
               )}
